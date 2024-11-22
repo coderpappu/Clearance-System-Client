@@ -1,8 +1,14 @@
 import { useFormik } from "formik";
+import toast, { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
+import { useLoginUserMutation } from "../api/apiSlice";
 import Logo from "../assets/cpi_logo.png";
-
 const LoginForm = () => {
+  const navigate = useNavigate();
+
+  const [userLogin] = useLoginUserMutation();
+
   // Validation schema with Yup
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -22,8 +28,17 @@ const LoginForm = () => {
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: (values) => {
-      console.log("Login Form Submitted:", values);
+    onSubmit: async (values) => {
+      try {
+        const data = await userLogin(values).unwrap();
+
+        localStorage.setItem("token", data?.data?.accessToken);
+
+        navigate("/");
+        toast.success("Login Successful!");
+      } catch (error) {
+        toast.error("Failed to login. Please check your credentials.");
+      }
     },
   });
 
@@ -120,6 +135,8 @@ const LoginForm = () => {
           </div>
         </div>
       </section>
+
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 };
