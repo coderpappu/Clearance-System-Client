@@ -25,6 +25,7 @@ export const apiSlice = createApi({
       providesTags: ["User"],
     }),
 
+    // user login
     loginUser: builder.mutation({
       query: (credentials) => ({
         url: "/user/login",
@@ -34,6 +35,7 @@ export const apiSlice = createApi({
       providesTags: ["User"],
     }),
 
+    // user create
     createUser: builder.mutation({
       query: (credentials) => ({
         url: "/user",
@@ -47,6 +49,7 @@ export const apiSlice = createApi({
       query: () => "/user/getuser",
       providesTags: ["User"],
     }),
+
     updateUser: builder.mutation({
       query: ({ id, ...credentials }) => ({
         url: `/user/update/${id}`,
@@ -55,7 +58,21 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+
+    // institute endpoint
+    createInstitute: builder.mutation({
+      query: (credentials) => ({
+        url: "/institute",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["Institute"],
+    }),
   }),
 });
 
-export const { useCreateUserMutation, useLoginUserMutation } = apiSlice;
+export const {
+  useCreateUserMutation,
+  useLoginUserMutation,
+  useCreateInstituteMutation,
+} = apiSlice;

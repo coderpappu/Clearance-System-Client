@@ -1,10 +1,10 @@
 import { useFormik } from "formik";
 import React from "react";
+import toast from "react-hot-toast";
 import * as Yup from "yup";
-import { useCreateUserMutation } from "../api/apiSlice";
-
+import { useCreateInstituteMutation } from "../api/apiSlice";
 const InstituteRegistrationForm = () => {
-  
+  const [createInstitute] = useCreateInstituteMutation();
 
   const validationSchema = Yup.object({
     name: Yup.string().required("Institute name is required"),
@@ -35,7 +35,12 @@ const InstituteRegistrationForm = () => {
     validationSchema,
     onSubmit: async (values) => {
       console.log("Form Submitted:", values);
-      await userRegistration(values);
+      try {
+        await createInstitute(values).unwrap();
+        toast.success("Institute registered successfully!");
+      } catch (error) {
+        toast.error("Failed to register Institute. Please try again.");
+      }
     },
   });
 

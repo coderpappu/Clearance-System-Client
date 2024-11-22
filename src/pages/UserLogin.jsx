@@ -31,8 +31,8 @@ const LoginForm = () => {
     onSubmit: async (values) => {
       try {
         const data = await userLogin(values).unwrap();
-
-        localStorage.setItem("token", data?.data?.accessToken);
+        console.log(data);
+        localStorage.setItem("token", data?.data?.token);
 
         navigate("/");
         toast.success("Login Successful!");
