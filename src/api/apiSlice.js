@@ -68,6 +68,20 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Institute"],
     }),
+    getInstitute: builder.query({
+      query: () => "/institutes",
+      providesTags: ["Institute"],
+    }),
+
+    // department
+    createDepartment: builder.mutation({
+      query: (credentials) => ({
+        url: "/departments",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["Departments"],
+    }),
   }),
 });
 
@@ -75,4 +89,6 @@ export const {
   useCreateUserMutation,
   useLoginUserMutation,
   useCreateInstituteMutation,
+  useGetInstituteQuery,
+  useCreateDepartmentMutation,
 } = apiSlice;

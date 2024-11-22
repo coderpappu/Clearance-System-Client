@@ -104,7 +104,7 @@ const Layout = () => {
                   <ul className="pl-8 mt-2 space-y-2">
                     <li>
                       <Link
-                        to="/department/add"
+                        to="/institute/adddepartment"
                         className="flex items-center px-4 py-2 text-base text-gray-300 hover:bg-gray-700"
                       >
                         Add Department

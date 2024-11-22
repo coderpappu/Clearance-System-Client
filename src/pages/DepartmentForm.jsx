@@ -1,8 +1,16 @@
 import { useFormik } from "formik";
 import React from "react";
+import toast from "react-hot-toast";
 import * as Yup from "yup";
+import {
+  useCreateDepartmentMutation,
+  useGetInstituteQuery,
+} from "../api/apiSlice";
 
 const DepartmentForm = () => {
+  const { data: getInstitute } = useGetInstituteQuery();
+  const [createDepartment] = useCreateDepartmentMutation();
+
   const validationSchema = Yup.object({
     department: Yup.string().required("Department name is required"),
   });
@@ -14,8 +22,17 @@ const DepartmentForm = () => {
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: (values) => {
-      console.log("Department Submitted:", values);
+    onSubmit: async (values) => {
+      try {
+        await createDepartment({
+          ...values,
+          institute_id: getInstitute?.[0]?.id,
+        }).unwrap();
+
+        toast.success("Successfully created department");
+      } catch (error) {
+        toast.error("Failed to create department");
+      }
     },
   });
 
