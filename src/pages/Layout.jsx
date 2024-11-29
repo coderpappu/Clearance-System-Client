@@ -121,7 +121,15 @@ const Layout = () => {
                   </ul>
                 )}
               </li>
-
+              <li>
+                <Link
+                  to="/clearance/category"
+                  className="flex items-center px-4 py-2 text-base hover:bg-gray-700"
+                >
+                  <FaGraduationCap className="mr-2" /> {/* Icon for Student */}
+                  Clearance Category
+                </Link>
+              </li>
               <li>
                 <Link
                   to="/student"

@@ -68,6 +68,7 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Institute"],
     }),
+
     getInstitute: builder.query({
       query: () => "/institutes",
       providesTags: ["Institute"],
@@ -82,6 +83,64 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Departments"],
     }),
+
+    getDepartments: builder.query({
+      query: () => "/departments",
+      providesTags: ["Departments"],
+    }),
+    getDepartmentDetails: builder.query({
+      query: (id) => `/departments/${id}`,
+      providesTags: ["Departments"],
+    }),
+    updateDepartment: builder.mutation({
+      query: ({ id, ...credentials }) => ({
+        url: `/departments/${id}`,
+        method: "PUT",
+        body: credentials,
+      }),
+      invalidatesTags: ["Departments"],
+    }),
+    deleteDepartment: builder.mutation({
+      query: (id) => ({
+        url: `/departments/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Departments"],
+    }),
+
+    // clearance category
+    createClearanceCategory: builder.mutation({
+      query: (credentials) => ({
+        url: "/clearancecategory",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["clearancecategory"],
+    }),
+
+    getClearanceCategories: builder.query({
+      query: () => "/clearancecategory",
+      providesTags: ["clearancecategory"],
+    }),
+    getClearanceCategoryDetails: builder.query({
+      query: (id) => `/clearancecategory/${id}`,
+      providesTags: ["clearancecategory"],
+    }),
+    updateClearanceCategory: builder.mutation({
+      query: ({ id, ...credentials }) => ({
+        url: `/clearancecategory/${id}`,
+        method: "PUT",
+        body: credentials,
+      }),
+      invalidatesTags: ["clearancecategory"],
+    }),
+    deleteClearanceCategory: builder.mutation({
+      query: (id) => ({
+        url: `/clearancecategory/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["clearancecategory"],
+    }),
   }),
 });
 
@@ -91,4 +150,13 @@ export const {
   useCreateInstituteMutation,
   useGetInstituteQuery,
   useCreateDepartmentMutation,
+  useGetDepartmentsQuery,
+  useGetDepartmentDetailsQuery,
+  useUpdateDepartmentMutation,
+  useDeleteDepartmentMutation,
+  useCreateClearanceCategoryMutation,
+  useGetClearanceCategoriesQuery,
+  useGetClearanceCategoryDetailsQuery,
+  useUpdateClearanceCategoryMutation,
+  useDeleteClearanceCategoryMutation,
 } = apiSlice;
