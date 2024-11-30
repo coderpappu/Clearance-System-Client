@@ -13,10 +13,11 @@ import InstituteCard from "./pages/Institute/InstituteCard";
 import InstituteRegistrationForm from "./pages/IntituteRegistration";
 import Layout from "./pages/Layout";
 import NotFound from "./pages/NotFound";
-import StudentList from "./pages/StudentList";
 import StudentRegistrationForm from "./pages/StudentRegForm";
 import LoginForm from "./pages/UserLogin";
 import UserRegistration from "./pages/UserRegistration";
+import StudentCard from "./pages/student/StudentCard";
+import StudentProfile from "./pages/student/StudentProfileCard";
 
 const router = createBrowserRouter([
   {
@@ -56,8 +57,12 @@ const router = createBrowserRouter([
         element: <StudentRegistrationForm />,
       },
       {
-        path: "/student/list",
-        element: <StudentList />,
+        path: "/student",
+        element: <StudentCard />,
+      },
+      {
+        path: "/student/profile/:id",
+        element: <StudentProfile />,
       },
     ],
     errorElement: <NotFound />,

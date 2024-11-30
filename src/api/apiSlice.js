@@ -141,6 +141,56 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["clearancecategory"],
     }),
+
+    // student
+    createStudentAcc: builder.mutation({
+      query: (credentials) => ({
+        url: "/student",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["student"],
+    }),
+
+    getStudentList: builder.query({
+      query: () => "/student",
+      providesTags: ["student"],
+    }),
+
+    getStudentDetails: builder.query({
+      query: (id) => `/student/${id}`,
+      providesTags: ["student"],
+    }),
+
+    updateStudent: builder.mutation({
+      query: ({ id, ...credentials }) => ({
+        url: `/student/${id}`,
+        method: "PUT",
+        body: credentials,
+      }),
+      invalidatesTags: ["student"],
+    }),
+    deleteStudent: builder.mutation({
+      query: (id) => ({
+        url: `/student/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["student"],
+    }),
+
+    createStudentClearance: builder.mutation({
+      query: (credentials) => ({
+        url: "/clearance",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["clearance"],
+    }),
+
+    getStudentBaseClearance: builder.query({
+      query: (id) => `/clearance/by-student/${id}`,
+      providesTags: ["clearance"],
+    }),
   }),
 });
 
@@ -159,4 +209,13 @@ export const {
   useGetClearanceCategoryDetailsQuery,
   useUpdateClearanceCategoryMutation,
   useDeleteClearanceCategoryMutation,
+
+  useCreateStudentAccMutation,
+  useGetStudentListQuery,
+  useGetStudentDetailsQuery,
+  useUpdateStudentMutation,
+  useDeleteStudentMutation,
+
+  useCreateStudentClearanceMutation,
+  useGetStudentBaseClearanceQuery,
 } = apiSlice;
