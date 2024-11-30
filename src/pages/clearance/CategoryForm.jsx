@@ -1,19 +1,25 @@
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import {
   useCreateClearanceCategoryMutation,
   useGetClearanceCategoryDetailsQuery,
   useGetDepartmentsQuery,
   useGetInstituteQuery,
+  useUpdateClearanceCategoryMutation,
 } from "../../api/apiSlice";
 
-const ClearanceCategoryForm = ({ selectedCategoryId }) => {
+const ClearanceCategoryForm = ({ selectedCategoryId, onClose }) => {
+  const navigate = useNavigate();
+
   const [createClearance] = useCreateClearanceCategoryMutation();
   const { data: instituteData } = useGetInstituteQuery();
   const { data: departmentList } = useGetDepartmentsQuery();
   const { data: categoryDetails, isLoading: isCategoryLoading } =
     useGetClearanceCategoryDetailsQuery(selectedCategoryId);
+  const [updateClearanceCategory] = useUpdateClearanceCategoryMutation();
 
   // State for initial values
   const [initialValues, setInitialValues] = useState({
@@ -37,14 +43,33 @@ const ClearanceCategoryForm = ({ selectedCategoryId }) => {
   });
 
   const formik = useFormik({
-    enableReinitialize: true, // Allows reinitialization when initialValues change
+    enableReinitialize: true,
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
-      await createClearance({
-        ...values,
-        institute_id: instituteData?.[0]?.id,
-      });
+      if (!selectedCategoryId) {
+        try {
+          await createClearance({
+            ...values,
+            institute_id: instituteData?.[0]?.id,
+          }).unwrap();
+          toast.success("Clearance category created successfully");
+        } catch (error) {
+          toast.error(error?.data?.message);
+        }
+      } else {
+        try {
+          await updateClearanceCategory({
+            id: selectedCategoryId,
+            ...values,
+            institute_id: instituteData?.[0]?.id,
+          }).unwrap();
+          toast.success("Clearance category updated successfully");
+        } catch (error) {
+          toast.error(error?.data?.message);
+        }
+      }
+      onClose();
     },
   });
 

@@ -148,6 +148,7 @@ const ClearanceCategoryCard = () => {
               <div className="mt-4">
                 <ClearanceCategoryForm
                   selectedCategoryId={selectedCategoryId}
+                  onClose={onClose}
                 />
               </div>
             </div>
