@@ -8,7 +8,7 @@ import "./index.css";
 import ClearanceCategoryForm from "./pages/clearance/CategoryForm";
 import ClearanceCategoryCard from "./pages/clearance/ClearanceCategoryCard";
 import DepartmentCard from "./pages/department/DepartmentCard";
-import DepartmentForm from "./pages/DepartmentForm";
+// import DepartmentForm from "./pages/DepartmentForm";
 import InstituteCard from "./pages/Institute/InstituteCard";
 import InstituteRegistrationForm from "./pages/IntituteRegistration";
 import Layout from "./pages/Layout";
@@ -37,10 +37,6 @@ const router = createBrowserRouter([
         element: <InstituteCard />,
       },
 
-      {
-        path: "/institute/adddepartment",
-        element: <DepartmentForm />,
-      },
       {
         path: "/department/list",
         element: <DepartmentCard />,

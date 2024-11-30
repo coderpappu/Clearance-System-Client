@@ -2,22 +2,21 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { AiOutlineDelete } from "react-icons/ai";
 import { CiEdit } from "react-icons/ci";
+import { RxCrossCircled } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
 import {
-    useDeleteDepartmentMutation,
-    useGetDepartmentsQuery,
+  useDeleteDepartmentMutation,
+  useGetDepartmentsQuery,
 } from "../../api/apiSlice";
 import { CardHeader } from "../../components/CardHeader";
 import CardWrapper from "../../components/CardWrapper";
 import ConfirmDialog from "../../components/ConfirmDialog";
-import DepartmentForm from "../DepartmentForm";
-
+import DepartmentForm from "./DepartmentForm";
 // import ConfirmDialog from "../../../helpers/ConfirmDialog";
 // import FormSkeleton from "../../../skeletons/FormSkeleton";
 // import ErrorMessage from "../../../utils/ErrorMessage";
 
 const DepartmentCard = () => {
-    
   const navigate = useNavigate();
 
   const [isPopupOpen, setIsPopupOpen] = useState(false); // State to manage popup visibility
@@ -88,13 +87,14 @@ const DepartmentCard = () => {
             <div className="w-8 h-8 bg-green-400 rounded-sm p-2 flex justify-center items-center cursor-pointer">
               <CiEdit
                 size={20}
-                // onClick={() => handleOpen(department?.id)}
+                className="text-white"
+                onClick={() => handleOpen(dept?.id)}
               />
             </div>
 
             {/* delete button  */}
             <div
-              className="w-8 h-8 bg-red-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer"
+              className="w-8 h-8 bg-red-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer text-white"
               onClick={() => handleDeleteDepartment(dept?.id)}
             >
               <AiOutlineDelete size={20} />
@@ -135,11 +135,14 @@ const DepartmentCard = () => {
                   className="text-gray-500 hover:text-gray-800"
                   onClick={() => setIsPopupOpen(false)} // Close popup
                 >
-                  &times;
+                  <RxCrossCircled fontSize={20} />
                 </button>
               </div>
               <div className="mt-4">
-                <DepartmentForm />
+                <DepartmentForm
+                  selectedDepartmentId={selectedDepartmentId}
+                  onClose={onClose}
+                />
               </div>
             </div>
           </div>

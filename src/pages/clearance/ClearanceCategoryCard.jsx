@@ -94,12 +94,16 @@ const ClearanceCategoryCard = () => {
           <div className="flex flex-wrap justify-start gap-2">
             {/* edit button  */}
             <div className="w-8 h-8 bg-green-400 rounded-sm p-2 flex justify-center items-center cursor-pointer">
-              <CiEdit size={20} onClick={() => handleOpen(category?.id)} />
+              <CiEdit
+                size={20}
+                className="text-white"
+                onClick={() => handleOpen(category?.id)}
+              />
             </div>
 
             {/* delete button  */}
             <div
-              className="w-8 h-8 bg-red-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer"
+              className="w-8 h-8 bg-red-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer text-white"
               onClick={() => handleDeleteDepartment(category?.id)}
             >
               <AiOutlineDelete size={20} />

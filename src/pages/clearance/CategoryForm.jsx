@@ -1,7 +1,6 @@
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import {
   useCreateClearanceCategoryMutation,
@@ -12,8 +11,6 @@ import {
 } from "../../api/apiSlice";
 
 const ClearanceCategoryForm = ({ selectedCategoryId, onClose }) => {
-  const navigate = useNavigate();
-
   const [createClearance] = useCreateClearanceCategoryMutation();
   const { data: instituteData } = useGetInstituteQuery();
   const { data: departmentList } = useGetDepartmentsQuery();
