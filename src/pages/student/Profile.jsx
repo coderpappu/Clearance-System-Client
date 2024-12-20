@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useGetStudentDetailsQuery } from "../../api/apiSlice";
 import Button from "./Button";
 import InfoBox from "./InfoBox";
+import ReportCard from "./Report";
 import StudentClearanceCard from "./StudentClearanceCard";
 
 const Profile = () => {
@@ -91,6 +92,12 @@ const Profile = () => {
       {selected == "3" && <SalarySettingsForm />} */}
       {selected == "1" && (
         <StudentClearanceCard
+          studentId={id}
+          instituteId={studentDetails?.data?.institute_id}
+        />
+      )}
+      {selected == "2" && (
+        <ReportCard
           studentId={id}
           instituteId={studentDetails?.data?.institute_id}
         />
