@@ -5,6 +5,7 @@ import { CiEdit } from "react-icons/ci";
 import { RxCrossCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import {
+  useAddStudentsCsvMutation,
   useDeleteStudentMutation,
   useGetStudentListQuery,
 } from "../../api/apiSlice";
@@ -13,20 +14,16 @@ import CardWrapper from "../../components/CardWrapper";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import StudentForm from "./StudentForm";
 
-// import ConfirmDialog from "../../../helpers/ConfirmDialog";
-// import FormSkeleton from "../../../skeletons/FormSkeleton";
-// import ErrorMessage from "../../../utils/ErrorMessage";
-
 const StudentCard = () => {
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // State to manage popup visibility
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedStudentId, setSelectStudentId] = useState(null);
+  const [csvFile, setCsvFile] = useState(null); // State to hold the CSV file
 
   const { data: studentList, isLoading, isError } = useGetStudentListQuery();
   const [deleteStudent] = useDeleteStudentMutation();
+  const [addStudentCsv] = useAddStudentsCsvMutation();
 
-  const onClose = () => {
-    setIsPopupOpen(false);
-  };
+  const onClose = () => setIsPopupOpen(false);
 
   const handleOpen = (id = null) => {
     setIsPopupOpen(true);
@@ -49,19 +46,47 @@ const StudentCard = () => {
                   }
                 });
               } catch (error) {
-                toast.error(error.message || "Failed to delete department");
+                toast.error(error.message || "Failed to delete student");
               }
             }}
             onCancel={() => toast.dismiss(t.id)}
-            title="Department"
+            title="Student"
           />
         ),
-        {
-          duration: Infinity,
-        }
+        { duration: Infinity }
       );
-
     confirm();
+  };
+
+  // Handle CSV file selection
+  const handleFileChange = (e) => {
+    setCsvFile(e.target.files[0]);
+  };
+
+  // Upload CSV to backend
+  const handleUploadCSV = async () => {
+    if (!csvFile) {
+      toast.error("Please select a CSV file to upload.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", csvFile);
+
+    const userData = {
+      name: "studentsfile",
+      email: "students@gmail.com",
+      file: csvFile, // Pass the file object here
+    };
+
+    console.log(userData);
+
+    try {
+      const studentsCSV = await addStudentCsv(userData).unwrap();
+      toast.success("CSV uploaded successfully!");
+    } catch (error) {
+      toast.error("An error occurred while uploading the file.");
+    }
   };
 
   let content;
@@ -104,7 +129,7 @@ const StudentCard = () => {
         </div>
         <div className="dark:text-white w-[15%]">
           <div className="flex flex-wrap justify-start gap-2">
-            {/* edit button  */}
+            {/* edit button */}
             <div className="w-8 h-8 bg-green-400 rounded-sm p-2 flex justify-center items-center cursor-pointer">
               <CiEdit
                 size={20}
@@ -113,7 +138,7 @@ const StudentCard = () => {
               />
             </div>
 
-            {/* delete button  */}
+            {/* delete button */}
             <div
               className="w-8 h-8 bg-red-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer text-white"
               onClick={() => handleDeleteStudent(student?.id)}
@@ -130,38 +155,38 @@ const StudentCard = () => {
       <CardWrapper>
         <CardHeader title="Student List" handleOpen={handleOpen} />
 
+        {/* CSV Upload Section */}
+
         <div className="px-6 py-3">
-          {/* header  */}
+          {/* header */}
           <div className="w-full bg-light-bg dark:bg-dark-box rounded-sm py-3 px-3 flex flex-wrap justify-between text-sm">
             <div className="dark:text-white w-[5%]">
               <h3>SL</h3>
             </div>
-
             <div className="dark:text-white w-[15%]">
-              <h3>Name </h3>
-            </div>
-            <div className="dark:text-white w-[15%]">
-              <h3>Board Roll </h3>
+              <h3>Name</h3>
             </div>
             <div className="dark:text-white w-[15%]">
-              <h3>Department </h3>
+              <h3>Board Roll</h3>
+            </div>
+            <div className="dark:text-white w-[15%]">
+              <h3>Department</h3>
             </div>
             <div className="dark:text-white w-[10%]">
-              <h3>Shift </h3>
+              <h3>Shift</h3>
             </div>
             <div className="dark:text-white w-[10%]">
-              <h3>Group </h3>
+              <h3>Group</h3>
             </div>
             <div className="dark:text-white w-[10%]">
-              <h3>Session </h3>
+              <h3>Session</h3>
             </div>
-
             <div className="dark:text-white w-[15%]">
               <h3>Actions</h3>
             </div>
           </div>
 
-          {/* body  */}
+          {/* body */}
           {content}
         </div>
         {isPopupOpen && (
@@ -171,9 +196,23 @@ const StudentCard = () => {
                 <h3 className="text-lg font-medium text-gray-800 dark:text-white">
                   Add Student
                 </h3>
+                <div className="flex items-center gap-4 px-6 py-4">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileChange}
+                    className="border rounded p-2 w-[70%] max-w-sm"
+                  />
+                  <button
+                    onClick={handleUploadCSV}
+                    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                  >
+                    Upload CSV
+                  </button>
+                </div>
                 <button
                   className="text-gray-500 hover:text-gray-800"
-                  onClick={() => setIsPopupOpen(false)} // Close popup
+                  onClick={() => setIsPopupOpen(false)}
                 >
                   <RxCrossCircled fontSize={20} />
                 </button>

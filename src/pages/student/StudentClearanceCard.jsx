@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useCreateStudentClearanceMutation,
   useGetClearanceCategoriesQuery,
@@ -11,49 +11,48 @@ const StudentClearanceCard = ({ studentId, instituteId, approvedBy }) => {
   const { data: clearanceCategory } = useGetClearanceCategoriesQuery();
   const { data: studentBaseClearance } =
     useGetStudentBaseClearanceQuery(studentId);
+
   const [createStudentClearance] = useCreateStudentClearanceMutation();
 
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  // State to hold category status
+  const [categoryStatus, setCategoryStatus] = useState({});
 
-  // Sync the selectedCategories state with fetched data
+  // Sync the category statuses with fetched data
   useEffect(() => {
     if (studentBaseClearance?.data) {
-      const savedCategories = studentBaseClearance.data.map(
-        (clearance) => clearance.clearanceCategoryId
-      );
-      setSelectedCategories(savedCategories);
+      const initialStatus = {};
+      studentBaseClearance.data.forEach((clearance) => {
+        initialStatus[clearance.clearanceCategoryId] = clearance.status; // "APPROVED" or "PENDING"
+      });
+      setCategoryStatus(initialStatus);
     }
   }, [studentBaseClearance]);
 
-  // Handle checkbox changes
+  // Handle checkbox changes (toggle between APPROVED and PENDING)
   const handleCheckboxChange = (categoryId) => {
-    setSelectedCategories(
-      (prev) =>
-        prev.includes(categoryId)
-          ? prev.filter((id) => id !== categoryId) // Remove if already selected
-          : [...prev, categoryId] // Add if not selected
-    );
+    setCategoryStatus((prev) => ({
+      ...prev,
+      [categoryId]: prev[categoryId] === "APPROVED" ? "PENDING" : "APPROVED",
+    }));
   };
 
-  console.log(selectedCategories);
-
-  // Save function to send the array to the backend
+  // Save function to send the updated statuses to the backend
   const handleSave = async () => {
-    if (selectedCategories.length === 0) {
-      alert("Please select at least one clearance category.");
-      return;
-    }
-
-    // Create the payload array
-    const payload = selectedCategories.map((categoryId) => ({
+    const payload = Object.keys(categoryStatus).map((categoryId) => ({
       student_id: studentId,
       institute_id: instituteId,
       clearanceCategoryId: categoryId,
-      status: "APPROVED",
+      status: categoryStatus[categoryId],
       approvedBy,
     }));
 
-    await createStudentClearance(payload);
+    try {
+      await createStudentClearance(payload);
+      alert("Clearance updated successfully!");
+    } catch (error) {
+      console.error("Error updating clearance:", error);
+      alert("Failed to update clearance.");
+    }
   };
 
   return (
@@ -79,8 +78,8 @@ const StudentClearanceCard = ({ studentId, instituteId, approvedBy }) => {
                     type="checkbox"
                     className="mr-2"
                     id={`category-${category?.id}`}
-                    checked={selectedCategories.includes(category?.id)}
-                    onChange={() => handleCheckboxChange(category?.id)}
+                    checked={categoryStatus[category.id] === "APPROVED"}
+                    onChange={() => handleCheckboxChange(category.id)}
                   />
                   <label
                     htmlFor={`category-${category?.id}`}

@@ -18,12 +18,27 @@ import LoginForm from "./pages/UserLogin";
 import UserRegistration from "./pages/UserRegistration";
 import StudentCard from "./pages/student/StudentCard";
 import StudentProfile from "./pages/student/StudentProfileCard";
+import UserList from "./pages/user/UserList";
+import UserProfile from "./pages/user/UserProfile";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />, // Wrap all routes inside Layout
     children: [
+      {
+        path: "/",
+        element: <App />,
+      },
+
+      {
+        path: "/user/profile/:id",
+        element: <UserProfile />,
+      },
+      {
+        path: "/user/list",
+        element: <UserList />,
+      },
       {
         path: "/",
         element: <App />,

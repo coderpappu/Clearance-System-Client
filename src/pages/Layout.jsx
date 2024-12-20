@@ -59,7 +59,7 @@ const Layout = () => {
             <ul>
               <li>
                 <Link
-                  to="/user-account"
+                  to="/user/list"
                   className="flex items-center px-4 py-2 text-base hover:bg-gray-700"
                 >
                   <FaUser className="mr-2" /> {/* Icon for User Account */}

@@ -52,7 +52,47 @@ export const apiSlice = createApi({
 
     updateUser: builder.mutation({
       query: ({ id, ...credentials }) => ({
-        url: `/user/update/${id}`,
+        url: `/user/${id}`,
+        method: "PUT",
+        body: credentials,
+      }),
+      invalidatesTags: ["User"],
+    }),
+
+    getUserList: builder.query({
+      query: () => "/user/",
+      providesTags: ["User"],
+    }),
+    getUserDetails: builder.query({
+      query: (id) => `/user/${id}`,
+      providesTags: ["User"],
+    }),
+    addUserCsv: builder.mutation({
+      query: (data) => {
+        const formData = new FormData();
+        formData.append("name", data.name);
+        formData.append("email", data.email);
+        formData.append("file", data.file); // Append the file here
+
+        return {
+          url: "/users/csv/import",
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["User"],
+    }),
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `/users/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["User"],
+    }),
+
+    changeUserPassword: builder.mutation({
+      query: ({ id, ...credentials }) => ({
+        url: `/user/change-password/${id}`,
         method: "PUT",
         body: credentials,
       }),
@@ -191,6 +231,21 @@ export const apiSlice = createApi({
       query: (id) => `/clearance/by-student/${id}`,
       providesTags: ["clearance"],
     }),
+    addStudentsCsv: builder.mutation({
+      query: (data) => {
+        const formData = new FormData();
+        formData.append("name", data.name);
+        formData.append("email", data.email);
+        formData.append("file", data.file); // Append the file here
+
+        return {
+          url: "/students/csv/import",
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["student"],
+    }),
   }),
 });
 
@@ -218,4 +273,11 @@ export const {
 
   useCreateStudentClearanceMutation,
   useGetStudentBaseClearanceQuery,
+  useAddStudentsCsvMutation,
+  useGetUserListQuery,
+  useGetUserDetailsQuery,
+  useAddUserCsvMutation,
+  useDeleteUserMutation,
+  useUpdateUserMutation,
+  useChangeUserPasswordMutation,
 } = apiSlice;
