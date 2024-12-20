@@ -14,7 +14,6 @@ import UserForm from "./UserForm";
 const UserList = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedUserId, setSelectUserId] = useState(null);
-  const [csvFile, setCsvFile] = useState(null); // State to hold the CSV file
 
   const { data: userList, isLoading, isError } = useGetUserListQuery();
   const [deleteUser] = useDeleteUserMutation();

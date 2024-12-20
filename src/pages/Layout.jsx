@@ -2,21 +2,25 @@ import React, { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import {
   FaBuilding,
-  FaChevronDown,
-  FaChevronUp,
   FaGraduationCap,
   FaMoon,
-  FaRegBuilding,
+  FaSignOutAlt,
   FaSun,
   FaUniversity,
   FaUser,
 } from "react-icons/fa"; // Import icons
-import { Link, Outlet } from "react-router-dom";
+
+import { jwtDecode } from "jwt-decode"; // Import jwt-decode
+import { Link, Outlet, useNavigate } from "react-router-dom"; // Import useNavigate
+import ProfileImg from "../assets/profile.png";
+
 const Layout = () => {
   const [isDepartmentOpen, setIsDepartmentOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [user, setUser] = useState(null); // Initialize user as null
+  const navigate = useNavigate();
 
-  // On initial render, check localStorage for theme preference
+  // On initial render, check localStorage for theme preference and user data
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
@@ -25,6 +29,14 @@ const Layout = () => {
     } else {
       setIsDarkMode(false);
       document.body.classList.remove("dark"); // Apply light theme
+    }
+
+    // Fetch user data from token
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      console.log(decodedToken);
+      setUser(decodedToken);
     }
   }, []);
 
@@ -47,13 +59,38 @@ const Layout = () => {
     setIsDepartmentOpen((prev) => !prev);
   };
 
+  const handleLogout = () => {
+    // Clear user session (e.g., remove token from localStorage)
+    localStorage.removeItem("token");
+    navigate("/signin"); // Redirect to login page
+  };
+
   return (
     <>
       <div className="min-h-screen flex">
         {/* Sidebar */}
-        <div className="w-72 bg-gray-800 text-white">
-          <div className="h-16 flex items-center justify-center bg-blue-600">
-            <h1 className="text-2xl font-bold">Clearance System</h1>
+        <div className="w-72 bg-gray-800 text-white relative">
+          {/* logged profile img and user name */}
+          <div className="flex items-center p-4">
+            <Link to={`user/profile/${user?.userId}`}>
+              <img
+                src={ProfileImg}
+                alt="Profile"
+                className="h-14 w-14 rounded-full mr-4"
+              />
+            </Link>
+            <div>
+              {user ? (
+                <>
+                  <h2 className="text-lg font-semibold">
+                    {user.first_name + " " + user?.last_name}
+                  </h2>
+                  <p className="text-sm">{user.role}</p>
+                </>
+              ) : (
+                <p>Loading...</p>
+              )}
+            </div>
           </div>
           <nav className="mt-8">
             <ul>
@@ -86,40 +123,14 @@ const Layout = () => {
                 </Link>
               </li>
 
-              {/* Department Dropdown */}
               <li>
-                <button
-                  onClick={toggleDepartmentMenu}
-                  className="flex items-center w-full px-4 py-2 text-base hover:bg-gray-700"
+                <Link
+                  to="/department/list"
+                  className="flex items-center px-4 py-2 text-base hover:bg-gray-700"
                 >
-                  <FaRegBuilding className="mr-2" /> {/* Icon for Department */}
+                  <FaUser className="mr-2" /> {/* Icon for User Account */}
                   Department
-                  {isDepartmentOpen ? (
-                    <FaChevronUp className="ml-auto" />
-                  ) : (
-                    <FaChevronDown className="ml-auto" />
-                  )}
-                </button>
-                {isDepartmentOpen && (
-                  <ul className="pl-8 mt-2 space-y-2">
-                    <li>
-                      <Link
-                        to="/institute/adddepartment"
-                        className="flex items-center px-4 py-2 text-base text-gray-300 hover:bg-gray-700"
-                      >
-                        Add Department
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/department/list"
-                        className="flex items-center px-4 py-2 text-base text-gray-300 hover:bg-gray-700"
-                      >
-                        Department List
-                      </Link>
-                    </li>
-                  </ul>
-                )}
+                </Link>
               </li>
               <li>
                 <Link
@@ -152,7 +163,7 @@ const Layout = () => {
           </nav>
 
           {/* Dark Mode Toggle Button (Located at the bottom of the sidebar) */}
-          <div className="absolute bottom-4 left-4 flex items-center space-x-2">
+          <div className="absolute bottom-4 left-4 flex flex-col space-y-2">
             <button
               onClick={toggleTheme}
               className="flex items-center px-4 py-2 text-base hover:bg-gray-700 rounded-lg"
@@ -163,6 +174,13 @@ const Layout = () => {
                 <FaMoon className="mr-2" />
               )}
               {isDarkMode ? "Light Mode" : "Dark Mode"}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center px-4 py-2 text-base hover:bg-gray-700 rounded-lg"
+            >
+              <FaSignOutAlt className="mr-2" />
+              Logout
             </button>
           </div>
         </div>

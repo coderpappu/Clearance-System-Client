@@ -1,8 +1,7 @@
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { FiEdit } from "react-icons/fi";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import * as Yup from "yup";
 import {
   useChangeUserPasswordMutation,
@@ -77,11 +76,6 @@ const UserProfile = () => {
             <h3 className="text-[15px] mt-2 font-semibold  text-[#3c3c3c] dark:text-dark-text-color">
               Email : {user?.data?.email}
             </h3>
-          </div>
-          <div className="w-[40px] cursor-pointer  h-[40px] flex flex-col justify-center align-middle items-center rounded-full bg-[#85858512] mr-2">
-            <Link to={`/user/update/${user?._id}`}>
-              <FiEdit />
-            </Link>
           </div>
         </div>
         <div className="w-[50%] border-l-2 border-dotted border-[#cacaca]">
