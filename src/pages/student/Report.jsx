@@ -1,31 +1,18 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import { usePDF } from "react-to-pdf";
+import { useGetStudentBaseClearanceQuery } from "../../api/apiSlice";
 
 const ClearanceForm = () => {
-  const data = [
-    {
-      department: "Workshop Technology",
-      labs: ["Senior Workshop", "Initial Workshop"],
-      verified: [true, false],
-    },
-    {
-      department: "Electrical Technology",
-      labs: ["Basic Electrical Workshop", "Advanced Electrical Workshop"],
-      verified: [true, true],
-    },
-    {
-      department: "Library",
-      labs: ["Books Section", "Study Section"],
-      verified: [true, false],
-    },
-    {
-      department: "Mechanical Technology",
-      labs: ["Mechanical Lab 1", "Mechanical Lab 2"],
-      verified: [true, true],
-    },
-  ];
-
+  const { id } = useParams();
+  const { data: studentBaseClearance } = useGetStudentBaseClearanceQuery(id);
   const { toPDF, targetRef } = usePDF({ filename: "page.pdf" });
+
+  // Split the departments into two groups for two columns
+  const departmentEntries = Object.entries(studentBaseClearance?.data || {});
+  const half = Math.ceil(departmentEntries.length / 2);
+  const firstHalf = departmentEntries.slice(0, half);
+  const secondHalf = departmentEntries.slice(half);
 
   return (
     <div>
@@ -82,32 +69,34 @@ const ClearanceForm = () => {
         </div>
 
         {/* Table */}
-        {data.map((dept, index) => {
-          const isEvenIndex = index % 2 === 0;
-          if (!isEvenIndex) return null;
-
-          const dept1 = data[index];
-          const dept2 = data[index + 1] || null;
-
-          return (
-            <div key={index} className="flex flex-wrap justify-between  ">
-              {/* First Department */}
-              <div className="w-[50%] flex flex-wrap justify-start gap-0 font-semibold text-gray-700 ">
-                <div className="w-[30%]  border border-gray-300 p-2">
-                  {dept1.department}
+        <div className="flex flex-wrap justify-between">
+          <div className="w-[50%]">
+            {firstHalf.map(([departmentName, clearances]) => (
+              <div
+                className="flex flex-wrap justify-start gap-0 font-semibold text-gray-700"
+                key={departmentName}
+              >
+                <div className="w-[30%] border border-gray-300 p-2">
+                  {departmentName}
                 </div>
                 <div className="w-[30%] border border-gray-300 p-2">
                   <ul className="list-disc list-inside">
-                    {dept1.labs.map((lab, i) => (
-                      <li key={i}>{lab}</li>
+                    {clearances.map((clearance) => (
+                      <li key={clearance.id}>
+                        {clearance.clearanceCategory.name}
+                      </li>
                     ))}
                   </ul>
                 </div>
                 <div className="w-[20%] border border-gray-300 p-2">
-                  {dept1.verified.every(Boolean)
-                    ? "✔ All Verified"
-                    : dept1.verified.map((v, i) => (
-                        <div key={i}>{v ? "✔" : "✖"}</div>
+                  {clearances.every(
+                    (clearance) => clearance.status === "APPROVED"
+                  )
+                    ? "✔"
+                    : clearances.map((clearance) => (
+                        <div key={clearance.id}>
+                          {clearance.status === "APPROVED" ? "✔" : "✖"}
+                        </div>
                       ))}
                 </div>
                 <div className="w-[20%] border border-gray-300 p-2">
@@ -115,40 +104,45 @@ const ClearanceForm = () => {
                   <p className="text-center text-xs">Head Signature</p>
                 </div>
               </div>
-
-              {/* Second Department */}
-              {dept2 ? (
-                <div className="w-[50%] flex flex-wrap justify-between gap-0  font-semibold text-gray-700 ">
-                  <div className="w-[30%]  border border-gray-300 p-2">
-                    {dept2.department}
-                  </div>
-                  <div className="w-[30%] border border-gray-300 p-2">
-                    <ul className="list-disc list-inside">
-                      {dept2.labs.map((lab, i) => (
-                        <li key={i}>{lab}</li>
+            ))}
+          </div>
+          <div className="w-[50%]">
+            {secondHalf.map(([departmentName, clearances]) => (
+              <div
+                className="flex flex-wrap justify-start gap-0 font-semibold text-gray-700"
+                key={departmentName}
+              >
+                <div className="w-[30%] border border-gray-300 p-2">
+                  {departmentName}
+                </div>
+                <div className="w-[30%] border border-gray-300 p-2">
+                  <ul className="list-disc list-inside">
+                    {clearances.map((clearance) => (
+                      <li key={clearance.id}>
+                        {clearance.clearanceCategory.name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="w-[20%] border border-gray-300 p-2">
+                  {clearances.every(
+                    (clearance) => clearance.status === "APPROVED"
+                  )
+                    ? "✔"
+                    : clearances.map((clearance) => (
+                        <div key={clearance.id}>
+                          {clearance.status === "APPROVED" ? "✔" : "✖"}
+                        </div>
                       ))}
-                    </ul>
-                  </div>
-                  <div className="w-[20%] border border-gray-300 p-2">
-                    {dept2.verified.every(Boolean)
-                      ? "✔ All Verified"
-                      : dept2.verified.map((v, i) => (
-                          <div key={i}>{v ? "✔" : "✖"}</div>
-                        ))}
-                  </div>
-                  <div className="w-[20%] border border-gray-300 p-2">
-                    <div className="h-8 border-b border-gray-400"></div>
-                    <p className="text-center text-xs">Head Signature</p>
-                  </div>
                 </div>
-              ) : (
-                <div className="w-[50%] flex flex-wrap justify-between gap-0 bg-gray-200 text-gray-400 font-semibold p-2 border border-gray-300">
-                  No Data
+                <div className="w-[20%] border border-gray-300 p-2">
+                  <div className="h-8 border-b border-gray-400"></div>
+                  <p className="text-center text-xs">Head Signature</p>
                 </div>
-              )}
-            </div>
-          );
-        })}
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Footer */}
         <footer className="mt-8 text-sm text-gray-700">

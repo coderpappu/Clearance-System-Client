@@ -21,8 +21,10 @@ const StudentClearanceCard = ({ studentId, instituteId, approvedBy }) => {
   useEffect(() => {
     if (studentBaseClearance?.data) {
       const initialStatus = {};
-      studentBaseClearance.data.forEach((clearance) => {
-        initialStatus[clearance.clearanceCategoryId] = clearance.status; // "APPROVED" or "PENDING"
+      Object.values(studentBaseClearance.data).forEach((clearances) => {
+        clearances.forEach((clearance) => {
+          initialStatus[clearance.clearanceCategoryId] = clearance.status; // "APPROVED" or "PENDING"
+        });
       });
       setCategoryStatus(initialStatus);
     }
