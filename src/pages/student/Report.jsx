@@ -6,7 +6,7 @@ import { useGetStudentBaseClearanceQuery } from "../../api/apiSlice";
 const ClearanceForm = () => {
   const { id } = useParams();
   const { data: studentBaseClearance } = useGetStudentBaseClearanceQuery(id);
-  const { toPDF, targetRef } = usePDF({ filename: "page.pdf" });
+  const { toPDF, targetRef } = usePDF({ filename: "page.pdf", margin: 40 });
 
   // Split the departments into two groups for two columns
   const departmentEntries = Object.entries(studentBaseClearance?.data || {});
@@ -15,7 +15,7 @@ const ClearanceForm = () => {
   const secondHalf = departmentEntries.slice(half);
 
   return (
-    <div>
+    <div className="w-[85%] mx-auto p-4">
       <button
         onClick={() => toPDF()}
         className="mb-4 px-4 py-2 bg-blue-500 text-white rounded cursor-pointer"
@@ -28,15 +28,31 @@ const ClearanceForm = () => {
       >
         {/* Header */}
         <header className="text-center mb-8">
+          <h3 className="text-lg">Bangladesh Goverment</h3>
+          <h3 className="font-semibold text-base">Principle Section</h3>
           <h1 className="text-2xl font-bold">
             Chittagong Polytechnic Institute
           </h1>
-          <p className="text-sm font-medium">Student Clearance Form</p>
-          <p className="text-sm">
-            Complete all sections. Clearance cannot proceed without proper
-            verification.
+          <h4>Nasirabad , Chattogram </h4>
+          <p className="text-md my-2 font-bold underline">
+            Student Clearance Form
           </p>
         </header>
+        {/* application format  */}
+
+        <div className="text-base">
+          {`  Name : Pappu Dey , Father's Name : Sree Babul Kanti Dey , Mother's Name : Jinu Dey . This student is a regular student of Chittagong Polytechnic Institute. He has completed all the courses of the 4th semester of the 2019 academic year. He has completed all the courses of the 4th semester of the 2019 academic year. He has completed all the courses of the 4th semester of the 2019 academic year. He has completed all the courses of the 4th semester of the 2019 academic year. `}
+        </div>
+        <div className="flex justify-end my-8">
+          <div>
+            <div className="w-56 border-b border-gray-500"></div>
+            <p className="text-center text-base">
+              Principle
+              <p /> <p> Chattogram Polytechnic Institute</p>
+              <p> Nasirabad , Chattogram</p>
+            </p>
+          </div>
+        </div>
         <div className="flex flex-wrap justify-between ">
           <div className="w-[50%] flex flex-wrap justify-start gap-0 font-semibold text-gray-700 ">
             <div className="w-[30%]  border border-gray-300 p-2">
@@ -144,25 +160,47 @@ const ClearanceForm = () => {
           </div>
         </div>
 
+        <div className="my-3">
+          <p>
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Enim cum
+            praesentium minus fugiat iusto vero quasi nihil neque quis dolore
+          </p>
+        </div>
+
+        <div className="flex justify-end my-16">
+          <div>
+            <div className="w-56 border-b border-gray-500"></div>
+            <p className="text-center text-base">
+              Principle
+              <p /> <p> Chattogram Polytechnic Institute</p>
+              <p> Nasirabad , Chattogram</p>
+            </p>
+          </div>
+        </div>
+
+        <div className="my-3">
+          <p>
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Enim cum
+            praesentium minus fugiat iusto vero quasi nihil neque quis dolore
+          </p>
+        </div>
+
         {/* Footer */}
         <footer className="mt-8 text-sm text-gray-700">
-          <p className="mb-4">
-            Visit:{" "}
-            <a
-              href="https://ctgpoly.gov.bd/clearance"
-              className="text-blue-600 underline"
-            >
-              https://ctgpoly.gov.bd/clearance
-            </a>
-          </p>
           <div className="flex justify-between">
-            <div>
-              <p>Signature:</p>
-              <div className="w-48 border-b border-gray-500"></div>
-            </div>
             <div>
               <p>Date:</p>
               <div className="w-48 border-b border-gray-500"></div>
+            </div>
+
+            <div className="flex justify-end my-8">
+              <div>
+                <div className="w-56 border-b border-gray-500"></div>
+                <p className="text-center text-base">
+                  Student Signature
+                  <p />
+                </p>
+              </div>
             </div>
           </div>
         </footer>

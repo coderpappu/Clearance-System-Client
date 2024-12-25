@@ -105,21 +105,11 @@ const Layout = () => {
               </li>
               <li>
                 <Link
-                  to="/institute"
+                  to="/institute/profile"
                   className="flex items-center px-4 py-2 text-base hover:bg-gray-700"
                 >
                   <FaBuilding className="mr-2" /> {/* Icon for Institute */}
                   Institute
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  to="/institute/registration"
-                  className="flex items-center px-4 py-2 text-base hover:bg-gray-700"
-                >
-                  <FaBuilding className="mr-2" /> {/* Icon for Institute */}
-                  Create Institute
                 </Link>
               </li>
 

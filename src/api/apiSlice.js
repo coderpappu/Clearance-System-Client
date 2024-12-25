@@ -113,6 +113,19 @@ export const apiSlice = createApi({
       query: () => "/institutes",
       providesTags: ["Institute"],
     }),
+    getInstituteDetails: builder.query({
+      query: () => "/institute",
+      providesTags: ["Institute"],
+    }),
+
+    updateInstitute: builder.mutation({
+      query: ({ id, ...credentials }) => ({
+        url: `/institute/${id}`,
+        method: "PUT",
+        body: credentials,
+      }),
+      invalidatesTags: ["Institute"],
+    }),
 
     // department
     createDepartment: builder.mutation({
@@ -254,6 +267,8 @@ export const {
   useLoginUserMutation,
   useCreateInstituteMutation,
   useGetInstituteQuery,
+  useGetInstituteDetailsQuery,
+  useUpdateInstituteMutation,
   useCreateDepartmentMutation,
   useGetDepartmentsQuery,
   useGetDepartmentDetailsQuery,

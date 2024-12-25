@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import {
   useCreateStudentClearanceMutation,
   useGetClearanceCategoriesQuery,
   useGetDepartmentsQuery,
   useGetStudentBaseClearanceQuery,
 } from "../../api/apiSlice";
-
 const StudentClearanceCard = ({ studentId, instituteId, approvedBy }) => {
   const { data: departmentList } = useGetDepartmentsQuery();
   const { data: clearanceCategory } = useGetClearanceCategoriesQuery();
@@ -40,20 +40,23 @@ const StudentClearanceCard = ({ studentId, instituteId, approvedBy }) => {
 
   // Save function to send the updated statuses to the backend
   const handleSave = async () => {
-    const payload = Object.keys(categoryStatus).map((categoryId) => ({
+    const payload = {
       student_id: studentId,
       institute_id: instituteId,
-      clearanceCategoryId: categoryId,
-      status: categoryStatus[categoryId],
-      approvedBy,
-    }));
+      clearances: Object.keys(categoryStatus)
+        .filter((categoryId) => categoryStatus[categoryId] === "APPROVED")
+        .map((categoryId) => ({
+          clearanceCategoryId: categoryId,
+          status: categoryStatus[categoryId],
+          approvedBy,
+        })),
+    };
 
     try {
       await createStudentClearance(payload);
-      alert("Clearance updated successfully!");
+      toast.success("Clearance update successfully!");
     } catch (error) {
-      console.error("Error updating clearance:", error);
-      alert("Failed to update clearance.");
+      toast.error("Failed to update clearance.");
     }
   };
 

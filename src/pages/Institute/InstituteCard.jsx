@@ -1,132 +1,114 @@
 import React, { useState } from "react";
-import { AiOutlineDelete } from "react-icons/ai";
-import { CiEdit } from "react-icons/ci";
-import { useNavigate } from "react-router-dom";
-import { CardHeader } from "../../components/CardHeader";
-import CardWrapper from "../../components/CardWrapper";
+import { FiEdit } from "react-icons/fi";
+import { IoAdd } from "react-icons/io5";
+import { RxCrossCircled } from "react-icons/rx";
+import { Link } from "react-router-dom";
+import { useGetInstituteDetailsQuery } from "../../api/apiSlice";
+import InstituteRegistrationForm from "../IntituteRegistration";
+import InfoBox from "../student/InfoBox";
 
 // import ConfirmDialog from "../../../helpers/ConfirmDialog";
 // import FormSkeleton from "../../../skeletons/FormSkeleton";
 // import ErrorMessage from "../../../utils/ErrorMessage";
 
 const InstituteCard = () => {
-  const navigate = useNavigate();
+  const { data: instituteDetails } = useGetInstituteDetailsQuery();
 
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // State to manage popup visibility
-  const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectInstitute, setSelectInstitute] = useState(null);
 
   const onClose = () => {
     setIsPopupOpen(false);
   };
 
-  const handleOpen = (id = null) => {
+  const handleOpen = (data = null) => {
     setIsPopupOpen(true);
-    setSelectedDepartmentId(id);
+    setSelectInstitute(data);
   };
-
-  // const handleDeleteDepartment = async (id) => {
-  //   const confirm = () =>
-  //     toast(
-  //       (t) => (
-  //         <ConfirmDialog
-  //           onConfirm={async () => {
-  //             toast.dismiss(t.id);
-  //             try {
-  //               deleteDepartment(id).then((res) => {
-  //                 if (res.error != null) {
-  //                   toast.error(res.error.data.message);
-  //                 } else {
-  //                   toast.success("Department deleted successfully");
-  //                 }
-  //               });
-  //             } catch (error) {
-  //               toast.error(error.message || "Failed to delete department");
-  //             }
-  //           }}
-  //           onCancel={() => toast.dismiss(t.id)}
-  //           title="Department"
-  //         />
-  //       ),
-  //       {
-  //         duration: Infinity,
-  //       }
-  //     );
-
-  //   confirm();
-  // };
 
   return (
     <>
-      <CardWrapper>
-        <CardHeader title="Department" handleOpen={handleOpen} />
-
-        <div className="px-6 py-3">
-          {/* header  */}
-          <div className="w-full bg-light-bg dark:bg-dark-box rounded-sm py-3 px-3 flex flex-wrap justify-between text-sm">
-            <div className="dark:text-white w-[35%]">
-              <h3>Department</h3>
-            </div>
-
-            <div className="dark:text-white w-[15%]">
-              <h3>Actions</h3>
-            </div>
-          </div>
-
-          {/* body  */}
-          {/* {content} */}
+      <div>
+        <div className="flex flex-wrap justify-between ">
+          <h2> Institute / Profile</h2>
           <div
-            // key={department?.id}
-            className="w-full flex flex-wrap justify-between items-center text-[13px] px-3 py-3 border-t border-dark-border-color dark:border-opacity-10"
+            className={`w-8 ${
+              instituteDetails && "hidden"
+            } h-8 bg-green-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer`}
+            onClick={() => handleOpen()}
           >
-            <div className="dark:text-white w-[35%]">
-              <h3>ksd</h3>
-            </div>
-
-            <div className="dark:text-white w-[15%]">
-              <div className="flex flex-wrap justify-start gap-2">
-                {/* edit button  */}
-                <div className="w-8 h-8 bg-green-400 rounded-sm p-2 flex justify-center items-center cursor-pointer">
-                  <CiEdit
-                    size={20}
-                    // onClick={() => handleOpen(department?.id)}
-                  />
-                </div>
-
-                {/* delete button  */}
-                <div
-                  className="w-8 h-8 bg-red-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer"
-                  // onClick={() => handleDeleteDepartment(department?.id)}
-                >
-                  <AiOutlineDelete size={20} />
-                </div>
-              </div>
-            </div>
+            <IoAdd color="#fff" />
           </div>
         </div>
+        <div className="w-full relative p-5 mx-5 mt-5 mb-1 rounded-md bg-white dark:bg-dark-card flex flex-wrap justify-between ">
+          <div className="flex flex-wrap justify-between items-center w-[50%]">
+            <div className="w-[20%] mr-4">
+              <div className="w-24 h-24 mx-auto rounded-full bg-gray-200 dark:bg-blue-500  flex items-center justify-center mb-4"></div>
+            </div>
+            <div className="w-[75%]">
+              <h1 className="font-poppins text-2xl dark:text-dark-text-color font-semibold">
+                <span className="text-2xl font-bold text-gray-600 dark:text-white">
+                  {instituteDetails?.name}
+                </span>
+              </h1>
+              <h3 className="text-[15px] font-medium  text-[#686767] dark:text-dark-text-color">
+                Email : {instituteDetails?.email}
+              </h3>
+              <h3 className="text-[15px] font-medium  text-[#686767] dark:text-dark-text-color">
+                Phone : {instituteDetails?.phone}
+              </h3>
+
+              <h3 className="text-[15px] font-medium  text-[#3c3c3c]  dark:text-dark-text-color">
+                {/* Registration No : {studentDetails?.data?.registrationNo} */}
+              </h3>
+            </div>
+            <div className="w-[40px] absolute cursor-pointer right-0 top-2 h-[40px] flex flex-col justify-center align-middle items-center rounded-full bg-[#85858512] mr-2">
+              <Link onClick={() => handleOpen(instituteDetails)}>
+                <FiEdit />
+              </Link>
+            </div>
+          </div>
+          <div className="w-[50%] border-l-2 border-dotted border-[#cacaca]">
+            <InfoBox title="Post Office" data={instituteDetails?.postOffice} />
+            <InfoBox title="Post Code" data={instituteDetails?.postCode} />
+            <InfoBox title="District" data={instituteDetails?.district} />
+            <InfoBox title="Country" data={instituteDetails?.country} />
+            {/*  <InfoBox title="Upazila" data={studentDetails?.data?.upazila} />
+            <InfoBox
+              title="Birth Date"
+              data={new Date(
+                studentDetails?.data?.birthDate
+              ).toLocaleDateString()}
+            />
+            <InfoBox title="Phone" data={studentDetails?.data?.phoneNumber} /> */}
+          </div>
+        </div>
+
         {isPopupOpen && (
           <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-            <div className="bg-white dark:bg-dark-card rounded-lg p-6 w-full max-w-md">
+            <div className="bg-white dark:bg-dark-card rounded-lg p-6 w-full max-w-4xl">
               <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-dark-border-color dark:border-opacity-5">
                 <h3 className="text-lg font-medium text-gray-800 dark:text-white">
-                  Department
+                  {instituteDetails ? "Update Institute" : "Add Institute"}
                 </h3>
+
                 <button
                   className="text-gray-500 hover:text-gray-800"
-                  onClick={() => setIsPopupOpen(false)} // Close popup
+                  onClick={() => onClose()}
                 >
-                  &times;
+                  <RxCrossCircled fontSize={20} />
                 </button>
               </div>
               <div className="mt-4">
-                {/* <DepartmentForm
-                  departmentId={selectedDepartmentId}
-                  setIsPopupOpen={setIsPopupOpen}
-                /> */}
+                <InstituteRegistrationForm
+                  institute={selectInstitute}
+                  onClose={onClose}
+                />
               </div>
             </div>
           </div>
         )}
-      </CardWrapper>
+      </div>
     </>
   );
 };
