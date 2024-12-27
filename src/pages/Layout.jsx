@@ -1,3 +1,4 @@
+import { jwtDecode } from "jwt-decode"; // Import jwt-decode
 import React, { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import {
@@ -9,9 +10,8 @@ import {
   FaUniversity,
   FaUser,
 } from "react-icons/fa"; // Import icons
-
-import { jwtDecode } from "jwt-decode"; // Import jwt-decode
 import { Link, Outlet, useNavigate } from "react-router-dom"; // Import useNavigate
+import CompanyLogo from "../assets/company.png";
 import ProfileImg from "../assets/profile.png";
 
 const Layout = () => {
@@ -69,7 +69,7 @@ const Layout = () => {
     <>
       <div className="min-h-screen flex">
         {/* Sidebar */}
-        <div className="w-72 bg-gray-800 text-white relative">
+        <div className="w-72 bg-gray-800 text-white fixed h-full overflow-y-auto">
           {/* logged profile img and user name */}
           <div className="flex items-center p-4">
             <Link to={`user/profile/${user?.userId}`}>
@@ -92,7 +92,7 @@ const Layout = () => {
               )}
             </div>
           </div>
-          <nav className="mt-8">
+          <nav className="mt-8  left-4 ">
             <ul>
               <li>
                 <Link
@@ -153,7 +153,7 @@ const Layout = () => {
           </nav>
 
           {/* Dark Mode Toggle Button (Located at the bottom of the sidebar) */}
-          <div className="absolute bottom-4 left-4 flex flex-col space-y-2">
+          <div className="absolute bottom-36 left-4 flex flex-col space-y-2">
             <button
               onClick={toggleTheme}
               className="flex items-center px-4 py-2 text-base hover:bg-gray-700 rounded-lg"
@@ -173,10 +173,19 @@ const Layout = () => {
               Logout
             </button>
           </div>
+
+          {/* company logo  */}
+          <div className="w-full px-5  absolute bottom-5 ">
+            <Link to="https://www.codexdevware.com/">
+              {" "}
+              <p className="pb-3">Developed By: </p>
+              <img src={CompanyLogo} alt="Codex Devware" />
+            </Link>
+          </div>
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 p-8 bg-gray-100 dark:bg-gray-900">
+        <div className="flex-1 p-8 bg-gray-100 dark:bg-gray-900 ml-72">
           {/* This will render the component based on the current route */}
           <Outlet />
         </div>

@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
 import {
   useCreateStudentClearanceMutation,
   useGetClearanceCategoriesQuery,
   useGetDepartmentsQuery,
   useGetStudentBaseClearanceQuery,
 } from "../../api/apiSlice";
+
 const StudentClearanceCard = ({ studentId, instituteId, approvedBy }) => {
   const { data: departmentList } = useGetDepartmentsQuery();
+
   const { data: clearanceCategory } = useGetClearanceCategoriesQuery();
+
   const { data: studentBaseClearance } =
     useGetStudentBaseClearanceQuery(studentId);
 
