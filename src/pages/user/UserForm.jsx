@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import {
+  useGetDepartmentsQuery,
   useGetUserDetailsQuery,
   useUpdateUserMutation,
 } from "../../api/apiSlice";
@@ -16,6 +17,7 @@ const UserForm = ({ selectedUserId, onClose }) => {
     isLoading,
     isError,
   } = useGetUserDetailsQuery(selectedUserId);
+  const { data: departments } = useGetDepartmentsQuery();
 
   const validationSchema = Yup.object({
     first_name: Yup.string().required("First name is required"),
@@ -24,6 +26,7 @@ const UserForm = ({ selectedUserId, onClose }) => {
       .email("Invalid email address")
       .required("Email is required"),
     role: Yup.string().required("Role is required"),
+    department_id: Yup.string().optional(),
   });
 
   const [initialValues, setInitialValues] = useState({
@@ -31,6 +34,7 @@ const UserForm = ({ selectedUserId, onClose }) => {
     last_name: "",
     email: "",
     role: "",
+    department_id: "",
   });
 
   useEffect(() => {
@@ -40,6 +44,7 @@ const UserForm = ({ selectedUserId, onClose }) => {
         last_name: userDetails?.data.last_name || "",
         email: userDetails?.data.email || "",
         role: userDetails?.data.role || "",
+        department_id: userDetails?.data?.department_id || "",
       });
     }
   }, [isLoading, userDetails]);
@@ -177,6 +182,40 @@ const UserForm = ({ selectedUserId, onClose }) => {
         </select>
         {formik.touched.role && formik.errors.role ? (
           <div className="text-red-500 text-sm">{formik.errors.role}</div>
+        ) : null}
+      </div>
+
+      {/* department */}
+      <div>
+        <label
+          htmlFor="department_id"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          Department
+        </label>
+        <select
+          name="department_id"
+          id="department_id"
+          className={`w-full bg-gray-50 border ${
+            formik.touched.department_id && formik.errors.department_id
+              ? "border-red-500"
+              : "border-gray-300"
+          } text-gray-900 rounded-lg p-3 dark:bg-gray-700`}
+          value={formik.values.department_id}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+        >
+          <option value="">Select Department</option>
+          {departments?.data?.map((department, idx) => (
+            <option key={idx} value={department?.id}>
+              {department?.name}
+            </option>
+          ))}
+        </select>
+        {formik.touched.department_id && formik.errors.department_id ? (
+          <div className="text-red-500 text-sm">
+            {formik.errors.department_id}
+          </div>
         ) : null}
       </div>
 
