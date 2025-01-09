@@ -1,13 +1,31 @@
 import { useFormik } from "formik";
+import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { useLoginUserMutation } from "../api/apiSlice";
+import devCompany from "../assets/company.png";
 import Logo from "../assets/cpi_logo.png";
+import devCompanyDark from "../assets/darkCompany.png"; // Add the dark mode logo
+
 const LoginForm = () => {
   const navigate = useNavigate();
 
   const [userLogin] = useLoginUserMutation();
+
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const darkModeMediaQuery = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    );
+    setIsDarkMode(darkModeMediaQuery.matches);
+
+    const handleChange = (e) => setIsDarkMode(e.matches);
+    darkModeMediaQuery.addEventListener("change", handleChange);
+
+    return () => darkModeMediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
   // Validation schema with Yup
   const validationSchema = Yup.object({
@@ -117,7 +135,7 @@ const LoginForm = () => {
                 </div>
                 <button
                   type="submit"
-                  className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  className="w-full text-white bg-blue-500 hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                 >
                   Sign in
                 </button>
@@ -132,6 +150,16 @@ const LoginForm = () => {
                 </p>
               </form>
             </div>
+          </div>
+          <div className="w-[200px] mt-28 flex flex-col items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+            <p className="text-sm text-dark-card dark:bg-dark-text-color">
+              Developed By :{" "}
+            </p>
+            <img
+              src={isDarkMode ? devCompanyDark : devCompany}
+              alt="Codex Devware"
+              className="mt-3"
+            />
           </div>
         </div>
       </section>

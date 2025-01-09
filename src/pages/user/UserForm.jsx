@@ -2,7 +2,9 @@ import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
+
 import {
+  useCreateUserMutation,
   useGetUserDetailsQuery,
   useUpdateUserMutation,
 } from "../../api/apiSlice";
@@ -11,11 +13,15 @@ const roles = ["Admin", "SuperAdmin", "User", "Manager"];
 
 const UserForm = ({ selectedUserId, onClose }) => {
   const [updateUser] = useUpdateUserMutation();
+  const [registerUser] = useCreateUserMutation();
+
   const {
     data: userDetails,
     isLoading,
     isError,
-  } = useGetUserDetailsQuery(selectedUserId);
+  } = useGetUserDetailsQuery(selectedUserId, {
+    skip: !selectedUserId,
+  });
 
   const validationSchema = Yup.object({
     first_name: Yup.string().required("First name is required"),
@@ -50,11 +56,20 @@ const UserForm = ({ selectedUserId, onClose }) => {
     enableReinitialize: true,
     onSubmit: async (values) => {
       try {
-        await updateUser({ id: selectedUserId, ...values }).unwrap();
-        toast.success("User updated successfully!");
+        if (selectedUserId) {
+          await updateUser({ id: selectedUserId, ...values }).unwrap();
+          toast.success("User updated successfully!");
+        } else {
+          await registerUser(values).unwrap();
+          toast.success("User registered successfully!");
+        }
         onClose();
       } catch (error) {
-        toast.error("Failed to update user. Please try again.");
+        toast.error(
+          `Failed to ${
+            selectedUserId ? "update" : "register"
+          } user. Please try again.`
+        );
       }
     },
   });
@@ -186,7 +201,7 @@ const UserForm = ({ selectedUserId, onClose }) => {
           type="submit"
           className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
         >
-          Update User
+          {selectedUserId ? "Update User" : "Register User"}
         </button>
       </div>
     </form>
