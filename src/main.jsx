@@ -13,71 +13,107 @@ import InstituteCard from "./pages/Institute/InstituteCard";
 import InstituteRegistrationForm from "./pages/IntituteRegistration";
 import Layout from "./pages/Layout";
 import NotFound from "./pages/NotFound";
-import StudentRegistrationForm from "./pages/StudentRegForm";
-import LoginForm from "./pages/UserLogin";
-import UserRegistration from "./pages/UserRegistration";
 import StudentCard from "./pages/student/StudentCard";
 import StudentProfile from "./pages/student/StudentProfileCard";
+import StudentRegistrationForm from "./pages/StudentRegForm";
 import UserList from "./pages/user/UserList";
 import UserProfile from "./pages/user/UserProfile";
+import LoginForm from "./pages/UserLogin";
+import UserRegistration from "./pages/UserRegistration";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />, // Wrap all routes inside Layout
+    element: (
+      <PrivateRoute>
+        <Layout />
+      </PrivateRoute>
+    ), // Wrap all routes inside Layout
     children: [
       {
         path: "/",
         element: <App />,
       },
-
       {
         path: "/user/profile/:id",
-        element: <UserProfile />,
+        element: (
+          <PrivateRoute>
+            <UserProfile />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/user/list",
-        element: <UserList />,
+        element: (
+          <PrivateRoute>
+            <UserList />
+          </PrivateRoute>
+        ),
       },
-      {
-        path: "/",
-        element: <App />,
-      },
-
       {
         path: "/institute/registration",
-        element: <InstituteRegistrationForm />,
+        element: (
+          <PrivateRoute>
+            <InstituteRegistrationForm />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/institute/profile",
-        element: <InstituteCard />,
+        element: (
+          <PrivateRoute>
+            <InstituteCard />
+          </PrivateRoute>
+        ),
       },
-
       {
         path: "/department/list",
-        element: <DepartmentCard />,
+        element: (
+          <PrivateRoute>
+            <DepartmentCard />
+          </PrivateRoute>
+        ),
       },
-
       {
         path: "/institute/clearance/addcategory",
-        element: <ClearanceCategoryForm />,
+        element: (
+          <PrivateRoute>
+            <ClearanceCategoryForm />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/clearance/category",
-        element: <ClearanceCategoryCard />,
+        element: (
+          <PrivateRoute>
+            <ClearanceCategoryCard />
+          </PrivateRoute>
+        ),
       },
-
       {
         path: "/student/registration",
-        element: <StudentRegistrationForm />,
+        element: (
+          <PrivateRoute>
+            <StudentRegistrationForm />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/student",
-        element: <StudentCard />,
+        element: (
+          <PrivateRoute>
+            <StudentCard />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/student/profile/:id",
-        element: <StudentProfile />,
+        element: (
+          <PrivateRoute>
+            <StudentProfile />
+          </PrivateRoute>
+        ),
       },
     ],
     errorElement: <NotFound />,
@@ -86,7 +122,6 @@ const router = createBrowserRouter([
     path: "/signup",
     element: <UserRegistration />, // Wrap all routes inside Layout
   },
-
   {
     path: "/signin",
     element: <LoginForm />,

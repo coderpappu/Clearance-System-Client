@@ -83,7 +83,7 @@ const UserList = () => {
           <h3>{user?.role}</h3>
         </div>
         <div className="dark:text-white w-[10%]">
-          <h3>{user?.department_id}</h3>
+          <h3>{user?.department_name}</h3>
         </div>
         <div className="dark:text-white w-[10%]">
           <h3>{user?.createdAt}</h3>

@@ -2,7 +2,9 @@ import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
+
 import {
+  useCreateUserMutation,
   useGetDepartmentsQuery,
   useGetUserDetailsQuery,
   useUpdateUserMutation,
@@ -12,12 +14,18 @@ const roles = ["Admin", "SuperAdmin", "User", "Manager"];
 
 const UserForm = ({ selectedUserId, onClose }) => {
   const [updateUser] = useUpdateUserMutation();
+  const [registerUser] = useCreateUserMutation();
+  const { data: departments } = useGetDepartmentsQuery();
+
+  console.log(departments?.data?.name);
+
   const {
     data: userDetails,
     isLoading,
     isError,
-  } = useGetUserDetailsQuery(selectedUserId);
-  const { data: departments } = useGetDepartmentsQuery();
+  } = useGetUserDetailsQuery(selectedUserId, {
+    skip: !selectedUserId,
+  });
 
   const validationSchema = Yup.object({
     first_name: Yup.string().required("First name is required"),
@@ -26,7 +34,7 @@ const UserForm = ({ selectedUserId, onClose }) => {
       .email("Invalid email address")
       .required("Email is required"),
     role: Yup.string().required("Role is required"),
-    department_id: Yup.string().optional(),
+    department_name: Yup.string().required("Department is required"),
   });
 
   const [initialValues, setInitialValues] = useState({
@@ -34,7 +42,7 @@ const UserForm = ({ selectedUserId, onClose }) => {
     last_name: "",
     email: "",
     role: "",
-    department_id: "",
+    department_name: "",
   });
 
   useEffect(() => {
@@ -44,7 +52,7 @@ const UserForm = ({ selectedUserId, onClose }) => {
         last_name: userDetails?.data.last_name || "",
         email: userDetails?.data.email || "",
         role: userDetails?.data.role || "",
-        department_id: userDetails?.data?.department_id || "",
+        department_name: userDetails?.data?.department_name || "",
       });
     }
   }, [isLoading, userDetails]);
@@ -55,11 +63,20 @@ const UserForm = ({ selectedUserId, onClose }) => {
     enableReinitialize: true,
     onSubmit: async (values) => {
       try {
-        await updateUser({ id: selectedUserId, ...values }).unwrap();
-        toast.success("User updated successfully!");
+        if (selectedUserId) {
+          await updateUser({ id: selectedUserId, ...values }).unwrap();
+          toast.success("User updated successfully!");
+        } else {
+          await registerUser(values).unwrap();
+          toast.success("User registered successfully!");
+        }
         onClose();
       } catch (error) {
-        toast.error("Failed to update user. Please try again.");
+        toast.error(
+          `Failed to ${
+            selectedUserId ? "update" : "register"
+          } user. Please try again.`
+        );
       }
     },
   });
@@ -185,36 +202,36 @@ const UserForm = ({ selectedUserId, onClose }) => {
         ) : null}
       </div>
 
-      {/* department */}
+      {/* Role */}
       <div>
         <label
-          htmlFor="department_id"
+          htmlFor="department_name"
           className="block text-sm font-medium text-gray-700 dark:text-gray-300"
         >
           Department
         </label>
         <select
-          name="department_id"
-          id="department_id"
+          name="department_name"
+          id="department_name"
           className={`w-full bg-gray-50 border ${
-            formik.touched.department_id && formik.errors.department_id
+            formik.touched.department_name && formik.errors.department_name
               ? "border-red-500"
               : "border-gray-300"
           } text-gray-900 rounded-lg p-3 dark:bg-gray-700`}
-          value={formik.values.department_id}
+          value={formik.values.department_name}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
         >
           <option value="">Select Department</option>
-          {departments?.data?.map((department, idx) => (
-            <option key={idx} value={department?.id}>
-              {department?.name}
+          {departments?.data?.map((dept, idx) => (
+            <option key={idx} value={dept?.name}>
+              {dept?.name}
             </option>
           ))}
         </select>
-        {formik.touched.department_id && formik.errors.department_id ? (
+        {formik.touched.department_name && formik.errors.department_name ? (
           <div className="text-red-500 text-sm">
-            {formik.errors.department_id}
+            {formik.errors.department_name}
           </div>
         ) : null}
       </div>
@@ -225,7 +242,7 @@ const UserForm = ({ selectedUserId, onClose }) => {
           type="submit"
           className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
         >
-          Update User
+          {selectedUserId ? "Update User" : "Register User"}
         </button>
       </div>
     </form>
