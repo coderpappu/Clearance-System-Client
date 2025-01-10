@@ -1,24 +1,22 @@
-import { jwtDecode } from "jwt-decode"; // Import jwt-decode
 import React, { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
-import {
-  FaBuilding,
-  FaGraduationCap,
-  FaMoon,
-  FaSignOutAlt,
-  FaSun,
-  FaUniversity,
-  FaUser,
-} from "react-icons/fa"; // Import icons
-import { Link, Outlet, useNavigate } from "react-router-dom"; // Import useNavigate
-import CompanyLogo from "../assets/company.png";
-import ProfileImg from "../assets/profile.png";
+import { BiLayer } from "react-icons/bi";
+import { FaMoon, FaSignOutAlt, FaSun } from "react-icons/fa"; // Import icons
+import { PiStudentDuotone, PiUsers } from "react-icons/pi";
 
+import { BiBookOpen, BiDialpadAlt } from "react-icons/bi";
+import { PiSpeedometer } from "react-icons/pi";
+import { SlSettings } from "react-icons/sl";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"; // Import useNavigate and useLocation
+
+import CompanyLogo from "../assets/company.png";
+import Header from "../components/Header";
 const Layout = () => {
-  const [isDepartmentOpen, setIsDepartmentOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [user, setUser] = useState(null); // Initialize user as null
+  const [module, setModule] = useState(null); // Initialize user as null
+  const [moduleName, setModuleName] = useState(""); // State for module name
   const navigate = useNavigate();
+  const location = useLocation(); // Get current location
 
   // On initial render, check localStorage for theme preference and user data
   useEffect(() => {
@@ -30,15 +28,27 @@ const Layout = () => {
       setIsDarkMode(false);
       document.body.classList.remove("dark"); // Apply light theme
     }
-
-    // Fetch user data from token
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      console.log(decodedToken);
-      setUser(decodedToken);
-    }
   }, []);
+
+  // Update module name based on current route
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.includes("/user/list")) {
+      setModuleName("Users Management");
+    } else if (path.includes("/institute/profile")) {
+      setModuleName("Institute Management");
+    } else if (path.includes("/department/list")) {
+      setModuleName("Departments Management");
+    } else if (path.includes("/clearance/category")) {
+      setModuleName("Clearance Category Management");
+    } else if (path.includes("/student")) {
+      setModuleName("Student Management");
+    } else if (path.includes("/dashboard")) {
+      setModuleName("Dashboard");
+    } else {
+      setModuleName("");
+    }
+  }, [location]);
 
   // Toggle theme
   const toggleTheme = () => {
@@ -55,10 +65,6 @@ const Layout = () => {
     });
   };
 
-  const toggleDepartmentMenu = () => {
-    setIsDepartmentOpen((prev) => !prev);
-  };
-
   const handleLogout = () => {
     // Clear user session (e.g., remove token from localStorage)
     localStorage.removeItem("token");
@@ -71,82 +77,76 @@ const Layout = () => {
         {/* Sidebar */}
         <div className="w-72 bg-gray-800 text-white fixed h-full overflow-y-auto">
           {/* logged profile img and user name */}
-          <div className="flex items-center p-4">
-            <Link to={`user/profile/${user?.userId}`}>
-              <img
-                src={ProfileImg}
-                alt="Profile"
-                className="h-14 w-14 rounded-full mr-4"
-              />
-            </Link>
-            <div>
-              {user ? (
-                <>
-                  <h2 className="text-lg font-semibold">
-                    {user.first_name + " " + user?.last_name}
-                  </h2>
-                  <p className="text-sm">{user.role}</p>
-                </>
-              ) : (
-                <p>Loading...</p>
-              )}
-            </div>
+          <div className="px-8 py-3">
+            <h2>Edu Clearance</h2>
           </div>
-          <nav className="mt-8  left-4 ">
-            <ul>
-              <li>
+          <nav className="mt-8 ">
+            <ul className="p-4 ">
+              <li className="my-1">
                 <Link
-                  to="/user/list"
-                  className="flex items-center px-4 py-2 text-base hover:bg-gray-700"
+                  to="/dashboard"
+                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
                 >
-                  <FaUser className="mr-2" /> {/* Icon for User Account */}
-                  User Account
+                  <PiSpeedometer className="mr-2" />{" "}
+                  {/* Icon for User Account */}
+                  Dashboard
                 </Link>
               </li>
-              <li>
+              <li className="my-1">
+                <Link
+                  to="/user/list"
+                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
+                >
+                  <PiUsers className="mr-2" /> {/* Icon for User Account */}
+                  Users
+                </Link>
+              </li>
+              <li className="my-1">
                 <Link
                   to="/institute/profile"
-                  className="flex items-center px-4 py-2 text-base hover:bg-gray-700"
+                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
                 >
-                  <FaBuilding className="mr-2" /> {/* Icon for Institute */}
+                  <BiBookOpen className="mr-2" /> {/* Icon for Institute */}
                   Institute
                 </Link>
               </li>
 
-              <li>
+              <li className="my-1">
                 <Link
                   to="/department/list"
-                  className="flex items-center px-4 py-2 text-base hover:bg-gray-700"
+                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
                 >
-                  <FaUser className="mr-2" /> {/* Icon for User Account */}
-                  Department
+                  <BiDialpadAlt className="mr-2" />{" "}
+                  {/* Icon for User Account */}
+                  Departments
                 </Link>
               </li>
-              <li>
+              <li className="my-1">
                 <Link
                   to="/clearance/category"
-                  className="flex items-center px-4 py-2 text-base hover:bg-gray-700"
+                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
                 >
-                  <FaGraduationCap className="mr-2" /> {/* Icon for Student */}
+                  <BiLayer className="mr-2" /> {/* Icon for Student */}
                   Clearance Category
                 </Link>
               </li>
-              <li>
+              <li className="my-1">
                 <Link
                   to="/student"
-                  className="flex items-center px-4 py-2 text-base hover:bg-gray-700"
+                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
                 >
-                  <FaGraduationCap className="mr-2" /> {/* Icon for Student */}
+                  <PiStudentDuotone className="mr-2" /> {/* Icon for Student */}
                   Student
                 </Link>
               </li>
-              <li>
+
+              <li className="my-1">
                 <Link
-                  to="/clearance"
-                  className="flex items-center px-4 py-2 text-base hover:bg-gray-700"
+                  to="/settings"
+                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
                 >
-                  <FaUniversity className="mr-2" /> {/* Icon for Clearance */}
-                  Clearance
+                  <SlSettings className="mr-2" /> {/* Icon for Student */}
+                  Settings
                 </Link>
               </li>
             </ul>
@@ -185,9 +185,12 @@ const Layout = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 p-8 bg-gray-100 dark:bg-gray-900 ml-72">
+        <div className="flex-1  bg-gray-100 dark:bg-gray-900 ml-72">
+          <Header moduleName={moduleName} /> {/* Pass moduleName to Header */}
           {/* This will render the component based on the current route */}
-          <Outlet />
+          <div className="p-5">
+            <Outlet />
+          </div>
         </div>
       </div>
 

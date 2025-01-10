@@ -29,8 +29,7 @@ const InstituteCard = () => {
   return (
     <>
       <div>
-        <div className="flex flex-wrap justify-between ">
-          <h2> Institute / Profile</h2>
+        <div className="flex flex-wrap justify-between">
           <div
             className={`w-8 ${
               instituteDetails && "hidden"

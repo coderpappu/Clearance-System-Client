@@ -9,6 +9,7 @@ import ClearanceCategoryForm from "./pages/clearance/CategoryForm";
 import ClearanceCategoryCard from "./pages/clearance/ClearanceCategoryCard";
 import DepartmentCard from "./pages/department/DepartmentCard";
 // import DepartmentForm from "./pages/DepartmentForm";
+import DashboardStats from "./pages/dashboard/Dashboard";
 import InstituteCard from "./pages/Institute/InstituteCard";
 import InstituteRegistrationForm from "./pages/IntituteRegistration";
 import Layout from "./pages/Layout";
@@ -34,6 +35,14 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <App />,
+      },
+      {
+        path: "/dashboard",
+        element: (
+          <PrivateRoute>
+            <DashboardStats />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/user/profile/:id",

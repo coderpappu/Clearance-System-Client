@@ -17,17 +17,12 @@ const StudentClearanceCard = ({ studentId, instituteId }) => {
   const id = decodedToken?.userId;
 
   const { data: departmentList } = useGetDepartmentsQuery();
-
   const { data: clearanceCategory } = useGetClearanceCategoriesQuery();
-
   const { data: studentBaseClearance } =
     useGetStudentBaseClearanceQuery(studentId);
-
   const [createStudentClearance] = useCreateStudentClearanceMutation();
-
   const { data: userData } = useGetUserDetailsQuery(id);
 
-  console.log(userData);
   // State to hold category status
   const [categoryStatus, setCategoryStatus] = useState({});
 
@@ -48,7 +43,7 @@ const StudentClearanceCard = ({ studentId, instituteId }) => {
   const handleCheckboxChange = (categoryId, departmentId) => {
     if (
       (userData?.data?.department_name === departmentId &&
-        ["Manager", "Admin", "SuperAdmin"].includes(userData?.data?.role)) ||
+        ["Manager", "Admin"].includes(userData?.data?.role)) ||
       ["SuperAdmin"].includes(userData?.data?.role)
     ) {
       setCategoryStatus((prev) => ({
@@ -82,7 +77,7 @@ const StudentClearanceCard = ({ studentId, instituteId }) => {
   };
 
   return (
-    <div className="w-full mx-5 mt-5 mb-2 rounded-md flex flex-wrap justify-between">
+    <div className="w-full  mt-2 mb-2 rounded-md flex flex-wrap justify-between">
       <div className="w-[49%] relative p-4 bg-white dark:bg-dark-card rounded-md">
         <h1 className="text-xl font-medium mb-4 dark:text-dark-heading-color">
           Clearance Form
@@ -108,10 +103,29 @@ const StudentClearanceCard = ({ studentId, instituteId }) => {
                     onChange={() =>
                       handleCheckboxChange(category.id, dept.name)
                     }
+                    disabled={
+                      !(
+                        (userData?.data?.department_name === dept.name &&
+                          ["Manager", "Admin"].includes(
+                            userData?.data?.role
+                          )) ||
+                        ["SuperAdmin"].includes(userData?.data?.role)
+                      )
+                    }
                   />
                   <label
                     htmlFor={`category-${category?.id}`}
-                    className="text-sm dark:text-dark-heading-color"
+                    className={`text-sm dark:text-dark-heading-color ${
+                      !(
+                        (userData?.data?.department_name === dept.name &&
+                          ["Manager", "Admin"].includes(
+                            userData?.data?.role
+                          )) ||
+                        ["SuperAdmin"].includes(userData?.data?.role)
+                      )
+                        ? "text-gray-400"
+                        : ""
+                    }`}
                   >
                     {category?.name}
                   </label>

@@ -56,8 +56,7 @@ const UserProfile = () => {
 
   return (
     <div>
-      <h2> User / Profile</h2>
-      <div className="w-full p-5 mx-5 mt-5 mb-1 rounded-md bg-white dark:bg-dark-card flex flex-wrap justify-between ">
+      <div className="w-full p-5  mb-1 rounded-md bg-white dark:bg-dark-card flex flex-wrap justify-between ">
         <div className="flex flex-wrap justify-between items-center w-[50%]">
           <div className="w-[20%] mr-4">
             <div className="w-24 h-24 mx-auto rounded-full bg-gray-200 dark:bg-blue-500  flex items-center justify-center mb-4">
@@ -85,7 +84,7 @@ const UserProfile = () => {
           <InfoBox title="Postal Code" data={user?.postalCode} />
         </div>
       </div>
-      <div className="w-full mx-5 rounded-md bg-white dark:bg-dark-card flex flex-wrap ">
+      <div className="w-full  rounded-md bg-white dark:bg-dark-card flex flex-wrap ">
         <Button
           button_id="1"
           isActive={selected == "1"}

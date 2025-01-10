@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 
 import { useParams } from "react-router-dom";
-import {
-  useGetStudentDetailsQuery,
-  useGetUserDetailsQuery,
-} from "../../api/apiSlice";
+import { useGetStudentDetailsQuery } from "../../api/apiSlice";
 import Button from "./Button";
 import InfoBox from "./InfoBox";
 import ReportCard from "./Report";
@@ -12,9 +9,7 @@ import StudentClearanceCard from "./StudentClearanceCard";
 
 const Profile = () => {
   const [selected, setSelected] = useState("1");
-  const { data: userData } = useGetUserDetailsQuery();
 
-  console.log(userData);
   // handle function for button state
   const handleSelect = (id) => {
     setSelected(id);
@@ -27,12 +22,13 @@ const Profile = () => {
     isError,
   } = useGetStudentDetailsQuery(id);
 
+  console.log(studentDetails);
+
   if (isLoading && !isError) return "Loading...";
 
   return (
     <div>
-      <h2> Student / Profile</h2>
-      <div className="w-full p-5 mx-5 mt-5 mb-1 rounded-md bg-white dark:bg-dark-card flex flex-wrap justify-between ">
+      <div className="w-full p-5  mb-1 rounded-md bg-white dark:bg-dark-card flex flex-wrap justify-between ">
         <div className="flex flex-wrap justify-between items-center w-[50%]">
           <div className="w-[20%] mr-4">
             <div className="w-24 h-24 mx-auto rounded-full bg-gray-200 dark:bg-blue-500  flex items-center justify-center mb-4">
@@ -55,7 +51,12 @@ const Profile = () => {
               {/* {`Website : ${website_url}`} */}
               Registration No : {studentDetails?.data?.registrationNo}
             </h3>
+            <h3 className="text-[15px] font-medium  text-[#3c3c3c]  dark:text-dark-text-color">
+              {/* {`Website : ${website_url}`} */}
+              Status : {studentDetails?.data?.status}
+            </h3>
           </div>
+
           {/* <div className="w-[40px] cursor-pointer  h-[40px] flex flex-col justify-center align-middle items-center rounded-full bg-[#85858512] mr-2">
             <Link to={`/company/update/${data._id}`}>
               <FiEdit />
@@ -78,7 +79,7 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="w-full mx-5 rounded-md bg-white dark:bg-dark-card flex flex-wrap ">
+      <div className="w-full  rounded-md bg-white dark:bg-dark-card flex flex-wrap ">
         <Button
           button_id="1"
           isActive={selected == "1"}

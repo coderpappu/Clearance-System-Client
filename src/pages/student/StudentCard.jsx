@@ -127,7 +127,7 @@ const StudentCard = () => {
       (groupFilter ? student.group === groupFilter : true)
     );
   });
-
+  console.log(filteredStudents);
   const paginatedStudents = filteredStudents?.slice(
     (currentPage - 1) * studentsPerPage,
     currentPage * studentsPerPage
@@ -170,7 +170,7 @@ const StudentCard = () => {
           </Link>
         </div>
 
-        <div className="dark:text-white w-[15%]">
+        <div className="dark:text-white w-[10%]">
           <h3>{student?.boardRoll}</h3>
         </div>
 
@@ -183,10 +183,22 @@ const StudentCard = () => {
         <div className="dark:text-white w-[10%]">
           <h3>{student?.group}</h3>
         </div>
-        <div className="dark:text-white w-[10%]">
+        <div className="dark:text-white w-[5%]">
           <h3>{student?.session}</h3>
         </div>
-        <div className="dark:text-white w-[15%]">
+        <div className="dark:text-white w-[8%]">
+          <h3
+            className={` border text-center p-1 rounded-md ${
+              student?.clearanceStatus == "Success"
+                ? " text-white bg-green-500 border-none"
+                : "text-white bg-yellow-400 border-none"
+            } `}
+          >
+            {student?.clearanceStatus}
+          </h3>
+        </div>
+
+        <div className="dark:text-white w-[10%]">
           <div className="flex flex-wrap justify-start gap-2">
             {/* edit button */}
             <div className="w-8 h-8 bg-green-400 rounded-sm p-2 flex justify-center items-center cursor-pointer">
@@ -287,7 +299,7 @@ const StudentCard = () => {
             <div className="dark:text-white w-[15%]">
               <h3>Name</h3>
             </div>
-            <div className="dark:text-white w-[15%]">
+            <div className="dark:text-white w-[10%]">
               <h3>Board Roll</h3>
             </div>
             <div className="dark:text-white w-[15%]">
@@ -299,10 +311,13 @@ const StudentCard = () => {
             <div className="dark:text-white w-[10%]">
               <h3>Group</h3>
             </div>
-            <div className="dark:text-white w-[10%]">
+            <div className="dark:text-white w-[5%]">
               <h3>Session</h3>
             </div>
-            <div className="dark:text-white w-[15%]">
+            <div className="dark:text-white w-[8%] text-center">
+              <h3>Status</h3>
+            </div>
+            <div className="dark:text-white w-[10%]">
               <h3>Actions</h3>
             </div>
           </div>
