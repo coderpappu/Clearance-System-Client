@@ -1,3 +1,4 @@
+import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -6,9 +7,15 @@ import {
   useGetClearanceCategoriesQuery,
   useGetDepartmentsQuery,
   useGetStudentBaseClearanceQuery,
+  useGetUserDetailsQuery,
 } from "../../api/apiSlice";
 
-const StudentClearanceCard = ({ studentId, instituteId, approvedBy }) => {
+const StudentClearanceCard = ({ studentId, instituteId }) => {
+  const token = localStorage.getItem("token");
+
+  const decodedToken = jwtDecode(token);
+  const id = decodedToken?.userId;
+
   const { data: departmentList } = useGetDepartmentsQuery();
 
   const { data: clearanceCategory } = useGetClearanceCategoriesQuery();
@@ -18,6 +25,9 @@ const StudentClearanceCard = ({ studentId, instituteId, approvedBy }) => {
 
   const [createStudentClearance] = useCreateStudentClearanceMutation();
 
+  const { data: userData } = useGetUserDetailsQuery(id);
+
+  console.log(userData);
   // State to hold category status
   const [categoryStatus, setCategoryStatus] = useState({});
 
@@ -35,11 +45,19 @@ const StudentClearanceCard = ({ studentId, instituteId, approvedBy }) => {
   }, [studentBaseClearance]);
 
   // Handle checkbox changes (toggle between APPROVED and PENDING)
-  const handleCheckboxChange = (categoryId) => {
-    setCategoryStatus((prev) => ({
-      ...prev,
-      [categoryId]: prev[categoryId] === "APPROVED" ? "PENDING" : "APPROVED",
-    }));
+  const handleCheckboxChange = (categoryId, departmentId) => {
+    console.log(departmentId);
+    if (
+      userData?.data?.department_name === departmentId &&
+      ["Manager", "Admin", "SuperAdmin"].includes(userData?.data?.role)
+    ) {
+      setCategoryStatus((prev) => ({
+        ...prev,
+        [categoryId]: prev[categoryId] === "APPROVED" ? "PENDING" : "APPROVED",
+      }));
+    } else {
+      toast.error("You are not authorized to change this clearance.");
+    }
   };
 
   // Save function to send the updated statuses to the backend
@@ -52,7 +70,6 @@ const StudentClearanceCard = ({ studentId, instituteId, approvedBy }) => {
         .map((categoryId) => ({
           clearanceCategoryId: categoryId,
           status: categoryStatus[categoryId],
-          approvedBy,
         })),
     };
 
@@ -88,7 +105,9 @@ const StudentClearanceCard = ({ studentId, instituteId, approvedBy }) => {
                     className="mr-2"
                     id={`category-${category?.id}`}
                     checked={categoryStatus[category.id] === "APPROVED"}
-                    onChange={() => handleCheckboxChange(category.id)}
+                    onChange={() =>
+                      handleCheckboxChange(category.id, dept.name)
+                    }
                   />
                   <label
                     htmlFor={`category-${category?.id}`}

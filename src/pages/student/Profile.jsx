@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 
 import { useParams } from "react-router-dom";
-import { useGetStudentDetailsQuery } from "../../api/apiSlice";
+import {
+  useGetStudentDetailsQuery,
+  useGetUserDetailsQuery,
+} from "../../api/apiSlice";
 import Button from "./Button";
 import InfoBox from "./InfoBox";
 import ReportCard from "./Report";
@@ -9,6 +12,9 @@ import StudentClearanceCard from "./StudentClearanceCard";
 
 const Profile = () => {
   const [selected, setSelected] = useState("1");
+  const { data: userData } = useGetUserDetailsQuery();
+
+  console.log(userData);
   // handle function for button state
   const handleSelect = (id) => {
     setSelected(id);
