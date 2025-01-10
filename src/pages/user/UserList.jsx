@@ -115,9 +115,7 @@ const UserList = () => {
     <>
       <CardWrapper>
         <CardHeader title="User List" handleOpen={handleOpen} />
-
         {/* CSV Upload Section */}
-
         <div className="px-6 py-3">
           {/* header */}
           <div className="w-full bg-light-bg dark:bg-dark-box rounded-sm py-3 px-3 flex flex-wrap justify-between text-sm">
@@ -154,7 +152,6 @@ const UserList = () => {
                 <h3 className="text-lg font-medium text-gray-800 dark:text-white">
                   Add User
                 </h3>
-
                 <button
                   className="text-gray-500 hover:text-gray-800"
                   onClick={() => setIsPopupOpen(false)}
