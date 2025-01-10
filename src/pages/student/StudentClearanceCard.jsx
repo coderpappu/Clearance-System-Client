@@ -46,10 +46,10 @@ const StudentClearanceCard = ({ studentId, instituteId }) => {
 
   // Handle checkbox changes (toggle between APPROVED and PENDING)
   const handleCheckboxChange = (categoryId, departmentId) => {
-    console.log(departmentId);
     if (
-      userData?.data?.department_name === departmentId &&
-      ["Manager", "Admin", "SuperAdmin"].includes(userData?.data?.role)
+      (userData?.data?.department_name === departmentId &&
+        ["Manager", "Admin", "SuperAdmin"].includes(userData?.data?.role)) ||
+      ["SuperAdmin"].includes(userData?.data?.role)
     ) {
       setCategoryStatus((prev) => ({
         ...prev,
