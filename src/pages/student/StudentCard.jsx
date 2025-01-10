@@ -191,7 +191,7 @@ const StudentCard = () => {
             className={` border text-center p-1 rounded-md ${
               student?.clearanceStatus == "Success"
                 ? " text-white bg-green-500 border-none"
-                : "text-white bg-yellow-400 border-none"
+                : "text-white bg-orange-400 border-none"
             } `}
           >
             {student?.clearanceStatus}

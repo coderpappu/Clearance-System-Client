@@ -1,4 +1,7 @@
 import React from "react";
+import { GiGraduateCap } from "react-icons/gi";
+import { HiOutlineChartPie, HiOutlineColorSwatch } from "react-icons/hi";
+import { PiStudent } from "react-icons/pi";
 import {
   useGetClearanceCategoriesQuery,
   useGetDepartmentsQuery,
@@ -19,7 +22,7 @@ const DashboardStats = () => {
           <div
             className={`w-12 h-12 flex items-center justify-center text-white rounded-full bg-blue-500`}
           >
-            <span className="text-2xl"></span>
+            <PiStudent size={25} />
           </div>
           <div className="ml-4">
             <p className="text-gray-500 dark:text-slate-100 text-sm">
@@ -34,7 +37,7 @@ const DashboardStats = () => {
           <div
             className={`w-12 h-12 flex items-center justify-center text-white rounded-full bg-[#FB7D5B]`}
           >
-            <span className="text-2xl"></span>
+            <GiGraduateCap size={25} />
           </div>
           <div className="ml-4">
             <p className="text-gray-500 dark:text-slate-100 text-sm">
@@ -47,9 +50,9 @@ const DashboardStats = () => {
         </div>
         <div className="flex items-center bg-white dark:bg-dark-card p-7 rounded-lg shadow hover:shadow-lg transition duration-300">
           <div
-            className={`w-12 h-12 flex items-center justify-center text-white rounded-full bg-yellow-400`}
+            className={`w-12 h-12 flex items-center justify-center text-white rounded-full bg-green-600`}
           >
-            <span className="text-2xl"></span>
+            <HiOutlineColorSwatch size={25} />
           </div>
           <div className="ml-4">
             <p className="text-gray-500 dark:text-slate-100 text-sm">
@@ -62,9 +65,9 @@ const DashboardStats = () => {
         </div>
         <div className="flex items-center bg-white dark:bg-dark-card p-7 rounded-lg shadow hover:shadow-lg transition duration-300">
           <div
-            className={`w-12 h-12 flex items-center justify-center text-white rounded-full bg-emerald-300`}
+            className={`w-12 h-12 flex items-center justify-center text-white rounded-full bg-emerald-400`}
           >
-            <span className="text-2xl"></span>
+            <HiOutlineChartPie size={25} />
           </div>
           <div className="ml-4">
             <p className="text-gray-500 dark:text-slate-100 text-sm">

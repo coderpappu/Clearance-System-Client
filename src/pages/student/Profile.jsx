@@ -22,7 +22,6 @@ const Profile = () => {
     isError,
   } = useGetStudentDetailsQuery(id);
 
-  console.log(studentDetails);
 
   if (isLoading && !isError) return "Loading...";
 
