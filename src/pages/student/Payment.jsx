@@ -1,20 +1,106 @@
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { AiOutlineDelete } from "react-icons/ai";
 import { CiEdit } from "react-icons/ci";
 import { IoAdd } from "react-icons/io5";
 import { RxCrossCircled } from "react-icons/rx";
+import {
+  useDeleteDuePaymentMutation,
+  useGetDuePaymentListByStudentQuery,
+} from "../../api/apiSlice";
+import ConfirmDialog from "../../components/ConfirmDialog";
+import ErrorMessage from "../../utils/ErrorMessage";
 import DuePaymentForm from "./DuePaymentForm";
-
-const Payment = () => {
+const Payment = ({ studentId }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selectedUserId, setSelectUserId] = useState(null);
+  const [selectedId, setSelectId] = useState(null);
+
+  const {
+    data: dueList,
+    isLoading,
+    isError,
+    error,
+  } = useGetDuePaymentListByStudentQuery(studentId);
+
+  const [deleteDuePayment] = useDeleteDuePaymentMutation();
 
   const onClose = () => setIsPopupOpen(false);
 
   const handleOpen = (id = null) => {
     setIsPopupOpen(true);
-    setSelectUserId(id);
+    setSelectId(id);
   };
+
+  const handleDeleteUser = async (id) => {
+    const confirm = () =>
+      toast(
+        (t) => (
+          <ConfirmDialog
+            onConfirm={async () => {
+              toast.dismiss(t.id);
+              try {
+                deleteDuePayment(id).then((res) => {
+                  if (res.error != null) {
+                    toast.error(res.error.data.message);
+                  } else {
+                    toast.success("Due payment deleted successfully");
+                  }
+                });
+              } catch (error) {
+                toast.error(error.message || "Failed to delete due payment");
+              }
+            }}
+            onCancel={() => toast.dismiss(t.id)}
+            title="User"
+          />
+        ),
+        { duration: Infinity }
+      );
+    confirm();
+  };
+
+  let content;
+
+  if (isLoading && !isError) return "Loading...";
+
+  if (!isLoading && isError)
+    content = <ErrorMessage message={error?.data?.message} />;
+
+  if (!isError && !isLoading && dueList)
+    content = dueList?.data?.map((duePay) => (
+      <>
+        <div className="w-full dark:text-dark-text-color px-5 py-2 bg-slate-100 dark:bg-dark-box rounded-sm flex flex-wrap justify-between items-center mb-2">
+          <div className="w-[50%]">
+            <h2 className="mb-2 font-medium">{duePay?.department?.name}</h2>
+            <h2>{duePay?.clearanceCategory?.name}</h2>
+          </div>
+
+          <div className="w-[30%]">
+            <h2>{duePay?.amount}</h2>
+          </div>
+
+          <div className="w-[15%] flex flex-wrap justify-start gap-2">
+            {/* edit button */}
+            <div className="w-8 h-8 bg-green-400 rounded-sm p-2 flex justify-center items-center cursor-pointer">
+              <CiEdit
+                size={20}
+                className="text-white"
+                onClick={() => handleOpen(duePay?.id)}
+              />
+            </div>
+
+            {/* delete button */}
+            <div
+              className="w-8 h-8 bg-red-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer text-white"
+              onClick={() => handleDeleteUser(duePay?.id)}
+            >
+              <AiOutlineDelete size={20} />
+            </div>
+          </div>
+        </div>
+      </>
+    ));
+
   return (
     <div className="w-full  mt-2 mb-2 rounded-md flex flex-wrap justify-between">
       <div className="w-[49%] relative p-4 bg-white dark:bg-dark-card rounded-md">
@@ -33,39 +119,7 @@ const Payment = () => {
         </div>
 
         {/* due payment list  */}
-        <div className="">
-          <div className="w-full dark:text-dark-text-color p-4 bg-slate-100 dark:bg-dark-box rounded-sm flex flex-wrap justify-between items-center">
-            <div className="">
-              <h2 className="mb-2 font-medium">Civil Department</h2>
-              <h2>Wood Lab</h2>
-            </div>
-
-            <div>
-              <h2>900</h2>
-            </div>
-
-            <div>
-              <div className="flex flex-wrap justify-start gap-2">
-                {/* edit button */}
-                <div className="w-8 h-8 bg-green-400 rounded-sm p-2 flex justify-center items-center cursor-pointer">
-                  <CiEdit
-                    size={20}
-                    className="text-white"
-                    onClick={() => handleOpen(user?.id)}
-                  />
-                </div>
-
-                {/* delete button */}
-                <div
-                  className="w-8 h-8 bg-red-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer text-white"
-                  onClick={() => handleDeleteUser(user?.id)}
-                >
-                  <AiOutlineDelete size={20} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div className="">{content}</div>
 
         {isPopupOpen && (
           <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -83,14 +137,15 @@ const Payment = () => {
               </div>
               <div className="mt-4">
                 <DuePaymentForm
-                  selectedUserId={selectedUserId}
+                  selectedId={selectedId}
+                  studentId={studentId}
                   onClose={onClose}
                 />
               </div>
             </div>
           </div>
         )}
-      </div>{" "}
+      </div>
     </div>
   );
 };

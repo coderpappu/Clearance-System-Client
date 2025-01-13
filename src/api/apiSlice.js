@@ -265,6 +265,34 @@ export const apiSlice = createApi({
       },
       invalidatesTags: ["student"],
     }),
+
+    // duepayment
+    createDuePayment: builder.mutation({
+      query: (credentials) => ({
+        url: "/student/duepayment",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["duepayment"],
+    }),
+
+    getDuePaymentListByStudent: builder.query({
+      query: (studentId) => `/student/duepayment/due/${studentId}`,
+      providesTags: ["duepayment"],
+    }),
+
+    getDuePaymentDetails: builder.query({
+      query: (id) => `/student/duepayment/${id}`,
+      providesTags: ["duepayment"],
+    }),
+
+    deleteDuePayment: builder.mutation({
+      query: (id) => ({
+        url: `/student/duepayment/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["duepayment"],
+    }),
   }),
 });
 
@@ -302,4 +330,9 @@ export const {
   useDeleteUserMutation,
   useUpdateUserMutation,
   useChangeUserPasswordMutation,
+
+  useCreateDuePaymentMutation,
+  useGetDuePaymentListByStudentQuery,
+  useDeleteDuePaymentMutation,
+  useGetDuePaymentDetailsQuery,
 } = apiSlice;

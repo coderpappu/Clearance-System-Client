@@ -1,17 +1,23 @@
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import * as Yup from "yup";
-import { useGetDeptByUserDetailsQuery } from "../../api/apiSlice.js";
+import {
+  useCreateDuePaymentMutation,
+  useGetDeptByUserDetailsQuery,
+  useGetDuePaymentDetailsQuery,
+} from "../../api/apiSlice.js";
 import getUserDetails from "../../utils/getUserDetails.js";
 
-const DuePaymentForm = () => {
+const DuePaymentForm = ({ selectedId, studentId, onClose }) => {
   const { userId } = getUserDetails();
-  //   const userId = userDetails ? userDetails.user_id : null;
+  const [createDuePayment] = useCreateDuePaymentMutation();
+
+  const { data: duePayment } = useGetDuePaymentDetailsQuery(selectedId);
 
   // Validation schema using Yup
   const validationSchema = Yup.object().shape({
-    department: Yup.string().required("Department is required"),
-    lab: Yup.string().required("Lab is required"),
+    department_id: Yup.string().required("Department is required"),
+    clearanceCategoryId: Yup.string().required("Lab is required"),
     amount: Yup.number()
       .required("Amount is required")
       .positive("Amount must be a positive number")
@@ -20,35 +26,38 @@ const DuePaymentForm = () => {
 
   const { data: user } = useGetDeptByUserDetailsQuery(userId);
 
-  const departments = user ? user?.data?.map((dept) => dept.name) : [];
+  const departments = user || [];
 
   const [labs, setLabs] = useState([]);
 
   return (
     <Formik
       initialValues={{
-        department: "",
-        lab: "",
-        amount: "",
+        department_id: duePayment?.data?.department_id || "",
+        clearanceCategoryId: duePayment?.data?.clearanceCategoryId || "",
+        amount: duePayment?.data?.amount || "",
       }}
       validationSchema={validationSchema}
-      onSubmit={(values) => {
-        console.log("Form values:", values);
+      onSubmit={async (values) => {
+        await createDuePayment({ ...values, student_id: studentId }).unwrap();
+        onClose();
       }}
+      enableReinitialize={true}
     >
       {({ values, handleChange, handleBlur, touched, errors }) => {
         useEffect(() => {
           if (user && user.data && user.data.length > 0) {
             const selectedDept = user.data.find(
-              (dept) => dept.name === values.department
+              (dept) => dept.id === values.department_id
             );
+
             if (selectedDept) {
-              setLabs(selectedDept.ClearanceCategory.map((cat) => cat.name));
+              setLabs(selectedDept.ClearanceCategory);
             } else {
               setLabs([]);
             }
           }
-        }, [values.department, user]);
+        }, [values.department_id, user]);
 
         return (
           <Form>
@@ -61,21 +70,21 @@ const DuePaymentForm = () => {
                 Department
               </label>
               <select
-                name="department"
-                id="department"
+                name="department_id"
+                id="department_id"
                 className={`w-full bg-gray-50 border ${
                   touched.department && errors.department
                     ? "border-red-500"
                     : "border-gray-300"
                 } text-gray-900 rounded-lg p-3 dark:bg-gray-700`}
-                value={values.department}
+                value={values.department_id}
                 onChange={handleChange}
                 onBlur={handleBlur}
               >
                 <option value="">Select Department</option>
-                {departments.map((dept, idx) => (
-                  <option key={idx} value={dept}>
-                    {dept}
+                {departments?.data?.map((dept, idx) => (
+                  <option key={idx} value={dept?.id}>
+                    {dept.name}
                   </option>
                 ))}
               </select>
@@ -87,27 +96,27 @@ const DuePaymentForm = () => {
             {/* Lab Field */}
             <div className="mt-4">
               <label
-                htmlFor="lab"
+                htmlFor="clearanceCategoryId"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Lab
               </label>
               <select
-                name="lab"
-                id="lab"
+                name="clearanceCategoryId"
+                id="clearanceCategoryId"
                 className={`w-full bg-gray-50 border ${
                   touched.lab && errors.lab
                     ? "border-red-500"
                     : "border-gray-300"
                 } text-gray-900 rounded-lg p-3 dark:bg-gray-700`}
-                value={values.lab}
+                value={values.clearanceCategoryId}
                 onChange={handleChange}
                 onBlur={handleBlur}
               >
                 <option value="">Select Lab</option>
                 {labs.map((lab, idx) => (
-                  <option key={idx} value={lab}>
-                    {lab}
+                  <option key={idx} value={lab?.id}>
+                    {lab?.name}
                   </option>
                 ))}
               </select>
