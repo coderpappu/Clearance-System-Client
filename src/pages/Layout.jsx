@@ -11,6 +11,7 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"; // Im
 import CompanyLogo from "../assets/company.png";
 import ClearanceLogo from "../assets/e-clearance-logo.png";
 import Header from "../components/Header";
+
 const Layout = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [module, setModule] = useState(null); // Initialize user as null

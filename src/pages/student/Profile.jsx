@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useGetStudentDetailsQuery } from "../../api/apiSlice";
 import Button from "./Button";
 import InfoBox from "./InfoBox";
+import Payment from "./Payment";
 import ReportCard from "./Report";
 import StudentClearanceCard from "./StudentClearanceCard";
 
@@ -21,7 +22,6 @@ const Profile = () => {
     isLoading,
     isError,
   } = useGetStudentDetailsQuery(id);
-
 
   if (isLoading && !isError) return "Loading...";
 
@@ -91,6 +91,13 @@ const Profile = () => {
           handleSelect={handleSelect}
           title={"Report"}
         />
+
+        <Button
+          button_id="3"
+          isActive={selected == "3"}
+          handleSelect={handleSelect}
+          title={"Payment"}
+        />
       </div>
 
       {/* {selected == "1" && <AboutCard employeeDetails="sdf" />}
@@ -104,6 +111,12 @@ const Profile = () => {
       )}
       {selected == "2" && (
         <ReportCard
+          studentId={id}
+          instituteId={studentDetails?.data?.institute_id}
+        />
+      )}
+      {selected == "3" && (
+        <Payment
           studentId={id}
           instituteId={studentDetails?.data?.institute_id}
         />

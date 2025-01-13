@@ -67,6 +67,12 @@ export const apiSlice = createApi({
       query: (id) => `/user/${id}`,
       providesTags: ["User"],
     }),
+
+    getDeptByUserDetails: builder.query({
+      query: (id) => `/user/dept-details/${id}`,
+      providesTags: ["User"],
+    }),
+
     addUserCsv: builder.mutation({
       query: (data) => {
         const formData = new FormData();
@@ -265,6 +271,7 @@ export const apiSlice = createApi({
 export const {
   useCreateUserMutation,
   useLoginUserMutation,
+  useGetDeptByUserDetailsQuery,
   useCreateInstituteMutation,
   useGetInstituteQuery,
   useGetInstituteDetailsQuery,
