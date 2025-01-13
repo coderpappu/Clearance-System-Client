@@ -8,8 +8,8 @@ import { BiBookOpen, BiDialpadAlt } from "react-icons/bi";
 import { PiSpeedometer } from "react-icons/pi";
 import { SlSettings } from "react-icons/sl";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"; // Import useNavigate and useLocation
-
 import CompanyLogo from "../assets/company.png";
+import ClearanceLogo from "../assets/e-clearance-logo.png";
 import Header from "../components/Header";
 const Layout = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -78,7 +78,7 @@ const Layout = () => {
         <div className="w-72 bg-gray-800 text-white fixed h-full overflow-y-auto">
           {/* logged profile img and user name */}
           <div className="px-8 py-3">
-            <h2>Edu Clearance</h2>
+            <img src={ClearanceLogo} />
           </div>
           <nav className="mt-8 ">
             <ul className="p-4 ">
