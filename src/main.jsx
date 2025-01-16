@@ -14,6 +14,7 @@ import InstituteCard from "./pages/Institute/InstituteCard";
 import InstituteRegistrationForm from "./pages/IntituteRegistration";
 import Layout from "./pages/Layout";
 import NotFound from "./pages/NotFound";
+import PaymentCard from "./pages/payment/PaymentCard";
 import StudentCard from "./pages/student/StudentCard";
 import StudentProfile from "./pages/student/StudentProfileCard";
 import StudentRegistrationForm from "./pages/StudentRegForm";
@@ -134,6 +135,10 @@ const router = createBrowserRouter([
   {
     path: "/signin",
     element: <LoginForm />,
+  },
+  {
+    path: "/payment",
+    element: <PaymentCard />,
   },
 ]);
 
