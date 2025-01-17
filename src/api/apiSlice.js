@@ -285,7 +285,10 @@ export const apiSlice = createApi({
       query: (id) => `/student/duepayment/${id}`,
       providesTags: ["duepayment"],
     }),
-
+    getTotalDueByStudentId: builder.query({
+      query: (id) => `/student/duepayment/due-total/${id}`,
+      providesTags: ["duepayment"],
+    }),
     deleteDuePayment: builder.mutation({
       query: (id) => ({
         url: `/student/duepayment/${id}`,
@@ -335,4 +338,5 @@ export const {
   useGetDuePaymentListByStudentQuery,
   useDeleteDuePaymentMutation,
   useGetDuePaymentDetailsQuery,
+  useGetTotalDueByStudentIdQuery,
 } = apiSlice;

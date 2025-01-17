@@ -19,8 +19,6 @@ const StudentProfile = () => {
     return <div>Failed to fetch student data.</div>;
   }
 
-  console.log(studentDetails);
-
   return (
     <div>
   

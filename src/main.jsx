@@ -15,6 +15,8 @@ import InstituteRegistrationForm from "./pages/IntituteRegistration";
 import Layout from "./pages/Layout";
 import NotFound from "./pages/NotFound";
 import StudentCard from "./pages/student/StudentCard";
+import StudentDueCheck from "./pages/student/StudentDueCheck";
+import StudentPaymentCard from "./pages/student/StudentPaymentCard";
 import StudentProfile from "./pages/student/StudentProfileCard";
 import StudentRegistrationForm from "./pages/StudentRegForm";
 import UserList from "./pages/user/UserList";
@@ -30,7 +32,7 @@ const router = createBrowserRouter([
       <PrivateRoute>
         <Layout />
       </PrivateRoute>
-    ), // Wrap all routes inside Layout
+    ),
     children: [
       {
         path: "/",
@@ -134,6 +136,14 @@ const router = createBrowserRouter([
   {
     path: "/signin",
     element: <LoginForm />,
+  },
+  {
+    path: "/student-verify",
+    element: <StudentDueCheck />,
+  },
+  {
+    path: "/student-payment",
+    element: <StudentPaymentCard />,
   },
 ]);
 
