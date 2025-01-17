@@ -7,9 +7,7 @@ const PaymentCard = () => {
         {/* card header  */}
         <h2 className="text-lg text-center font-medium">Student Payment </h2>
 
-        <div className="">
-
-        </div>
+        <div className=""></div>
       </div>
     </div>
   );

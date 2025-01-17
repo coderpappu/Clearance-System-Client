@@ -1,14 +1,18 @@
 import React, { useState } from "react";
+import { RxCrossCircled } from "react-icons/rx";
 import { usePDF } from "react-to-pdf";
 import { useGetTotalDueByStudentIdQuery } from "../../api/apiSlice";
 import Logo from "../../assets/cpi_logo.png";
+
 import ErrorMessage from "../../utils/ErrorMessage";
+import StudentPaymentCard from "./StudentPaymentCard";
 const StudentDueCheck = () => {
   const [boardRoll, setBoardRoll] = useState("");
   const [session, setSession] = useState("");
   const [error, setError] = useState("");
   const [studentData, setStudentData] = useState("");
   const [showResult, setShowResult] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const {
     data: totalStudentDueCheck,
@@ -16,6 +20,12 @@ const StudentDueCheck = () => {
     error: serverMsg,
   } = useGetTotalDueByStudentIdQuery(studentData);
   const { toPDF, targetRef } = usePDF({ filename: "page.pdf", margin: 40 });
+
+  const onClose = () => setIsPopupOpen(false);
+
+  const handleOpen = (id = null) => {
+    setIsPopupOpen(true);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -201,7 +211,7 @@ const StudentDueCheck = () => {
                     Print
                   </button>
                   <button
-                    onClick={() => {}}
+                    onClick={() => handleOpen()}
                     className="mb-4 px-3 py-2 bg-green-500 text-white rounded cursor-pointer text-sm"
                   >
                     Payment
@@ -209,6 +219,31 @@ const StudentDueCheck = () => {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+      {isPopupOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-dark-card rounded-lg p-6 w-full max-w-xl">
+            <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-dark-border-color dark:border-opacity-5">
+              <h3 className="text-lg font-medium text-gray-800 dark:text-white">
+                Student Payment
+              </h3>
+
+              <button
+                className="text-gray-500 hover:text-gray-800"
+                onClick={() => setIsPopupOpen(false)}
+              >
+                <RxCrossCircled fontSize={20} />
+              </button>
+            </div>
+            <div className="mt-4">
+              <StudentPaymentCard
+                studentId={totalStudentDueCheck?.data?.stuInfo?.id}
+                due={totalStudentDueCheck?.data?.totalDue}
+                onClose={onClose}
+              />
+            </div>
           </div>
         </div>
       )}

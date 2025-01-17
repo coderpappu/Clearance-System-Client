@@ -11,6 +11,8 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"; // Im
 import CompanyLogo from "../assets/company.png";
 import ClearanceLogo from "../assets/e-clearance-logo.png";
 import Header from "../components/Header";
+import { GiTakeMyMoney } from "react-icons/gi";
+import { TbMoneybag } from "react-icons/tb";
 
 const Layout = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -138,6 +140,16 @@ const Layout = () => {
                 >
                   <PiStudentDuotone className="mr-2" /> {/* Icon for Student */}
                   Student
+                </Link>
+              </li>
+
+              <li className="my-1">
+                <Link
+                  to="/payment-verify"
+                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
+                >
+                  <TbMoneybag className="mr-2" /> {/* Icon for Student */}
+                  Payment
                 </Link>
               </li>
 

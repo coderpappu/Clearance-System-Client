@@ -86,7 +86,7 @@ const StudentCard = () => {
       file: csvFile, // Pass the file object here
     };
 
-    console.log(userData);
+ 
 
     try {
       const studentsCSV = await addStudentCsv(userData).unwrap();

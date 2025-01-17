@@ -15,6 +15,7 @@ import InstituteRegistrationForm from "./pages/IntituteRegistration";
 import Layout from "./pages/Layout";
 import NotFound from "./pages/NotFound";
 import PaymentCard from "./pages/payment/PaymentCard";
+import PaymentVerify from "./pages/payment/PaymentVerify";
 import StudentCard from "./pages/student/StudentCard";
 import StudentDueCheck from "./pages/student/StudentDueCheck";
 import StudentPaymentCard from "./pages/student/StudentPaymentCard";
@@ -124,6 +125,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <StudentProfile />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/payment-verify",
+        element: (
+          <PrivateRoute>
+            <PaymentVerify />
           </PrivateRoute>
         ),
       },
