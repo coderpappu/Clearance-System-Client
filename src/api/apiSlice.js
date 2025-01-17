@@ -267,6 +267,7 @@ export const apiSlice = createApi({
     }),
 
     // duepayment
+
     createDuePayment: builder.mutation({
       query: (credentials) => ({
         url: "/student/duepayment",
@@ -308,6 +309,23 @@ export const apiSlice = createApi({
     getAllDuePaymentList: builder.query({
       query: () => `/student/duestupayment/payment`,
       providesTags: ["duestupayment"],
+    }),
+
+    updateDuePayment: builder.mutation({
+      query: ({ id, ...credentials }) => ({
+        url: `/student/duestupayment/${id}`,
+        method: "PUT",
+        body: credentials,
+      }),
+      invalidatesTags: ["duestupayment"],
+    }),
+
+    deleteStuDuePayment: builder.mutation({
+      query: (id) => ({
+        url: `/student/duestupayment/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["duestupayment"],
     }),
   }),
 });
@@ -355,4 +373,6 @@ export const {
 
   useCreateDueStuPaymentMutation,
   useGetAllDuePaymentListQuery,
+  useUpdateDuePaymentMutation,
+  useDeleteStuDuePaymentMutation,
 } = apiSlice;

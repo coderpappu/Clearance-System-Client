@@ -70,13 +70,17 @@ const Payment = ({ studentId }) => {
     content = dueList?.data?.map((duePay) => (
       <>
         <div className="w-full dark:text-dark-text-color px-5 py-2 bg-slate-100 dark:bg-dark-box rounded-sm flex flex-wrap justify-between items-center mb-2">
-          <div className="w-[50%]">
+          <div className="w-[40%]">
             <h2 className="mb-2 font-medium">{duePay?.department?.name}</h2>
             <h2>{duePay?.clearanceCategory?.name}</h2>
           </div>
 
-          <div className="w-[30%]">
+          <div className="w-[10%]">
             <h2>{duePay?.amount}</h2>
+          </div>
+
+          <div className="w-[10%]">
+            <h2>{duePay?.status}</h2>
           </div>
 
           <div className="w-[15%] flex flex-wrap justify-start gap-2">

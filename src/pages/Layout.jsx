@@ -7,12 +7,11 @@ import { PiStudentDuotone, PiUsers } from "react-icons/pi";
 import { BiBookOpen, BiDialpadAlt } from "react-icons/bi";
 import { PiSpeedometer } from "react-icons/pi";
 import { SlSettings } from "react-icons/sl";
+import { TbMoneybag } from "react-icons/tb";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"; // Import useNavigate and useLocation
 import CompanyLogo from "../assets/company.png";
 import ClearanceLogo from "../assets/e-clearance-logo.png";
 import Header from "../components/Header";
-import { GiTakeMyMoney } from "react-icons/gi";
-import { TbMoneybag } from "react-icons/tb";
 
 const Layout = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -48,6 +47,8 @@ const Layout = () => {
       setModuleName("Student Management");
     } else if (path.includes("/dashboard")) {
       setModuleName("Dashboard");
+    } else if (path.includes("/payment-verify")) {
+      setModuleName("Payments Verify");
     } else {
       setModuleName("");
     }
