@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
-import { BiLayer } from "react-icons/bi";
+import { BiBookOpen, BiDialpadAlt, BiLayer } from "react-icons/bi";
 import { FaMoon, FaSignOutAlt, FaSun } from "react-icons/fa"; // Import icons
-import { PiStudentDuotone, PiUsers } from "react-icons/pi";
-
-import { BiBookOpen, BiDialpadAlt } from "react-icons/bi";
-import { PiSpeedometer } from "react-icons/pi";
+import { PiSpeedometer, PiStudentDuotone, PiUsers } from "react-icons/pi";
 import { SlSettings } from "react-icons/sl";
 import { TbMoneybag } from "react-icons/tb";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"; // Import useNavigate and useLocation
