@@ -37,6 +37,8 @@ const StudentForm = ({ selectedStudentId, onClose }) => {
     phoneNumber: Yup.string().required("Phone number is required"),
     district: Yup.string().required("District is required"),
     upazila: Yup.string().required("Upazila is required"),
+    mother_name: Yup.string().required("Mother's name is required"),
+    father_name: Yup.string().required("Father's name is required"),
   });
 
   // Local state for initial values
@@ -52,6 +54,8 @@ const StudentForm = ({ selectedStudentId, onClose }) => {
     phoneNumber: "",
     district: "",
     upazila: "",
+    mother_name: "",
+    father_name: "",
   });
 
   // Update initial values once data is fetched
@@ -69,6 +73,8 @@ const StudentForm = ({ selectedStudentId, onClose }) => {
         phoneNumber: studentDetails?.data.phoneNumber || "",
         district: studentDetails?.data.district || "",
         upazila: studentDetails?.data.upazila || "",
+        mother_name: studentDetails?.data.mother_name || "",
+        father_name: studentDetails?.data.father_name || "",
       });
     }
   }, [isLoading, studentDetails]);
@@ -134,6 +140,64 @@ const StudentForm = ({ selectedStudentId, onClose }) => {
           />
           {formik.touched.name && formik.errors.name ? (
             <div className="text-red-500 text-sm">{formik.errors.name}</div>
+          ) : null}
+        </div>
+
+        {/* Mother's Name */}
+        <div>
+          <label
+            htmlFor="mother_name"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Mother's Name
+          </label>
+          <input
+            type="text"
+            name="mother_name"
+            id="mother_name"
+            className={`w-full bg-gray-50 border ${
+              formik.touched.mother_name && formik.errors.mother_name
+                ? "border-red-500"
+                : "border-gray-300"
+            } text-gray-900 rounded-lg p-3 dark:bg-gray-700`}
+            value={formik.values.mother_name}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            placeholder="Mother's Name"
+          />
+          {formik.touched.mother_name && formik.errors.mother_name ? (
+            <div className="text-red-500 text-sm">
+              {formik.errors.mother_name}
+            </div>
+          ) : null}
+        </div>
+
+        {/* Father's Name */}
+        <div>
+          <label
+            htmlFor="father_name"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Father's Name
+          </label>
+          <input
+            type="text"
+            name="father_name"
+            id="father_name"
+            className={`w-full bg-gray-50 border ${
+              formik.touched.father_name && formik.errors.father_name
+                ? "border-red-500"
+                : "border-gray-300"
+            } text-gray-900 rounded-lg p-3 dark:bg-gray-700`}
+            value={formik.values.father_name}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            placeholder="Father's Name"
+          />
+          {formik.touched.father_name && formik.errors.father_name ? (
+            <div className="text-red-500 text-sm">
+              {formik.errors.father_name}
+            </div>
           ) : null}
         </div>
 
