@@ -18,8 +18,6 @@ const Profile = () => {
 
   const id = useParams().id;
 
-
-
   const {
     data: studentDetails,
     isLoading,

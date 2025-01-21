@@ -1,12 +1,25 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { usePDF } from "react-to-pdf";
-import { useGetStudentBaseClearanceQuery } from "../../api/apiSlice";
+import {
+  useGetStudentBaseClearanceQuery,
+  useGetStudentDetailsQuery,
+} from "../../api/apiSlice";
 
 const ClearanceForm = () => {
   const { id } = useParams();
   const { data: studentBaseClearance } = useGetStudentBaseClearanceQuery(id);
-  const { toPDF, targetRef } = usePDF({ filename: "page.pdf", margin: 40 });
+
+  const {
+    data: studentDetails,
+    isLoading,
+    isError,
+  } = useGetStudentDetailsQuery(id);
+
+  const { toPDF, targetRef } = usePDF({
+    filename: "page.pdf",
+    margin: 40,
+  });
 
   // Split the departments into two groups for two columns
   const departmentEntries = Object.entries(studentBaseClearance?.data || {});
@@ -41,7 +54,7 @@ const ClearanceForm = () => {
         {/* application format  */}
 
         <div className="text-base">
-          {`  Name : Pappu Dey , Father's Name : Sree Babul Kanti Dey , Mother's Name : Jinu Dey . This student is a regular student of Chittagong Polytechnic Institute. He has completed all the courses of the 4th semester of the 2019 academic year. He has completed all the courses of the 4th semester of the 2019 academic year. He has completed all the courses of the 4th semester of the 2019 academic year. He has completed all the courses of the 4th semester of the 2019 academic year. `}
+          {`  Name : ${studentDetails?.data?.name}, Father's Name : ${studentDetails?.data?.father_name} , Mother's Name : ${studentDetails?.data?.mother_name} . This student is a regular student of Chittagong Polytechnic Institute. He has completed all the courses of the 8th semester of the 2025 academic year.`}
         </div>
         <div className="flex justify-end my-8">
           <div>
