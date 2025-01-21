@@ -1,10 +1,50 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { usePDF } from "react-to-pdf";
+import generatePDF, { Margin, Resolution } from "react-to-pdf";
 import {
   useGetStudentBaseClearanceQuery,
   useGetStudentDetailsQuery,
 } from "../../api/apiSlice";
+const options = {
+  filename: "advanced-example.pdf",
+  method: "save",
+  // default is Resolution.MEDIUM = 3, which should be enough, higher values
+  // increases the image quality but also the size of the PDF, so be careful
+  // using values higher than 10 when having multiple pages generated, it
+  // might cause the page to crash or hang.
+  resolution: Resolution.EXTREME,
+  page: {
+    // margin is in MM, default is Margin.NONE = 0
+    margin: Margin.SMALL,
+    // default is 'A4'
+    format: "letter",
+    // default is 'portrait'
+    orientation: "portrait",
+  },
+  canvas: {
+    // default is 'image/jpeg' for better size performance
+    mimeType: "image/jpeg",
+    qualityRatio: 1,
+  },
+  // Customize any value passed to the jsPDF instance and html2canvas
+  // function. You probably will not need this and things can break,
+  // so use with caution.
+  overrides: {
+    // see https://artskydj.github.io/jsPDF/docs/jsPDF.html for more options
+    pdf: {
+      compress: true,
+    },
+    // see https://html2canvas.hertzen.com/configuration for more options
+    canvas: {
+      useCORS: true,
+    },
+  },
+};
+
+// you can also use a function to return the target element besides using React refs
+const getTargetElement = () => document.getElementById("container");
+
+const downloadPdf = () => generatePDF(getTargetElement, options);
 
 const ClearanceForm = () => {
   const { id } = useParams();
@@ -16,11 +56,6 @@ const ClearanceForm = () => {
     isError,
   } = useGetStudentDetailsQuery(id);
 
-  const { toPDF, targetRef } = usePDF({
-    filename: "page.pdf",
-    margin: 40,
-  });
-
   // Split the departments into two groups for two columns
   const departmentEntries = Object.entries(studentBaseClearance?.data || {});
   const half = Math.ceil(departmentEntries.length / 2);
@@ -30,14 +65,14 @@ const ClearanceForm = () => {
   return (
     <div className="w-[85%] mx-auto p-4">
       <button
-        onClick={() => toPDF()}
+        onClick={downloadPdf}
         className="mb-4 px-4 py-2 bg-blue-500 text-white rounded cursor-pointer"
       >
         Download PDF
       </button>
       <div
-        ref={targetRef}
         className="w-full mx-auto p-5 border border-gray-300 rounded-lg bg-white"
+        id="container"
       >
         {/* Header */}
         <header className="text-center mb-8">
