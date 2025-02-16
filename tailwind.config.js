@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+
+import { keepTheme } from "keep-react/keepTheme";
+
+const config = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 
   plugins: [],
@@ -7,7 +10,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        "dark-bg": "#0F172A",
+        "dark-bg": "#0B1120",
         "dark-card": "#1E293B",
         "dark-box": "#293548",
         "dark-text-color": "#c4c7ce",
@@ -22,6 +25,7 @@ export default {
     },
     fontFamily: {
       body: [
+        "Raleway",
         "Inter",
         "ui-sans-serif",
         "system-ui",
@@ -38,7 +42,9 @@ export default {
         "Segoe UI Symbol",
         "Noto Color Emoji",
       ],
+      heading: "Raleway",
       sans: [
+        "Raleway",
         "Inter",
         "ui-sans-serif",
         "system-ui",
@@ -55,6 +61,9 @@ export default {
         "Segoe UI Symbol",
         "Noto Color Emoji",
       ],
+      raleway: ["Raleway", "Roboto"],
     },
   },
 };
+
+export default keepTheme(config);

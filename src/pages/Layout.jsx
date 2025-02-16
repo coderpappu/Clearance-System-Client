@@ -1,33 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { BiBookOpen, BiDialpadAlt, BiLayer } from "react-icons/bi";
-import { FaMoon, FaSignOutAlt, FaSun } from "react-icons/fa"; // Import icons
+// import { FaMoon, FaSignOutAlt, FaSun } from "react-icons/fa";
 import { PiSpeedometer, PiStudentDuotone, PiUsers } from "react-icons/pi";
 import { SlSettings } from "react-icons/sl";
 import { TbMoneybag } from "react-icons/tb";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"; // Import useNavigate and useLocation
+import { Link, Outlet, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
+import SupportImg from "../assets//customer-service.png";
 import CompanyLogo from "../assets/company.png";
-import ClearanceLogo from "../assets/e-clearance-logo.png";
+import ClearanceLogo from "../assets/eclearance.png";
 import Header from "../components/Header";
 
 const Layout = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [module, setModule] = useState(null); // Initialize user as null
   const [moduleName, setModuleName] = useState(""); // State for module name
-  const navigate = useNavigate();
-  const location = useLocation(); // Get current location
 
-  // On initial render, check localStorage for theme preference and user data
+  const location = useLocation(); // Get current location
+  const [activeRoute, setActiveRoute] = useState(location.pathname);
+
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      setIsDarkMode(true);
-      document.body.classList.add("dark"); // Apply dark theme
-    } else {
-      setIsDarkMode(false);
-      document.body.classList.remove("dark"); // Apply light theme
-    }
-  }, []);
+    setActiveRoute(location.pathname);
+  }, [location.pathname]);
 
   // Update module name based on current route
   useEffect(() => {
@@ -51,42 +44,28 @@ const Layout = () => {
     }
   }, [location]);
 
-  // Toggle theme
-  const toggleTheme = () => {
-    setIsDarkMode((prevMode) => {
-      const newMode = !prevMode;
-      if (newMode) {
-        localStorage.setItem("theme", "dark");
-        document.body.classList.add("dark"); // Apply dark theme
-      } else {
-        localStorage.setItem("theme", "light");
-        document.body.classList.remove("dark"); // Apply light theme
-      }
-      return newMode;
-    });
-  };
-
-  const handleLogout = () => {
-    // Clear user session (e.g., remove token from localStorage)
-    localStorage.removeItem("token");
-    navigate("/signin"); // Redirect to login page
+  const isActive = (path) => {
+    return activeRoute === path;
   };
 
   return (
     <>
       <div className="min-h-screen flex">
         {/* Sidebar */}
-        <div className="w-72 bg-gray-800 text-white fixed h-full overflow-y-auto">
+        <div className="w-72 px-5 bg-dark-card text-white fixed h-full  overflow-y-auto">
           {/* logged profile img and user name */}
-          <div className="px-8 py-3">
+          <div className="py-3 w-48 ">
             <img src={ClearanceLogo} />
           </div>
+
           <nav className="mt-8 ">
-            <ul className="p-4 ">
+            <ul className="py-4">
               <li className="my-1">
                 <Link
                   to="/dashboard"
-                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
+                  className={`flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md ${
+                    isActive("/dashboard") ? "bg-gray-700" : ""
+                  }`}
                 >
                   <PiSpeedometer className="mr-2" />{" "}
                   {/* Icon for User Account */}
@@ -96,7 +75,9 @@ const Layout = () => {
               <li className="my-1">
                 <Link
                   to="/user/list"
-                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
+                  className={`flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md ${
+                    isActive("/user/list") ? "bg-gray-700" : ""
+                  }`}
                 >
                   <PiUsers className="mr-2" /> {/* Icon for User Account */}
                   Users
@@ -105,7 +86,9 @@ const Layout = () => {
               <li className="my-1">
                 <Link
                   to="/institute/profile"
-                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
+                  className={`flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md ${
+                    isActive("/institute/profile") ? "bg-gray-700" : ""
+                  }`}
                 >
                   <BiBookOpen className="mr-2" /> {/* Icon for Institute */}
                   Institute
@@ -115,7 +98,9 @@ const Layout = () => {
               <li className="my-1">
                 <Link
                   to="/department/list"
-                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
+                  className={`flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md ${
+                    isActive("/department/list") ? "bg-gray-700" : ""
+                  }`}
                 >
                   <BiDialpadAlt className="mr-2" />{" "}
                   {/* Icon for User Account */}
@@ -125,7 +110,9 @@ const Layout = () => {
               <li className="my-1">
                 <Link
                   to="/clearance/category"
-                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
+                  className={`flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md ${
+                    isActive("/clearance/category") ? "bg-gray-700" : ""
+                  }`}
                 >
                   <BiLayer className="mr-2" /> {/* Icon for Student */}
                   Clearance Category
@@ -134,7 +121,9 @@ const Layout = () => {
               <li className="my-1">
                 <Link
                   to="/student"
-                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
+                  className={`flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md ${
+                    isActive("/student") ? "bg-gray-700" : ""
+                  }`}
                 >
                   <PiStudentDuotone className="mr-2" /> {/* Icon for Student */}
                   Student
@@ -144,7 +133,9 @@ const Layout = () => {
               <li className="my-1">
                 <Link
                   to="/payment-verify"
-                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
+                  className={`flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md ${
+                    isActive("/payment-verify") ? "bg-gray-700" : ""
+                  }`}
                 >
                   <TbMoneybag className="mr-2" /> {/* Icon for Student */}
                   Payment
@@ -154,7 +145,9 @@ const Layout = () => {
               <li className="my-1">
                 <Link
                   to="/settings"
-                  className="flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md"
+                  className={`flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md ${
+                    isActive("/settings") ? "bg-gray-700" : ""
+                  }`}
                 >
                   <SlSettings className="mr-2" /> {/* Icon for Student */}
                   Settings
@@ -163,35 +156,22 @@ const Layout = () => {
             </ul>
           </nav>
 
-          {/* Dark Mode Toggle Button (Located at the bottom of the sidebar) */}
-          <div className="absolute bottom-36 left-4 flex flex-col space-y-2">
-            <button
-              onClick={toggleTheme}
-              className="flex items-center px-4 py-2 text-base hover:bg-gray-700 rounded-lg"
-            >
-              {isDarkMode ? (
-                <FaSun className="mr-2" />
-              ) : (
-                <FaMoon className="mr-2" />
-              )}
-              {isDarkMode ? "Light Mode" : "Dark Mode"}
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center px-4 py-2 text-base hover:bg-gray-700 rounded-lg"
-            >
-              <FaSignOutAlt className="mr-2" />
-              Logout
-            </button>
-          </div>
+          <div className="">
+            <div className="w-[85%] absolute bottom-40 z-20 flex justify-center">
+              <img src={SupportImg} alt="Support" className="w-16" />
+            </div>
 
-          {/* company logo  */}
-          <div className="w-full px-5  absolute bottom-5 ">
-            <Link to="https://www.codexdevware.com/">
-              {" "}
-              <p className="pb-3">Developed By: </p>
-              <img src={CompanyLogo} alt="Codex Devware" />
-            </Link>
+            <div className="w-[85%] h-44 absolute bottom-5 bg-white bg-opacity-10 border-2 border-slate-600 rounded-md ">
+              <div className="w-full p-[15px] absolute ">
+                <Link to="https://www.codexdevware.com/" target="_blank">
+                  {" "}
+                  <h2 className="text-sm text-slate-400 mb-3 mt-8 text-center">
+                    Need help? Visit our support center
+                  </h2>
+                  <img src={CompanyLogo} alt="Codex Devware" />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
 

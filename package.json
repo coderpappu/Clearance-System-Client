@@ -10,9 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.0",
+    "@heroicons/react": "^2.2.0",
     "@reduxjs/toolkit": "^2.3.0",
     "formik": "^2.4.6",
+    "headlessui": "^0.0.0",
+    "heroicons": "^2.2.0",
     "jwt-decode": "^4.0.0",
+    "keep-react": "^1.6.1",
+    "phosphor-react": "^1.4.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
@@ -22,6 +28,7 @@
     "react-router-dom": "^6.28.0",
     "react-to-pdf": "^1.0.1",
     "react-to-print": "^3.0.2",
+    "recharts": "^2.15.1",
     "redux": "^5.0.1",
     "yup": "^1.4.0"
   },
@@ -31,6 +38,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
+    "daisyui": "^4.12.23",
     "eslint": "^9.13.0",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",

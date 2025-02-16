@@ -1,50 +1,11 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import generatePDF, { Margin, Resolution } from "react-to-pdf";
+import { usePDF } from "react-to-pdf";
 import {
   useGetStudentBaseClearanceQuery,
   useGetStudentDetailsQuery,
 } from "../../api/apiSlice";
-const options = {
-  filename: "advanced-example.pdf",
-  method: "save",
-  // default is Resolution.MEDIUM = 3, which should be enough, higher values
-  // increases the image quality but also the size of the PDF, so be careful
-  // using values higher than 10 when having multiple pages generated, it
-  // might cause the page to crash or hang.
-  resolution: Resolution.EXTREME,
-  page: {
-    // margin is in MM, default is Margin.NONE = 0
-    margin: Margin.SMALL,
-    // default is 'A4'
-    format: "letter",
-    // default is 'portrait'
-    orientation: "portrait",
-  },
-  canvas: {
-    // default is 'image/jpeg' for better size performance
-    mimeType: "image/jpeg",
-    qualityRatio: 1,
-  },
-  // Customize any value passed to the jsPDF instance and html2canvas
-  // function. You probably will not need this and things can break,
-  // so use with caution.
-  overrides: {
-    // see https://artskydj.github.io/jsPDF/docs/jsPDF.html for more options
-    pdf: {
-      compress: true,
-    },
-    // see https://html2canvas.hertzen.com/configuration for more options
-    canvas: {
-      useCORS: true,
-    },
-  },
-};
-
 // you can also use a function to return the target element besides using React refs
-const getTargetElement = () => document.getElementById("container");
-
-const downloadPdf = () => generatePDF(getTargetElement, options);
 
 const ClearanceForm = () => {
   const { id } = useParams();
@@ -56,6 +17,21 @@ const ClearanceForm = () => {
     isError,
   } = useGetStudentDetailsQuery(id);
 
+  const { toPDF, targetRef } = usePDF({
+    filename: `${
+      studentDetails?.data?.name
+    }_${new Date().toLocaleDateString()}.pdf`,
+    options: {
+      format: "A4",
+      margin: {
+        top: 40,
+        right: 40,
+        bottom: 40,
+        left: 40,
+      },
+    },
+  });
+
   // Split the departments into two groups for two columns
   const departmentEntries = Object.entries(studentBaseClearance?.data || {});
   const half = Math.ceil(departmentEntries.length / 2);
@@ -65,19 +41,27 @@ const ClearanceForm = () => {
   return (
     <div className="w-[85%] mx-auto p-4">
       <button
-        onClick={downloadPdf}
+        onClick={() => toPDF()}
         className="mb-4 px-4 py-2 bg-blue-500 text-white rounded cursor-pointer"
       >
-        Download PDF
+        Download
+      </button>
+
+      <button
+        onClick={() => toPDF()}
+        className="mb-4 px-4 py-2 bg-yellow-500 text-white rounded cursor-pointer"
+      >
+        Print
       </button>
       <div
-        className="w-full mx-auto p-5 border border-gray-300 rounded-lg bg-white"
+        className="w-full mx-auto py-10 px-20 border border-gray-300 rounded-lg bg-white"
         id="container"
+        ref={targetRef}
       >
         {/* Header */}
         <header className="text-center mb-8">
           <h3 className="text-lg">Bangladesh Goverment</h3>
-          <h3 className="font-semibold text-base">Principle Section</h3>
+          <h3 className="font-semibold text-base">Principle Chamber</h3>
           <h1 className="text-2xl font-bold">
             Chittagong Polytechnic Institute
           </h1>
@@ -88,16 +72,23 @@ const ClearanceForm = () => {
         </header>
         {/* application format  */}
 
-        <div className="text-base">
-          {`  Name : ${studentDetails?.data?.name}, Father's Name : ${studentDetails?.data?.father_name} , Mother's Name : ${studentDetails?.data?.mother_name} . This student is a regular student of Chittagong Polytechnic Institute. He has completed all the courses of the 8th semester of the 2025 academic year.`}
+        <div className="text-lg">
+          {`This is to certify that ${studentDetails?.data?.name} , son of ${studentDetails?.data?.father_name} and ${studentDetails?.data?.mother_name}, is a student of 8th semester, ${studentDetails?.data?.shift} shift. His roll number is ${studentDetails?.data?.boardRoll}, and his registration number is ${studentDetails?.data?.registrationNo}. 
+`}
+          <br />
+          <br />
+          As he has successfully completed his studies, we are proceeding with
+          his refund. If there are any outstanding dues associated with him, we
+          kindly request you to inform us at your earliest convenience.
         </div>
-        <div className="flex justify-end my-8">
+        <div className="flex justify-end my-14 ">
           <div>
             <div className="w-56 border-b border-gray-500"></div>
-            <p className="text-center text-base">
-              Principle
-              <p /> <p> Chattogram Polytechnic Institute</p>
-              <p> Nasirabad , Chattogram</p>
+            <p className="text-center text-base mt-3">
+              Principle / Vice-Principle
+              <p />
+              <p className="my-1"> Chattogram Polytechnic Institute</p>
+              <p className="my-1"> Nasirabad , Chattogram</p>
             </p>
           </div>
         </div>
@@ -144,7 +135,7 @@ const ClearanceForm = () => {
                   {departmentName}
                 </div>
                 <div className="w-[30%] border border-gray-300 p-2">
-                  <ul className="list-disc list-inside">
+                  <ul className="list-disc list-inside pl-2">
                     {clearances.map((clearance) => (
                       <li key={clearance.id}>
                         {clearance.clearanceCategory.name}
@@ -208,28 +199,30 @@ const ClearanceForm = () => {
           </div>
         </div>
 
-        <div className="my-3">
+        <div className="my-6 text-lg">
           <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Enim cum
-            praesentium minus fugiat iusto vero quasi nihil neque quis dolore
+            His total refundable amount is ............................ BDT,
+            from which ........................ BDT has been deducted for
+            necessary reasons. The remaining amount will be returned.
           </p>
         </div>
 
         <div className="flex justify-end my-16">
           <div>
             <div className="w-56 border-b border-gray-500"></div>
-            <p className="text-center text-base">
+            <p className="text-center text-base my-1">
               Principle
-              <p /> <p> Chattogram Polytechnic Institute</p>
-              <p> Nasirabad , Chattogram</p>
+              <p /> <p className="my-1"> Chattogram Polytechnic Institute</p>
+              <p className="my-1"> Nasirabad , Chattogram</p>
             </p>
           </div>
         </div>
 
-        <div className="my-3">
+        <div className="my-3 text-lg">
           <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Enim cum
-            praesentium minus fugiat iusto vero quasi nihil neque quis dolore
+            At the time of admission, I deposited ....................... Tk as
+            a security deposit to the institute. I hereby confirm that I have
+            received the refunded amount.
           </p>
         </div>
 
@@ -238,7 +231,7 @@ const ClearanceForm = () => {
           <div className="flex justify-between">
             <div>
               <p>Date:</p>
-              <div className="w-48 border-b border-gray-500"></div>
+              <div className="w-48 border-b mt-3 border-gray-500"></div>
             </div>
 
             <div className="flex justify-end my-8">
