@@ -1,28 +1,34 @@
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "keep-react";
 import { Pie, PieChart, Sector } from "recharts";
+import { useGetDepartmentClearanceReportQuery } from "../../api/apiSlice";
 
 const PieChartComponent = () => {
-  const chartData = [
-    { browser: "chrome", visitors: 275, fill: "#3CAAFA" },
-    { browser: "safari", visitors: 200, fill: "#9631F5" },
-    { browser: "firefox", visitors: 187, fill: "#38D6EF" },
-    { browser: "edge", visitors: 173, fill: "#D638EE" },
-    { browser: "other", visitors: 90, fill: "#afbaca" },
-  ];
+  const {
+    data: chartData,
+    isLoading,
+    isError,
+  } = useGetDepartmentClearanceReportQuery();
+
+  console.log(chartData);
+
+  // const chartData = [
+  //   { department: "Computer Technology", students: 275, fill: "#3CAAFA" },
+  //   { department: "Civil Technology", students: 200, fill: "#9631F5" },
+  // ];
   const chartConfig = {
-    visitors: {
+    students: {
       label: "Visitors",
     },
-    chrome: {
-      label: "Chrome",
+    computer: {
+      label: "Computer Technology",
       color: "#3CAAFA",
     },
-    safari: {
-      label: "Safari",
+    electronics: {
+      label: "Electronics Technology",
       color: "#9631F5",
     },
-    firefox: {
-      label: "Firefox",
+    civil: {
+      label: "Civil Technology",
       color: "#38D6EF",
     },
     edge: {
@@ -30,6 +36,14 @@ const PieChartComponent = () => {
       color: "#D638EE",
     },
     other: {
+      label: "Other",
+      color: "#afbaca",
+    },
+    other2: {
+      label: "Other",
+      color: "#afbaca",
+    },
+    other3: {
       label: "Other",
       color: "#afbaca",
     },
@@ -48,9 +62,9 @@ const PieChartComponent = () => {
             content={<ChartTooltipContent hideLabel />}
           />
           <Pie
-            data={chartData}
-            dataKey="visitors"
-            nameKey="browser"
+            data={chartData?.data}
+            dataKey="students"
+            nameKey="department"
             innerRadius={60}
             strokeWidth={5}
             activeIndex={0}

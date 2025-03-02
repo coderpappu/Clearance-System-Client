@@ -216,6 +216,11 @@ export const apiSlice = createApi({
       providesTags: ["student"],
     }),
 
+    getDeptStudentsReport: builder.query({
+      query: () => "/student/deptstudentreport",
+      providesTags: ["student"],
+    }),
+
     getStudentDetails: builder.query({
       query: (id) => `/student/${id}`,
       providesTags: ["student"],
@@ -250,6 +255,12 @@ export const apiSlice = createApi({
       query: (id) => `/clearance/by-student/${id}`,
       providesTags: ["clearance"],
     }),
+
+    getDepartmentClearanceReport: builder.query({
+      query: () => "/clearance/department-clearance-report",
+      providesTags: ["clearance"],
+    }),
+
     addStudentsCsv: builder.mutation({
       query: (data) => {
         const formData = new FormData();
@@ -351,6 +362,7 @@ export const {
 
   useCreateStudentAccMutation,
   useGetStudentListQuery,
+  useGetDeptStudentsReportQuery,
   useGetStudentDetailsQuery,
   useUpdateStudentMutation,
   useDeleteStudentMutation,
@@ -375,4 +387,5 @@ export const {
   useGetAllDuePaymentListQuery,
   useUpdateDuePaymentMutation,
   useDeleteStuDuePaymentMutation,
+  useGetDepartmentClearanceReportQuery,
 } = apiSlice;

@@ -7,6 +7,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useGetDepartmentClearanceReportQuery } from "../../api/apiSlice";
 
 const data = [
   { department: "Computer Technology", clearances: 45 },
@@ -20,6 +21,8 @@ const data = [
 ];
 
 const DepartmentClearanceChart = () => {
+  console.log(useGetDepartmentClearanceReportQuery);
+
   return (
     <div className=" p-4 rounded bg-white dark:bg-dark-card">
       <h3 className="text-lg font-semibold mb-2 dark:text-dark-heading-color">

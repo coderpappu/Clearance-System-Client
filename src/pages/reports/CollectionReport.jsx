@@ -6,8 +6,13 @@ import {
   ChartTooltipContent,
 } from "keep-react";
 import { Bar, BarChart, CartesianGrid, Rectangle, XAxis } from "recharts";
+import { useGetDeptStudentsReportQuery } from "../../api/apiSlice";
 
 export const BarChartComponent = () => {
+  const { data } = useGetDeptStudentsReportQuery();
+
+  const deptReport = data?.data;
+
   const chartData = [
     { month: "January", desktop: 186 },
     { month: "February", desktop: 305 },
@@ -27,13 +32,13 @@ export const BarChartComponent = () => {
   return (
     <div className="p-4 rounded bg-white dark:bg-dark-card">
       <h3 className="text-lg font-semibold mb-2 text-dark-box  dark:text-dark-heading-color">
-        Student's Payment
+        Department's Student
       </h3>
       <ChartContainer config={chartConfig} className="h-[300px] w-full">
-        <BarChart accessibilityLayer data={chartData}>
+        <BarChart accessibilityLayer data={deptReport}>
           <CartesianGrid vertical={false} />
           <XAxis
-            dataKey="month"
+            dataKey="department"
             tickLine={false}
             tickMargin={10}
             axisLine={false}
@@ -46,7 +51,7 @@ export const BarChartComponent = () => {
             content={<ChartLegendContent />}
           />
           <Bar
-            dataKey="desktop"
+            dataKey="studentCount"
             activeIndex={2}
             activeBar={({ ...props }) => {
               return <Rectangle {...props} fill="#1B4DFF" fillOpacity={1} />;
