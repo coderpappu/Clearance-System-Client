@@ -7,24 +7,22 @@ import {
   ChartTooltipContent,
 } from "keep-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { useGetDuePaidReportQuery } from "../../api/apiSlice";
 
 export const AreaChartComponent = () => {
-  const chartData = [
-    { month: "January", sales: 186, profit: 80 },
-    { month: "February", sales: 305, profit: 200 },
-    { month: "March", sales: 237, profit: 120 },
-    { month: "April", sales: 73, profit: 190 },
-    { month: "May", sales: 209, profit: 130 },
-    { month: "June", sales: 214, profit: 140 },
-  ];
+  const { data, isLoading } = useGetDuePaidReportQuery();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  const duepaidReport = data?.data;
 
   const chartConfig = {
-    sales: {
-      label: "Sales",
+    due_student: {
+      label: "due_student",
       color: "#1B4DFF",
     },
-    profit: {
-      label: "Profit",
+    due_paid: {
+      label: "due_paid",
       color: "#60a5fa",
     },
   };
@@ -32,13 +30,13 @@ export const AreaChartComponent = () => {
   return (
     <div className="p-4 rounded bg-white dark:bg-dark-card ">
       <h3 className="text-lg font-semibold mb-2 text-dark-box  dark:text-dark-heading-color">
-        Student's Due
+        Payment's Due
       </h3>
 
       <ChartContainer config={chartConfig} className="h-[300px] w-full">
         <AreaChart
           accessibilityLayer
-          data={chartData}
+          data={duepaidReport}
           margin={{
             left: 12,
             right: 12,
@@ -46,18 +44,18 @@ export const AreaChartComponent = () => {
         >
           <CartesianGrid vertical={false} />
           <XAxis
-            dataKey="month"
+            dataKey="department"
             tickLine={false}
             axisLine={false}
             tickMargin={8}
             tickFormatter={(value) => value.slice(0, 3)}
           />
           <defs>
-            <linearGradient id="profit" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="due_paid" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#1B4DFF" stopOpacity={0.4} />
               <stop offset="95%" stopColor="#1B4DFF" stopOpacity={0} />
             </linearGradient>
-            <linearGradient id="sales" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="due_student" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#1B4DFF" stopOpacity={0.4} />
               <stop offset="95%" stopColor="#1B4DFF" stopOpacity={0} />
             </linearGradient>
@@ -70,18 +68,18 @@ export const AreaChartComponent = () => {
           <Area
             stackId="a"
             type="natural"
-            dataKey="profit"
+            dataKey="due_paid"
             stroke="#1B4DFF"
             fillOpacity={1}
-            fill="url(#profit)"
+            fill="url(#due_paid)"
           />
           <Area
             stackId="a"
             type="natural"
-            dataKey="sales"
+            dataKey="due_student"
             stroke="#1B4DFF"
             fillOpacity={1}
-            fill="url(#sales)"
+            fill="url(#due_student)"
           />
           <ChartTooltip
             cursor={true}

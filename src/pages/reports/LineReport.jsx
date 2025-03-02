@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useGetDuePaidReportQuery } from "../../api/apiSlice";
 
 const data = [
   { name: "Jan", Sales: 4000, Profit: 2400 },
@@ -20,12 +21,14 @@ const data = [
 ];
 
 const MyLineChart = () => {
+ 
+
   return (
     <div className="bg-white dark:bg-dark-card p-4 rounded shadow">
       {" "}
       {/* Container with Tailwind styling */}
       <h3 className="text-lg font-semibold mb-2 dark:text-dark-heading-color">
-        Student Due
+        Studen
       </h3>{" "}
       {/* Chart title */}
       <ResponsiveContainer width="100%" height={300}>

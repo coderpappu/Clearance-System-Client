@@ -292,7 +292,10 @@ export const apiSlice = createApi({
       query: (studentId) => `/student/duepayment/due/${studentId}`,
       providesTags: ["duepayment"],
     }),
-
+    getDuePaidReport: builder.query({
+      query: () => `/student/duepayment/due-list`,
+      providesTags: ["duepayment"],
+    }),
     getDuePaymentDetails: builder.query({
       query: (id) => `/student/duepayment/${id}`,
       providesTags: ["duepayment"],
@@ -366,6 +369,7 @@ export const {
   useGetStudentDetailsQuery,
   useUpdateStudentMutation,
   useDeleteStudentMutation,
+  useGetDuePaidReportQuery,
 
   useCreateStudentClearanceMutation,
   useGetStudentBaseClearanceQuery,
