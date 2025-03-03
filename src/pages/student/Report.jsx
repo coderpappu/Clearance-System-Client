@@ -60,10 +60,10 @@ const ClearanceForm = () => {
       >
         {/* Header */}
         <header className="text-center mb-8">
-          <h3 className="text-lg">Bangladesh Goverment</h3>
-          <h3 className="font-semibold text-base">Principle Chamber</h3>
+          <h3 className="text-lg">People Republic of Bangladesh</h3>
+          <h3 className="font-semibold text-base">Principal Office</h3>
           <h1 className="text-2xl font-bold">
-            Chittagong Polytechnic Institute
+            Chattogram Polytechnic Institute
           </h1>
           <h4>Nasirabad , Chattogram </h4>
           <p className="text-md my-2 font-bold underline">
@@ -85,7 +85,7 @@ const ClearanceForm = () => {
           <div>
             <div className="w-56 border-b border-gray-500"></div>
             <p className="text-center text-base mt-3">
-              Principle / Vice-Principle
+              Principal/ Vice-Principal
               <p />
               <p className="my-1"> Chattogram Polytechnic Institute</p>
               <p className="my-1"> Nasirabad , Chattogram</p>
@@ -211,7 +211,7 @@ const ClearanceForm = () => {
           <div>
             <div className="w-56 border-b border-gray-500"></div>
             <p className="text-center text-base my-1">
-              Principle
+              Principal
               <p /> <p className="my-1"> Chattogram Polytechnic Institute</p>
               <p className="my-1"> Nasirabad , Chattogram</p>
             </p>

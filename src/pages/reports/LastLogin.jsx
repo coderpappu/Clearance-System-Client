@@ -1,4 +1,5 @@
 import React from "react";
+import { useGetLoginLogsQuery } from "../../api/apiSlice";
 const loginData = [
   {
     id: 1,
@@ -60,44 +61,64 @@ const loginData = [
 ];
 
 const LastLogin = () => {
+  const { data } = useGetLoginLogsQuery();
+
+  const formatDate = (dateString) => {
+    const options = {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    };
+    return new Date(dateString)
+      .toLocaleString("en-GB", options)
+      .replace(",", "");
+  };
+
   return (
     <div className="dark:bg-dark-card p-4 bg-white rounded shadow h-[280px] overflow-y-auto custom-scrollbar">
       {" "}
       {/* Darker background, scroll */}
-      <h3 className="text-lg font-semibold mb-2 text-dark-box  dark:text-dark-heading-color">
+      <h3 className="text-lg font-semibold mb-2 text-dark-box dark:text-dark-heading-color">
         Last Login List
       </h3>{" "}
       {/* White title */}
-      <table className="w-full text-dark-box dark:text-white">
-        {" "}
-        {/* Full width, light text */}
-        <thead>
-          <tr className="text-left  px-2 text-sm  border-b border-dark-text-color border-opacity-10">
-            {" "}
-            {/* Left-aligned header text */}
-            <th className="py-2 px-2">User</th>
-            <th className="py-2">Role</th>
-            <th className="py-2">Last Login Time</th>
-            <th className="py-2">IP Address</th>
-          </tr>
-        </thead>
-        <tbody className="overflow-hidden">
-          {/* Map through your login data */}
-          {loginData.map((login) => (
-            <tr
-              key={login.id}
-              className="dark:hover:bg-[#333f52] transition-all hover:bg-blue-600 hover:text-white border-b px-2 border-dark-text-color border-opacity-10 text-sm"
-            >
+      <div className="overflow-x-auto">
+        <table className="w-full text-dark-box dark:text-white">
+          {" "}
+          {/* Full width, light text */}
+          <thead>
+            <tr className="text-left px-2 text-sm border-b border-dark-text-color border-opacity-10">
               {" "}
-              {/* Hover effect */}
-              <td className="py-2 px-2">{login.user}</td>
-              <td className="py-2">{login.role}</td>
-              <td className="py-2">{login.lastLogin}</td>
-              <td className="py-2">{login.ipAddress}</td>
+              {/* Left-aligned header text */}
+              <th className="py-2 px-2">User</th>
+              <th className="py-2">Role</th>
+              <th className="py-2">Last Login Time</th>
+              <th className="py-2">Location</th>
+              <th className="py-2">IP Address</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="overflow-hidden ">
+            {/* Map through your login data */}
+            {data?.data?.logs.map((login) => (
+              <tr
+                key={login.id}
+                className="dark:hover:bg-[#333f52] transition-all hover:bg-blue-600 hover:text-white border-b px-2 border-dark-text-color border-opacity-10 text-sm"
+              >
+                {" "}
+                {/* Hover effect */}
+                <td className="py-2 px-2">{login?.user?.first_name}</td>
+                <td className="py-2 px-2">{login?.user?.role}</td>
+                <td className="py-2 px-2">{formatDate(login?.createdAt)}</td>
+                <td className="py-2 px-2">{login?.location}</td>
+                <td className="py-2 px-2">{login?.ipAddress}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

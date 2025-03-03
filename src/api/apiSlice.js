@@ -35,6 +35,11 @@ export const apiSlice = createApi({
       providesTags: ["User"],
     }),
 
+    getLoginLogs: builder.query({
+      query: () => "/user/login-logs",
+      providesTags: ["User"],
+    }),
+
     // user create
     createUser: builder.mutation({
       query: (credentials) => ({
@@ -347,6 +352,7 @@ export const apiSlice = createApi({
 export const {
   useCreateUserMutation,
   useLoginUserMutation,
+  useGetLoginLogsQuery,
   useGetDeptByUserDetailsQuery,
   useCreateInstituteMutation,
   useGetInstituteQuery,
