@@ -63,7 +63,7 @@ const Header = ({ moduleName }) => {
       <div className="lg:wrapper-container xl:w-full flex flex-wrap items-center justify-between ">
         {/* Product Brand Logo  */}
         <div className="w-[50%]">
-          <h2 className="font-semibold  text-[#0E1A34] dark:text-white font-poppins flex gap-2 items-center">
+          <h2 className="font-semibold  mt-10 ml-5 md:mt-0 md:ml-16  text-[#0E1A34] dark:text-white font-poppins flex gap-2 items-center">
             <BiLogoAudible size={25} />
             {moduleName}
           </h2>

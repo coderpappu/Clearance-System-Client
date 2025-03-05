@@ -128,8 +128,8 @@ const PaymentVerify = () => {
           </div>
 
           {/* Payment List */}
-          <div className="px-6 py-3">
-            <div className="w-full bg-light-bg dark:bg-dark-box rounded-sm py-3 px-3 flex flex-wrap justify-between text-sm">
+          <div className="px-6 py-3 overflow-x-auto">
+            <div className="w-[1200px] lg:w-full bg-light-bg dark:bg-dark-box rounded-sm py-3 px-3 flex flex-wrap justify-between text-sm">
               <div className="dark:text-white w-[5%]">
                 <h3>SL</h3>
               </div>
@@ -162,7 +162,7 @@ const PaymentVerify = () => {
             {paginatedPayments.map((payment, index) => (
               <div
                 key={payment.id}
-                className="w-full flex flex-wrap justify-between items-center text-[13px] px-3 py-3 border-t border-dark-border-color dark:border-opacity-10"
+                className="w-[1200px] lg:w-full flex flex-wrap justify-between items-center text-[13px] px-3 py-3 border-t border-dark-border-color dark:border-opacity-10"
               >
                 <div className="dark:text-white w-[5%]">
                   <h3>{(currentPage - 1) * paymentsPerPage + index + 1}</h3>

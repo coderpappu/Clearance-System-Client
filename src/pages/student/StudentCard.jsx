@@ -86,8 +86,6 @@ const StudentCard = () => {
       file: csvFile, // Pass the file object here
     };
 
- 
-
     try {
       const studentsCSV = await addStudentCsv(userData).unwrap();
       toast.success("CSV uploaded successfully!");
@@ -158,7 +156,7 @@ const StudentCard = () => {
     content = paginatedStudents?.map((student, index) => (
       <div
         key={student?.id}
-        className="w-full flex flex-wrap justify-between items-center text-[13px] px-3 py-3 border-t border-dark-border-color dark:border-opacity-10"
+        className="w-[1200px] lg:w-full flex flex-wrap justify-between items-center text-[13px] px-3 py-3 border-t border-dark-border-color dark:border-opacity-10"
       >
         <div className="dark:text-white w-[5%]">
           <h3>{(currentPage - 1) * studentsPerPage + index + 1}</h3>
@@ -227,19 +225,19 @@ const StudentCard = () => {
         <CardHeader title="Student List" handleOpen={handleOpen} />
 
         {/* Search and Filter Section */}
-        <div className="px-6 py-3 flex justify-between items-center">
+        <div className="px-6 py-3 flex flex-wrap justify-between items-center gap-3">
           <input
             type="text"
             placeholder="Search by name"
             value={searchTerm}
             onChange={handleSearch}
-            className="dark:text-white border outline-none dark:border dark:border-none text-gray-900 rounded-lg p-3 dark:bg-gray-700"
+            className="dark:text-white border outline-none dark:border dark:border-none text-gray-900 rounded-lg p-3 dark:bg-gray-700 w-full md:w-auto"
           />
-          <div className="flex flex-wrap justify-end gap-3">
+          <div className="flex flex-wrap justify-end gap-3 w-full md:w-auto">
             <select
               value={sessionFilter}
               onChange={handleSessionFilter}
-              className="dark:text-white border outline-none dark:border dark:border-none text-gray-900 rounded-lg p-3 pr-8 dark:bg-gray-700"
+              className="dark:text-white border outline-none dark:border dark:border-none text-gray-900 rounded-lg p-3 pr-8 dark:bg-gray-700 w-full md:w-auto"
             >
               <option value="">All Sessions</option>
 
@@ -252,7 +250,7 @@ const StudentCard = () => {
             <select
               value={departmentFilter}
               onChange={handleDepartmentFilter}
-              className="dark:text-white border outline-none dark:border dark:border-none text-gray-900 rounded-lg p-3 pl-8 dark:bg-gray-700"
+              className="dark:text-white border outline-none dark:border dark:border-none text-gray-900 rounded-lg p-3 pl-8 dark:bg-gray-700 w-full md:w-auto"
             >
               <option value="">All Departments</option>
               {uniqueDepartments.map((department) => (
@@ -264,7 +262,7 @@ const StudentCard = () => {
             <select
               value={shiftFilter}
               onChange={handleShiftFilter}
-              className="dark:text-white border outline-none dark:border dark:border-none text-gray-900 rounded-lg p-3 pl-8 dark:bg-gray-700"
+              className="dark:text-white border outline-none dark:border dark:border-none text-gray-900 rounded-lg p-3 pl-8 dark:bg-gray-700 w-full md:w-auto"
             >
               <option value="">All Shifts</option>
               {uniqueShifts.map((shift) => (
@@ -276,7 +274,7 @@ const StudentCard = () => {
             <select
               value={groupFilter}
               onChange={handleGroupFilter}
-              className="dark:text-white border outline-none dark:border dark:border-none text-gray-900 rounded-lg p-3 pl-8 dark:bg-gray-700"
+              className="dark:text-white border outline-none dark:border dark:border-none text-gray-900 rounded-lg p-3 pl-8 dark:bg-gray-700 w-full md:w-auto"
             >
               <option value="">All Groups</option>
               {uniqueGroups.map((group) => (
@@ -290,9 +288,9 @@ const StudentCard = () => {
 
         {/* CSV Upload Section */}
 
-        <div className="px-6 py-3">
+        <div className="px-6 py-3 overflow-x-auto ">
           {/* header */}
-          <div className="w-full bg-light-bg dark:bg-dark-box rounded-sm py-3 px-3 flex flex-wrap justify-between text-sm">
+          <div className="w-[1200px] lg:w-full bg-light-bg dark:bg-dark-box rounded-sm py-3 px-3 flex flex-wrap justify-between text-sm">
             <div className="dark:text-white w-[5%]">
               <h3>SL</h3>
             </div>

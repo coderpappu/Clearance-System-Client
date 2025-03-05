@@ -1,28 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
-import { BiBookOpen, BiDialpadAlt, BiLayer } from "react-icons/bi";
-// import { FaMoon, FaSignOutAlt, FaSun } from "react-icons/fa";
+import { BiBookOpen, BiDialpadAlt, BiLayer, BiMenu, BiX } from "react-icons/bi";
 import { PiSpeedometer, PiStudentDuotone, PiUsers } from "react-icons/pi";
 import { SlSettings } from "react-icons/sl";
 import { TbMoneybag } from "react-icons/tb";
-import { Link, Outlet, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
-import SupportImg from "../assets//customer-service.png";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import CompanyLogo from "../assets/company.png";
+import SupportImg from "../assets/customer-service.png";
 import ClearanceLogo from "../assets/eclearance.png";
 import Header from "../components/Header";
 
 const Layout = () => {
-  const [module, setModule] = useState(null); // Initialize user as null
-  const [moduleName, setModuleName] = useState(""); // State for module name
+  const [module, setModule] = useState(null);
+  const [moduleName, setModuleName] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false); // State for sidebar visibility
 
-  const location = useLocation(); // Get current location
+  const location = useLocation();
   const [activeRoute, setActiveRoute] = useState(location.pathname);
 
   useEffect(() => {
     setActiveRoute(location.pathname);
   }, [location.pathname]);
 
-  // Update module name based on current route
   useEffect(() => {
     const path = location.pathname;
     if (path.includes("/user/list")) {
@@ -52,7 +51,21 @@ const Layout = () => {
     <>
       <div className="min-h-screen flex">
         {/* Sidebar */}
-        <div className="w-72 px-5 bg-dark-card text-white fixed h-full  overflow-y-auto">
+        <div
+          className={`w-72 px-5 bg-dark-card text-white fixed h-full overflow-y-auto transition-transform transform z-50 ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } lg:translate-x-0`}
+        >
+          {/* Close Button */}
+          {sidebarOpen && (
+            <button
+              className="absolute top-4 right-4 z-50 lg:hidden"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <BiX className="text-3xl dark:text-white text-dark-bg" />
+            </button>
+          )}
+
           {/* logged profile img and user name */}
           <div className="py-3 w-48 ">
             <img src={ClearanceLogo} />
@@ -67,9 +80,7 @@ const Layout = () => {
                     isActive("/dashboard") ? "bg-gray-700" : ""
                   }`}
                 >
-                  <PiSpeedometer className="mr-2" />{" "}
-                  {/* Icon for User Account */}
-                  Dashboard
+                  <PiSpeedometer className="mr-2" /> Dashboard
                 </Link>
               </li>
               <li className="my-1">
@@ -79,8 +90,7 @@ const Layout = () => {
                     isActive("/user/list") ? "bg-gray-700" : ""
                   }`}
                 >
-                  <PiUsers className="mr-2" /> {/* Icon for User Account */}
-                  Users
+                  <PiUsers className="mr-2" /> Users
                 </Link>
               </li>
               <li className="my-1">
@@ -90,11 +100,9 @@ const Layout = () => {
                     isActive("/institute/profile") ? "bg-gray-700" : ""
                   }`}
                 >
-                  <BiBookOpen className="mr-2" /> {/* Icon for Institute */}
-                  Institute
+                  <BiBookOpen className="mr-2" /> Institute
                 </Link>
               </li>
-
               <li className="my-1">
                 <Link
                   to="/department/list"
@@ -102,9 +110,7 @@ const Layout = () => {
                     isActive("/department/list") ? "bg-gray-700" : ""
                   }`}
                 >
-                  <BiDialpadAlt className="mr-2" />{" "}
-                  {/* Icon for User Account */}
-                  Departments
+                  <BiDialpadAlt className="mr-2" /> Departments
                 </Link>
               </li>
               <li className="my-1">
@@ -114,8 +120,7 @@ const Layout = () => {
                     isActive("/clearance/category") ? "bg-gray-700" : ""
                   }`}
                 >
-                  <BiLayer className="mr-2" /> {/* Icon for Student */}
-                  Clearance Category
+                  <BiLayer className="mr-2" /> Clearance Category
                 </Link>
               </li>
               <li className="my-1">
@@ -125,11 +130,9 @@ const Layout = () => {
                     isActive("/student") ? "bg-gray-700" : ""
                   }`}
                 >
-                  <PiStudentDuotone className="mr-2" /> {/* Icon for Student */}
-                  Student
+                  <PiStudentDuotone className="mr-2" /> Student
                 </Link>
               </li>
-
               <li className="my-1">
                 <Link
                   to="/payment-verify"
@@ -137,11 +140,9 @@ const Layout = () => {
                     isActive("/payment-verify") ? "bg-gray-700" : ""
                   }`}
                 >
-                  <TbMoneybag className="mr-2" /> {/* Icon for Student */}
-                  Payment
+                  <TbMoneybag className="mr-2" /> Payment
                 </Link>
               </li>
-
               <li className="my-1">
                 <Link
                   to="/settings"
@@ -149,8 +150,7 @@ const Layout = () => {
                     isActive("/settings") ? "bg-gray-700" : ""
                   }`}
                 >
-                  <SlSettings className="mr-2" /> {/* Icon for Student */}
-                  Settings
+                  <SlSettings className="mr-2" /> Settings
                 </Link>
               </li>
             </ul>
@@ -164,7 +164,6 @@ const Layout = () => {
             <div className="w-[85%] h-44 absolute bottom-5 bg-white bg-opacity-10 border-2 border-slate-600 rounded-md ">
               <div className="w-full p-[15px] absolute ">
                 <Link to="https://www.codexdevware.com/" target="_blank">
-                  {" "}
                   <h2 className="text-sm text-slate-400 mb-3 mt-8 text-center">
                     Need help? Visit our support center
                   </h2>
@@ -176,13 +175,22 @@ const Layout = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1  bg-gray-100 dark:bg-gray-900 ml-72">
-          <Header moduleName={moduleName} /> {/* Pass moduleName to Header */}
-          {/* This will render the component based on the current route */}
+        <div className="flex-1 bg-gray-100 dark:bg-gray-900 ml-0 lg:ml-72">
+          <Header moduleName={moduleName} />
           <div className="p-5">
             <Outlet />
           </div>
         </div>
+
+        {/* Menu Button */}
+        {!sidebarOpen && (
+          <button
+            className="fixed top-4 left-4  z-50 lg:hidden bg-dark-border-color dark:bg-dark-card rounded-full bg-opacity-35 p-2"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <BiMenu className="text-3xl dark:text-white text-dark-bg" />
+          </button>
+        )}
       </div>
 
       <Toaster position="top-center" reverseOrder={false} />

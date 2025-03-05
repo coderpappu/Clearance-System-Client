@@ -77,8 +77,8 @@ const StudentClearanceCard = ({ studentId, instituteId }) => {
   };
 
   return (
-    <div className="w-full  mt-2 mb-2 rounded-md flex flex-wrap justify-between">
-      <div className="w-[49%] relative p-4 bg-white dark:bg-dark-card rounded-md">
+    <div className="w-full mt-2 mb-2 rounded-md flex flex-wrap justify-between">
+      <div className="w-full md:w-[49%] relative p-4 bg-white dark:bg-dark-card rounded-md">
         <h1 className="text-xl font-medium mb-4 dark:text-dark-heading-color">
           Clearance Form
         </h1>

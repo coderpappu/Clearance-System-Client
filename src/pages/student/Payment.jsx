@@ -70,20 +70,20 @@ const Payment = ({ studentId }) => {
     content = dueList?.data?.map((duePay) => (
       <>
         <div className="w-full dark:text-dark-text-color px-5 py-2 bg-slate-100 dark:bg-dark-box rounded-sm flex flex-wrap justify-between items-center mb-2">
-          <div className="w-[40%]">
+          <div className="w-full md:w-[40%]">
             <h2 className="mb-2 font-medium">{duePay?.department?.name}</h2>
             <h2>{duePay?.clearanceCategory?.name}</h2>
           </div>
 
-          <div className="w-[10%]">
+          <div className="w-full md:w-[10%]">
             <h2>{duePay?.amount}</h2>
           </div>
 
-          <div className="w-[10%]">
+          <div className="w-full md:w-[10%]">
             <h2>{duePay?.status}</h2>
           </div>
 
-          <div className="w-[15%] flex flex-wrap justify-start gap-2">
+          <div className="w-full md:w-[15%] flex flex-wrap justify-start gap-2 mt-2 md:mt-0">
             {/* edit button */}
             <div className="w-8 h-8 bg-green-400 rounded-sm p-2 flex justify-center items-center cursor-pointer">
               <CiEdit
@@ -106,8 +106,8 @@ const Payment = ({ studentId }) => {
     ));
 
   return (
-    <div className="w-full  mt-2 mb-2 rounded-md flex flex-wrap justify-between">
-      <div className="w-[49%] relative p-4 bg-white dark:bg-dark-card rounded-md">
+    <div className="w-full mt-2 mb-2 rounded-md flex flex-wrap justify-between">
+      <div className="w-full md:w-[49%] relative p-4 bg-white dark:bg-dark-card rounded-md">
         {/* header level  */}
         <div className="flex flex-wrap justify-between items-center">
           <h1 className="text-xl font-medium mb-4 dark:text-dark-heading-color">

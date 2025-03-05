@@ -39,25 +39,24 @@ const InstituteCard = () => {
             <IoAdd color="#fff" />
           </div>
         </div>
-        <div className="w-full relative p-5 mx-5 mt-5 mb-1 rounded-md bg-white dark:bg-dark-card flex flex-wrap justify-between ">
-          <div className="flex flex-wrap justify-between items-center w-[50%]">
-            <div className="w-[20%] mr-4">
-              <div className="w-24 h-24 mx-auto rounded-full bg-gray-200 dark:bg-blue-500  flex items-center justify-center mb-4"></div>
+        <div className="w-full relative p-5  mt-5 mb-1 rounded-md bg-white dark:bg-dark-card flex flex-wrap justify-between">
+          <div className="flex flex-wrap justify-between items-center w-full md:w-[50%]">
+            <div className="w-full md:w-[20%] mr-4">
+              <div className="w-24 h-24 mx-auto rounded-full bg-gray-200 dark:bg-blue-500 flex items-center justify-center mb-4"></div>
             </div>
-            <div className="w-[75%]">
+            <div className="w-full md:w-[75%]">
               <h1 className="font-poppins text-2xl dark:text-dark-text-color font-semibold">
                 <span className="text-2xl font-bold text-gray-600 dark:text-white">
                   {instituteDetails?.name}
                 </span>
               </h1>
-              <h3 className="text-[15px] font-medium  text-[#686767] dark:text-dark-text-color">
+              <h3 className="text-[15px] font-medium text-[#686767] dark:text-dark-text-color">
                 Email : {instituteDetails?.email}
               </h3>
-              <h3 className="text-[15px] font-medium  text-[#686767] dark:text-dark-text-color">
+              <h3 className="text-[15px] font-medium text-[#686767] dark:text-dark-text-color">
                 Phone : {instituteDetails?.phone}
               </h3>
-
-              <h3 className="text-[15px] font-medium  text-[#3c3c3c]  dark:text-dark-text-color">
+              <h3 className="text-[15px] font-medium text-[#3c3c3c] dark:text-dark-text-color">
                 {/* Registration No : {studentDetails?.data?.registrationNo} */}
               </h3>
             </div>
@@ -67,7 +66,7 @@ const InstituteCard = () => {
               </Link>
             </div>
           </div>
-          <div className="w-[50%] border-l-2 border-dotted border-[#cacaca]">
+          <div className="w-full md:w-[50%] border-t-2 md:border-t-0 md:border-l-2 border-dotted border-[#cacaca] mt-4 md:mt-0">
             <InfoBox title="Post Office" data={instituteDetails?.postOffice} />
             <InfoBox title="Post Code" data={instituteDetails?.postCode} />
             <InfoBox title="District" data={instituteDetails?.district} />

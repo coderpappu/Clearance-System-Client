@@ -63,7 +63,7 @@ const UserList = () => {
     content = userList?.data?.map((user, index) => (
       <div
         key={user?.id}
-        className="w-full flex flex-wrap justify-between items-center text-[13px] px-3 py-3 border-t border-dark-border-color dark:border-opacity-10"
+        className="w-[1000px] lg:w-full flex flex-wrap justify-between items-center text-[13px] px-3 py-3 border-t border-dark-border-color dark:border-opacity-10 "
       >
         <div className="dark:text-white w-[5%]">
           <h3>{++index}</h3>
@@ -116,9 +116,9 @@ const UserList = () => {
       <CardWrapper>
         <CardHeader title="User List" handleOpen={handleOpen} />
         {/* CSV Upload Section */}
-        <div className="px-6 py-3">
+        <div className="px-6 py-3 overflow-x-auto ">
           {/* header */}
-          <div className="w-full bg-light-bg dark:bg-dark-box rounded-sm py-3 px-3 flex flex-wrap justify-between text-sm">
+          <div className="w-[1000px] lg:w-full  bg-light-bg dark:bg-dark-box rounded-sm py-3 px-3 flex flex-wrap justify-between text-sm ">
             <div className="dark:text-white w-[5%]">
               <h3>SL</h3>
             </div>
