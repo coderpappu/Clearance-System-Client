@@ -29,7 +29,7 @@ const ClearanceCategoryCard = () => {
   } = useGetClearanceCategoriesQuery();
   const [deleteCategory] = useDeleteClearanceCategoryMutation();
 
-  console.log(clearanceCategorys);
+  
   const onClose = () => {
     setIsPopupOpen(false);
   };

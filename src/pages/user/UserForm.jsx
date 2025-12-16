@@ -17,8 +17,6 @@ const UserForm = ({ selectedUserId, onClose }) => {
   const [registerUser] = useCreateUserMutation();
   const { data: departments } = useGetDepartmentsQuery();
 
-  console.log(departments?.data?.name);
-
   const {
     data: userDetails,
     isLoading,

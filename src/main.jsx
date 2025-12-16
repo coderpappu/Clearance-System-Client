@@ -2,7 +2,6 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import App from "./App";
 import { store } from "./app/store";
 import "./index.css";
 import ClearanceCategoryForm from "./pages/clearance/CategoryForm";
@@ -24,7 +23,6 @@ import StudentRegistrationForm from "./pages/StudentRegForm";
 import UserList from "./pages/user/UserList";
 import UserProfile from "./pages/user/UserProfile";
 import LoginForm from "./pages/UserLogin";
-import UserRegistration from "./pages/UserRegistration";
 import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
@@ -38,7 +36,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <App />,
+        element: (
+          <PrivateRoute>
+            <DashboardStats />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/dashboard",
@@ -139,10 +141,10 @@ const router = createBrowserRouter([
     ],
     errorElement: <NotFound />,
   },
-  {
-    path: "/signup",
-    element: <UserRegistration />, // Wrap all routes inside Layout
-  },
+  // {
+  //   path: "/signup",
+  //   element: <UserRegistration />,
+  // },
   {
     path: "/signin",
     element: <LoginForm />,

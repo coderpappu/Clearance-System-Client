@@ -5,7 +5,7 @@ import { PiSpeedometer, PiStudentDuotone, PiUsers } from "react-icons/pi";
 import { SlSettings } from "react-icons/sl";
 import { TbMoneybag } from "react-icons/tb";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import CompanyLogo from "../assets/company.png";
+import devCompany from "../assets/company.png";
 import SupportImg from "../assets/customer-service.png";
 import ClearanceLogo from "../assets/eclearance.png";
 import Header from "../components/Header";
@@ -167,7 +167,8 @@ const Layout = () => {
                   <h2 className="text-sm text-slate-400 mb-3 mt-8 text-center">
                     Need help? Visit our support center
                   </h2>
-                  <img src={CompanyLogo} alt="Codex Devware" />
+
+                  <img src={devCompany} alt="Codex Devware" className="mt-3" />
                 </Link>
               </div>
             </div>

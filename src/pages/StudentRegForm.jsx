@@ -29,9 +29,7 @@ const StudentRegistrationForm = () => {
       upazila: Yup.string().required("Upazila is required"),
       department: Yup.string().required("Department is required"),
     }),
-    onSubmit: (values) => {
-      console.log(values);
-    },
+    onSubmit: (values) => {},
   });
 
   const departments = ["HR", "Finance", "IT", "Marketing"]; // Sample data

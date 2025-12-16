@@ -36,7 +36,6 @@ const DepartmentForm = ({ selectedDepartmentId, onClose }) => {
     }
   }, [isLoading, departmentDetails]);
 
-  console.log(departmentDetails);
   const formik = useFormik({
     initialValues,
     validationSchema,

@@ -6,8 +6,7 @@ import * as Yup from "yup";
 import { useLoginUserMutation } from "../api/apiSlice";
 import devCompany from "../assets/company.png";
 import Logo from "../assets/cpi_logo.png";
-import devCompanyDark from "../assets/darkCompany.png"; // Add the dark mode logo
-
+import devCompanyDark from "../assets/darkCompany.png";
 const LoginForm = () => {
   const navigate = useNavigate();
 
@@ -38,8 +37,8 @@ const LoginForm = () => {
   });
 
   const initialValues = {
-    email: "",
-    password: "",
+    email: "pappudey@gmail.com",
+    password: "12345678",
   };
 
   // Formik setup
@@ -49,7 +48,7 @@ const LoginForm = () => {
     onSubmit: async (values) => {
       try {
         const data = await userLogin(values).unwrap();
-        console.log(data);
+
         localStorage.setItem("token", data?.data?.token);
 
         navigate("/");
@@ -139,7 +138,7 @@ const LoginForm = () => {
                 >
                   Sign in
                 </button>
-                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                {/* <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   Don’t have an account?{" "}
                   <a
                     href="/signup"
@@ -147,7 +146,7 @@ const LoginForm = () => {
                   >
                     Sign up here
                   </a>
-                </p>
+                </p> */}
               </form>
             </div>
           </div>

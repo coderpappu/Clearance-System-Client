@@ -21,7 +21,7 @@ const data = [
 ];
 
 const DepartmentClearanceChart = () => {
-  console.log(useGetDepartmentClearanceReportQuery);
+ 
 
   return (
     <div className=" p-4 rounded bg-white dark:bg-dark-card">

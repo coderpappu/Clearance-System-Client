@@ -1,4 +1,3 @@
-import React from "react";
 import { useParams } from "react-router-dom";
 import { usePDF } from "react-to-pdf";
 import {
@@ -9,12 +8,16 @@ import {
 
 const ClearanceForm = () => {
   const { id } = useParams();
-  const { data: studentBaseClearance } = useGetStudentBaseClearanceQuery(id);
+  const {
+    data: studentBaseClearance,
+    isLoading: isBaseClearanceLoading,
+    isError: isBaseClearanceError,
+  } = useGetStudentBaseClearanceQuery(id);
 
   const {
     data: studentDetails,
-    isLoading,
-    isError,
+    isLoading: isDetailsLoading,
+    isError: isDetailsError,
   } = useGetStudentDetailsQuery(id);
 
   const { toPDF, targetRef } = usePDF({
@@ -42,17 +45,12 @@ const ClearanceForm = () => {
     <div className="w-[85%] mx-auto p-4">
       <button
         onClick={() => toPDF()}
-        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded cursor-pointer"
+        className=" disabled:opacity-75 mb-4 px-4 py-2 bg-blue-500 text-white rounded cursor-pointer "
+        disabled={studentDetails?.data?.status !== "Success"}
       >
         Download
       </button>
 
-      <button
-        onClick={() => toPDF()}
-        className="mb-4 px-4 py-2 bg-yellow-500 text-white rounded cursor-pointer"
-      >
-        Print
-      </button>
       <div
         className="w-full mx-auto py-10 px-20 border border-gray-300 rounded-lg bg-white"
         id="container"
@@ -81,7 +79,7 @@ const ClearanceForm = () => {
           his refund. If there are any outstanding dues associated with him, we
           kindly request you to inform us at your earliest convenience.
         </div>
-        <div className="flex justify-end my-14 ">
+        <div className="flex justify-end my-14 mt-20 ">
           <div>
             <div className="w-56 border-b border-gray-500"></div>
             <p className="text-center text-base mt-3">
@@ -92,30 +90,30 @@ const ClearanceForm = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap justify-between ">
-          <div className="w-[50%] flex flex-wrap justify-start gap-0 font-semibold text-gray-700 ">
-            <div className="w-[30%]  border border-gray-300 p-2">
+        <div className="flex flex-wrap justify-between text-[13px]">
+          <div className="w-[50%] flex flex-wrap justify-start gap-0 font-semibold text-black ">
+            <div className="w-[35%]  border border-gray-300 p-2">
               Department Name
             </div>
-            <div className="w-[30%] border border-gray-300 p-2">
+            <div className="w-[40%] border border-gray-300 p-2">
               <h2>Lab </h2>
             </div>
-            <div className="w-[20%] border border-gray-300 p-2">
-              <h2>Clearance</h2>
+            <div className="w-[5%] border border-gray-300 p-2">
+              <h2>S</h2>
             </div>
             <div className="w-[20%] border border-gray-300 p-2">
               <p className="text-center text-xs">Head Signature</p>
             </div>
           </div>
-          <div className="w-[50%] flex flex-wrap justify-start gap-0 font-semibold text-gray-700 ">
-            <div className="w-[30%]  border border-gray-300 p-2">
+          <div className="w-[50%] flex flex-wrap justify-start gap-0 font-semibold text-black ">
+            <div className="w-[35%]  border border-gray-300 p-2">
               Department Name
             </div>
-            <div className="w-[30%] border border-gray-300 p-2">
+            <div className="w-[40%] border border-gray-300 p-2">
               <h2>Lab </h2>
             </div>
-            <div className="w-[20%] border border-gray-300 p-2">
-              <h2>Clearance</h2>
+            <div className="w-[5%] border border-gray-300 p-2">
+              <h2>S</h2>
             </div>
             <div className="w-[20%] border border-gray-300 p-2">
               <p className="text-center text-xs">Head Signature</p>
@@ -124,17 +122,53 @@ const ClearanceForm = () => {
         </div>
 
         {/* Table */}
-        <div className="flex flex-wrap justify-between">
+        <div className="flex flex-wrap justify-between text-[13px]">
           <div className="w-[50%]">
             {firstHalf.map(([departmentName, clearances]) => (
               <div
-                className="flex flex-wrap justify-start gap-0 font-semibold text-gray-700"
+                className="flex flex-wrap justify-start gap-0  text-black"
                 key={departmentName}
               >
-                <div className="w-[30%] border border-gray-300 p-2">
+                <div className="w-[35%] border border-gray-300 p-2 ">
                   {departmentName}
                 </div>
-                <div className="w-[30%] border border-gray-300 p-2">
+                <div className="w-[40%] border border-gray-300 p-2">
+                  <ol type="1" className="list-disc list-inside pl-2">
+                    {clearances.map((clearance) => (
+                      <li key={clearance.id}>
+                        {clearance.clearanceCategory.name}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+                <div className="w-[5%] border border-gray-300 p-2">
+                  {clearances.every(
+                    (clearance) => clearance.status === "APPROVED"
+                  )
+                    ? "✔"
+                    : clearances.map((clearance) => (
+                        <div key={clearance.id}>
+                          {clearance.status === "APPROVED" ? "✔" : "✖"}
+                        </div>
+                      ))}
+                </div>
+                <div className="w-[20%] border border-gray-300 p-2">
+                  <div className="h-8 border-b border-gray-400"></div>
+                  <p className="text-center text-xs"> Signature</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="w-[50%]">
+            {secondHalf.map(([departmentName, clearances]) => (
+              <div
+                className="flex flex-wrap justify-start gap-0  text-black"
+                key={departmentName}
+              >
+                <div className="w-[35%] border border-gray-300 p-2">
+                  {departmentName}
+                </div>
+                <div className="w-[40%] border border-gray-300 p-2">
                   <ul className="list-disc list-inside pl-2">
                     {clearances.map((clearance) => (
                       <li key={clearance.id}>
@@ -143,7 +177,7 @@ const ClearanceForm = () => {
                     ))}
                   </ul>
                 </div>
-                <div className="w-[20%] border border-gray-300 p-2">
+                <div className="w-[5%] border border-gray-300 p-2">
                   {clearances.every(
                     (clearance) => clearance.status === "APPROVED"
                   )
@@ -156,43 +190,7 @@ const ClearanceForm = () => {
                 </div>
                 <div className="w-[20%] border border-gray-300 p-2">
                   <div className="h-8 border-b border-gray-400"></div>
-                  <p className="text-center text-xs">Head Signature</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="w-[50%]">
-            {secondHalf.map(([departmentName, clearances]) => (
-              <div
-                className="flex flex-wrap justify-start gap-0 font-semibold text-gray-700"
-                key={departmentName}
-              >
-                <div className="w-[30%] border border-gray-300 p-2">
-                  {departmentName}
-                </div>
-                <div className="w-[30%] border border-gray-300 p-2">
-                  <ul className="list-disc list-inside">
-                    {clearances.map((clearance) => (
-                      <li key={clearance.id}>
-                        {clearance.clearanceCategory.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="w-[20%] border border-gray-300 p-2">
-                  {clearances.every(
-                    (clearance) => clearance.status === "APPROVED"
-                  )
-                    ? "✔"
-                    : clearances.map((clearance) => (
-                        <div key={clearance.id}>
-                          {clearance.status === "APPROVED" ? "✔" : "✖"}
-                        </div>
-                      ))}
-                </div>
-                <div className="w-[20%] border border-gray-300 p-2">
-                  <div className="h-8 border-b border-gray-400"></div>
-                  <p className="text-center text-xs">Head Signature</p>
+                  <p className="text-center text-xs"> Signature</p>
                 </div>
               </div>
             ))}

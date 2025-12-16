@@ -9,7 +9,7 @@ const PieChartComponent = () => {
     isError,
   } = useGetDepartmentClearanceReportQuery();
 
-  console.log(chartData);
+ 
 
   // const chartData = [
   //   { department: "Computer Technology", students: 275, fill: "#3CAAFA" },
@@ -52,7 +52,7 @@ const PieChartComponent = () => {
   return (
     <div className="p-4 rounded bg-white dark:bg-dark-card">
       <h3 className="text-lg font-semibold mb-2 text-dark-box  dark:text-dark-heading-color">
-        Sessions
+        Clearance
       </h3>
 
       <ChartContainer config={chartConfig} className="h-[300px] w-full">

@@ -3,7 +3,8 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://clearance.codexdevware.com/api/api/",
+    // baseUrl: "https://ctgpolyclearance.com/api/",
+    baseUrl: "http://localhost:3000/api/",
 
     prepareHeaders: (headers, { getState }) => {
       const token = localStorage.getItem("token");
@@ -218,17 +219,17 @@ export const apiSlice = createApi({
 
     getStudentList: builder.query({
       query: () => "/student",
-      providesTags: ["student"],
+      providesTags: ["student", "clearance"],
     }),
 
     getDeptStudentsReport: builder.query({
       query: () => "/student/deptstudentreport",
-      providesTags: ["student"],
+      providesTags: ["student", "clearance"],
     }),
 
     getStudentDetails: builder.query({
       query: (id) => `/student/${id}`,
-      providesTags: ["student"],
+      providesTags: ["student", "clearance"],
     }),
 
     updateStudent: builder.mutation({
@@ -237,7 +238,7 @@ export const apiSlice = createApi({
         method: "PUT",
         body: credentials,
       }),
-      invalidatesTags: ["student"],
+      invalidatesTags: ["student", "clearance"],
     }),
     deleteStudent: builder.mutation({
       query: (id) => ({
