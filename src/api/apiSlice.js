@@ -248,6 +248,24 @@ export const apiSlice = createApi({
       invalidatesTags: ["student"],
     }),
 
+    bulkDeleteStudents: builder.mutation({
+      query: (ids) => ({
+        url: "/student/bulk-delete",
+        method: "POST",
+        body: { ids },
+      }),
+      invalidatesTags: ["student"],
+    }),
+
+    bulkDeleteUsers: builder.mutation({
+      query: (ids) => ({
+        url: "/user/bulk-delete",
+        method: "POST",
+        body: { ids },
+      }),
+      invalidatesTags: ["User"],
+    }),
+
     createStudentClearance: builder.mutation({
       query: (credentials) => ({
         url: "/clearance",
@@ -267,7 +285,7 @@ export const apiSlice = createApi({
       providesTags: ["clearance"],
     }),
 
-    addStudentsCsv: builder.mutation({
+    addStudentsExcel: builder.mutation({
       query: (data) => {
         const formData = new FormData();
         formData.append("name", data.name);
@@ -275,7 +293,7 @@ export const apiSlice = createApi({
         formData.append("file", data.file); // Append the file here
 
         return {
-          url: "/students/csv/import",
+          url: "/students/excel/import",
           method: "POST",
           body: formData,
         };
@@ -376,11 +394,13 @@ export const {
   useGetStudentDetailsQuery,
   useUpdateStudentMutation,
   useDeleteStudentMutation,
+  useBulkDeleteStudentsMutation,
+  useBulkDeleteUsersMutation,
   useGetDuePaidReportQuery,
 
   useCreateStudentClearanceMutation,
   useGetStudentBaseClearanceQuery,
-  useAddStudentsCsvMutation,
+  useAddStudentsExcelMutation,
   useGetUserListQuery,
   useGetUserDetailsQuery,
   useAddUserCsvMutation,

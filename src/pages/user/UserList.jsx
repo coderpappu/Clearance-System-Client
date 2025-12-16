@@ -4,19 +4,20 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { CiEdit } from "react-icons/ci";
 import { RxCrossCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
-import { useDeleteUserMutation, useGetUserListQuery } from "../../api/apiSlice";
+import { useBulkDeleteUsersMutation, useDeleteUserMutation, useGetUserListQuery } from "../../api/apiSlice";
 import { CardHeader } from "../../components/CardHeader";
 import CardWrapper from "../../components/CardWrapper";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import UserForm from "./UserForm";
-// import UserForm from "./UserForm";
 
 const UserList = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedUserId, setSelectUserId] = useState(null);
+  const [selectedUsers, setSelectedUsers] = useState([]);
 
   const { data: userList, isLoading, isError } = useGetUserListQuery();
   const [deleteUser] = useDeleteUserMutation();
+  const [bulkDeleteUsers] = useBulkDeleteUsersMutation();
 
   const onClose = () => setIsPopupOpen(false);
 
@@ -25,6 +26,25 @@ const UserList = () => {
     setSelectUserId(id);
   };
 
+  // Handle individual checkbox selection
+  const handleCheckboxChange = (userId) => {
+    setSelectedUsers((prev) =>
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    if (selectedUsers.length === userList?.data?.length) {
+      setSelectedUsers([]);
+    } else {
+      setSelectedUsers(userList?.data?.map((user) => user.id) || []);
+    }
+  };
+
+  // Handle single user delete
   const handleDeleteUser = async (id) => {
     const confirm = () =>
       toast(
@@ -53,6 +73,42 @@ const UserList = () => {
     confirm();
   };
 
+  // Handle bulk delete
+  const handleBulkDelete = async () => {
+    if (selectedUsers.length === 0) {
+      toast.error("Please select users to delete");
+      return;
+    }
+
+    const confirm = () =>
+      toast(
+        (t) => (
+          <ConfirmDialog
+            onConfirm={async () => {
+              toast.dismiss(t.id);
+              try {
+                const res = await bulkDeleteUsers(selectedUsers);
+                if (res.error != null) {
+                  toast.error(res.error.data.message);
+                } else {
+                  toast.success(
+                    `${selectedUsers.length} user(s) deleted successfully`
+                  );
+                  setSelectedUsers([]);
+                }
+              } catch (error) {
+                toast.error(error.message || "Failed to delete users");
+              }
+            }}
+            onCancel={() => toast.dismiss(t.id)}
+            title={`${selectedUsers.length} User(s)`}
+          />
+        ),
+        { duration: Infinity }
+      );
+    confirm();
+  };
+
   let content;
 
   if (isLoading && isError) return "Loading...";
@@ -65,6 +121,15 @@ const UserList = () => {
         key={user?.id}
         className="w-[1000px] lg:w-full flex flex-wrap justify-between items-center text-[13px] px-3 py-3 border-t border-dark-border-color dark:border-opacity-10 "
       >
+        <div className="dark:text-white w-[5%]">
+          <input
+            type="checkbox"
+            checked={selectedUsers.includes(user?.id)}
+            onChange={() => handleCheckboxChange(user?.id)}
+            className="w-4 h-4 cursor-pointer"
+          />
+        </div>
+
         <div className="dark:text-white w-[5%]">
           <h3>{++index}</h3>
         </div>
@@ -79,7 +144,7 @@ const UserList = () => {
           <h3>{user?.email}</h3>
         </div>
 
-        <div className="dark:text-white w-[15%]">
+        <div className="dark:text-white w-[10%]">
           <h3>{user?.role}</h3>
         </div>
         <div className="dark:text-white w-[10%]">
@@ -115,10 +180,35 @@ const UserList = () => {
     <>
       <CardWrapper>
         <CardHeader title="User List" handleOpen={handleOpen} />
+
+        {/* Bulk Delete Button */}
+        {selectedUsers.length > 0 && (
+          <div className="px-6 py-3">
+            <button
+              onClick={handleBulkDelete}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            >
+              <AiOutlineDelete size={20} />
+              Delete Selected ({selectedUsers.length})
+            </button>
+          </div>
+        )}
+
         {/* CSV Upload Section */}
         <div className="px-6 py-3 overflow-x-auto ">
           {/* header */}
           <div className="w-[1000px] lg:w-full  bg-light-bg dark:bg-dark-box rounded-sm py-3 px-3 flex flex-wrap justify-between text-sm ">
+            <div className="dark:text-white w-[5%]">
+              <input
+                type="checkbox"
+                checked={
+                  userList?.data?.length > 0 &&
+                  selectedUsers.length === userList?.data?.length
+                }
+                onChange={handleSelectAll}
+                className="w-4 h-4 cursor-pointer"
+              />
+            </div>
             <div className="dark:text-white w-[5%]">
               <h3>SL</h3>
             </div>
@@ -128,7 +218,7 @@ const UserList = () => {
             <div className="dark:text-white w-[15%]">
               <h3>Email</h3>
             </div>
-            <div className="dark:text-white w-[15%]">
+            <div className="dark:text-white w-[10%]">
               <h3>Role</h3>
             </div>
             <div className="dark:text-white w-[10%]">
@@ -171,3 +261,4 @@ const UserList = () => {
 };
 
 export default UserList;
+

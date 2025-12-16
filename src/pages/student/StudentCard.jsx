@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { AiOutlineDelete } from "react-icons/ai";
 import { CiEdit } from "react-icons/ci";
 import { RxCrossCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import {
-  useAddStudentsCsvMutation,
-  useDeleteStudentMutation,
-  useGetStudentListQuery,
+    useAddStudentsExcelMutation,
+    useBulkDeleteStudentsMutation,
+    useDeleteStudentMutation,
+    useGetStudentListQuery,
 } from "../../api/apiSlice";
 import { CardHeader } from "../../components/CardHeader";
 import CardWrapper from "../../components/CardWrapper";
@@ -17,24 +18,47 @@ import StudentForm from "./StudentForm";
 const StudentCard = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedStudentId, setSelectStudentId] = useState(null);
-  const [csvFile, setCsvFile] = useState(null); // State to hold the CSV file
+  const [excelFile, setExcelFile] = useState(null); // State to hold the Excel file
   const [searchTerm, setSearchTerm] = useState("");
   const [sessionFilter, setSessionFilter] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("");
   const [shiftFilter, setShiftFilter] = useState("");
   const [groupFilter, setGroupFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedStudents, setSelectedStudents] = useState([]);
   const studentsPerPage = 20;
 
   const { data: studentList, isLoading, isError } = useGetStudentListQuery();
   const [deleteStudent] = useDeleteStudentMutation();
-  const [addStudentCsv] = useAddStudentsCsvMutation();
+  const [bulkDeleteStudents] = useBulkDeleteStudentsMutation();
+  const [addStudentExcel] = useAddStudentsExcelMutation();
 
   const onClose = () => setIsPopupOpen(false);
 
   const handleOpen = (id = null) => {
     setIsPopupOpen(true);
     setSelectStudentId(id);
+  };
+
+  // Handle individual checkbox selection
+  const handleCheckboxChange = (studentId) => {
+    setSelectedStudents((prev) =>
+      prev.includes(studentId)
+        ? prev.filter((id) => id !== studentId)
+        : [...prev, studentId]
+    );
+  };
+
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    const currentPageStudentIds = paginatedStudents?.map((student) => student.id) || [];
+    const allSelected = currentPageStudentIds.every((id) => selectedStudents.includes(id));
+    
+    if (allSelected) {
+      setSelectedStudents((prev) => prev.filter((id) => !currentPageStudentIds.includes(id)));
+    } else {
+      setSelectedStudents((prev) => [...new Set([...prev, ...currentPageStudentIds])]);
+    }
   };
 
   const handleDeleteStudent = async (id) => {
@@ -65,30 +89,66 @@ const StudentCard = () => {
     confirm();
   };
 
-  // Handle CSV file selection
-  const handleFileChange = (e) => {
-    setCsvFile(e.target.files[0]);
+  // Handle bulk delete
+  const handleBulkDelete = async () => {
+    if (selectedStudents.length === 0) {
+      toast.error("Please select students to delete");
+      return;
+    }
+
+    const confirm = () =>
+      toast(
+        (t) => (
+          <ConfirmDialog
+            onConfirm={async () => {
+              toast.dismiss(t.id);
+              try {
+                const res = await bulkDeleteStudents(selectedStudents);
+                if (res.error != null) {
+                  toast.error(res.error.data.message);
+                } else {
+                  toast.success(
+                    `${selectedStudents.length} student(s) deleted successfully`
+                  );
+                  setSelectedStudents([]);
+                }
+              } catch (error) {
+                toast.error(error.message || "Failed to delete students");
+              }
+            }}
+            onCancel={() => toast.dismiss(t.id)}
+            title={`${selectedStudents.length} Student(s)`}
+          />
+        ),
+        { duration: Infinity }
+      );
+    confirm();
   };
 
-  // Upload CSV to backend
-  const handleUploadCSV = async () => {
-    if (!csvFile) {
-      toast.error("Please select a CSV file to upload.");
+  // Handle Excel file selection
+  const handleFileChange = (e) => {
+    setExcelFile(e.target.files[0]);
+  };
+
+  // Upload Excel to backend
+  const handleUploadExcel = async () => {
+    if (!excelFile) {
+      toast.error("Please select an Excel file to upload.");
       return;
     }
 
     const formData = new FormData();
-    formData.append("file", csvFile);
+    formData.append("file", excelFile);
 
     const userData = {
       name: "studentsfile",
       email: "students@gmail.com",
-      file: csvFile, // Pass the file object here
+      file: excelFile, // Pass the file object here
     };
 
     try {
-      const studentsCSV = await addStudentCsv(userData).unwrap();
-      toast.success("CSV uploaded successfully!");
+      const studentsExcel = await addStudentExcel(userData).unwrap();
+      toast.success("Excel file uploaded successfully!");
     } catch (error) {
       toast.error("An error occurred while uploading the file.");
     }
@@ -131,6 +191,10 @@ const StudentCard = () => {
     currentPage * studentsPerPage
   );
 
+  const currentPageStudentIds = paginatedStudents?.map((student) => student.id) || [];
+  const allCurrentPageSelected = currentPageStudentIds.length > 0 && 
+    currentPageStudentIds.every((id) => selectedStudents.includes(id));
+
   const totalPages = Math.ceil(filteredStudents?.length / studentsPerPage);
 
   const uniqueSessions = [
@@ -158,27 +222,35 @@ const StudentCard = () => {
         key={student?.id}
         className="w-[1200px] lg:w-full flex flex-wrap justify-between items-center text-[13px] px-3 py-3 border-t border-dark-border-color dark:border-opacity-10"
       >
-        <div className="dark:text-white w-[5%]">
+        <div className="dark:text-white w-[3%]">
+          <input
+            type="checkbox"
+            checked={selectedStudents.includes(student?.id)}
+            onChange={() => handleCheckboxChange(student?.id)}
+            className="w-4 h-4 cursor-pointer"
+          />
+        </div>
+        <div className="dark:text-white w-[4%]">
           <h3>{(currentPage - 1) * studentsPerPage + index + 1}</h3>
         </div>
 
-        <div className="dark:text-white w-[15%]">
+        <div className="dark:text-white w-[14%]">
           <Link to={`/student/profile/${student?.id}`}>
             <h3>{student?.name}</h3>
           </Link>
         </div>
 
-        <div className="dark:text-white w-[10%]">
+        <div className="dark:text-white w-[9%]">
           <h3>{student?.boardRoll}</h3>
         </div>
 
-        <div className="dark:text-white w-[15%]">
+        <div className="dark:text-white w-[14%]">
           <h3>{student?.department?.name}</h3>
         </div>
-        <div className="dark:text-white w-[10%]">
+        <div className="dark:text-white w-[9%]">
           <h3>{student?.shift}</h3>
         </div>
-        <div className="dark:text-white w-[10%]">
+        <div className="dark:text-white w-[9%]">
           <h3>{student?.group}</h3>
         </div>
         <div className="dark:text-white w-[5%]">
@@ -223,6 +295,19 @@ const StudentCard = () => {
     <>
       <CardWrapper>
         <CardHeader title="Student List" handleOpen={handleOpen} />
+
+        {/* Bulk Delete Button */}
+        {selectedStudents.length > 0 && (
+          <div className="px-6 py-3">
+            <button
+              onClick={handleBulkDelete}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            >
+              <AiOutlineDelete size={20} />
+              Delete Selected ({selectedStudents.length})
+            </button>
+          </div>
+        )}
 
         {/* Search and Filter Section */}
         <div className="px-6 py-3 flex flex-wrap justify-between items-center gap-3">
@@ -291,22 +376,30 @@ const StudentCard = () => {
         <div className="px-6 py-3 overflow-x-auto ">
           {/* header */}
           <div className="w-[1200px] lg:w-full bg-light-bg dark:bg-dark-box rounded-sm py-3 px-3 flex flex-wrap justify-between text-sm">
-            <div className="dark:text-white w-[5%]">
+            <div className="dark:text-white w-[3%]">
+              <input
+                type="checkbox"
+                checked={allCurrentPageSelected}
+                onChange={handleSelectAll}
+                className="w-4 h-4 cursor-pointer"
+              />
+            </div>
+            <div className="dark:text-white w-[4%]">
               <h3>SL</h3>
             </div>
-            <div className="dark:text-white w-[15%]">
+            <div className="dark:text-white w-[14%]">
               <h3>Name</h3>
             </div>
-            <div className="dark:text-white w-[10%]">
+            <div className="dark:text-white w-[9%]">
               <h3>Board Roll</h3>
             </div>
-            <div className="dark:text-white w-[15%]">
+            <div className="dark:text-white w-[14%]">
               <h3>Department</h3>
             </div>
-            <div className="dark:text-white w-[10%]">
+            <div className="dark:text-white w-[9%]">
               <h3>Shift</h3>
             </div>
-            <div className="dark:text-white w-[10%]">
+            <div className="dark:text-white w-[9%]">
               <h3>Group</h3>
             </div>
             <div className="dark:text-white w-[5%]">
@@ -351,15 +444,15 @@ const StudentCard = () => {
                 <div className="flex items-center gap-4 px-6 py-4">
                   <input
                     type="file"
-                    accept=".csv"
+                    accept=".xlsx,.xls"
                     onChange={handleFileChange}
                     className="border rounded p-2 w-[70%] max-w-sm"
                   />
                   <button
-                    onClick={handleUploadCSV}
+                    onClick={handleUploadExcel}
                     className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
                   >
-                    Upload CSV
+                    Upload Excel
                   </button>
                 </div>
                 <button
