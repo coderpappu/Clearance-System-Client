@@ -8,6 +8,7 @@ import {
 
 const ClearanceForm = () => {
   const { id } = useParams();
+  
   const {
     data: studentBaseClearance,
     isLoading: isBaseClearanceLoading,
@@ -153,8 +154,28 @@ const ClearanceForm = () => {
                       ))}
                 </div>
                 <div className="w-[20%] border border-gray-300 p-2">
-                  <div className="h-8 border-b border-gray-400"></div>
-                  <p className="text-center text-xs"> Signature</p>
+                  {/* Display signature if all clearances approved and signature exists */}
+                  {(() => {
+                    const allApproved = clearances.every((c) => c.status === "APPROVED");
+                    const signatureUrl = clearances.find((c) => c.signatureUrl)?.signatureUrl;
+                    
+                    return allApproved && signatureUrl ? (
+                      <div className="flex flex-col items-center">
+                        <img
+                          src={`http://localhost:3000${signatureUrl}`}
+                          alt="Signature"
+                          className="h-8 object-contain"
+                          crossOrigin="anonymous"
+                        />
+                        <p className="text-center text-xs mt-1">Signature</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="h-8 border-b border-gray-400"></div>
+                        <p className="text-center text-xs">Signature</p>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             ))}
@@ -189,8 +210,28 @@ const ClearanceForm = () => {
                       ))}
                 </div>
                 <div className="w-[20%] border border-gray-300 p-2">
-                  <div className="h-8 border-b border-gray-400"></div>
-                  <p className="text-center text-xs"> Signature</p>
+                  {/* Display signature if all clearances approved and signature exists */}
+                  {(() => {
+                    const allApproved = clearances.every((c) => c.status === "APPROVED");
+                    const signatureUrl = clearances.find((c) => c.signatureUrl)?.signatureUrl;
+                    
+                    return allApproved && signatureUrl ? (
+                      <div className="flex flex-col items-center">
+                        <img
+                          src={`http://localhost:3000${signatureUrl}`}
+                          alt="Signature"
+                          className="h-8 object-contain"
+                          crossOrigin="anonymous"
+                        />
+                        <p className="text-center text-xs mt-1">Signature</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="h-8 border-b border-gray-400"></div>
+                        <p className="text-center text-xs">Signature</p>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             ))}

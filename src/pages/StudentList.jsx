@@ -5,9 +5,9 @@ import { CiEdit } from "react-icons/ci";
 import { RxCrossCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import {
-    useBulkDeleteStudentsMutation,
-    useDeleteStudentMutation,
-    useGetStudentListQuery,
+  useBulkDeleteStudentsMutation,
+  useDeleteStudentMutation,
+  useGetStudentListQuery,
 } from "../api/apiSlice";
 import { CardHeader } from "../components/CardHeader";
 import CardWrapper from "../components/CardWrapper";
@@ -44,7 +44,9 @@ const StudentList = () => {
     if (selectedStudents.length === studentList?.data?.length) {
       setSelectedStudents([]);
     } else {
-      setSelectedStudents(studentList?.data?.map((student) => student.id) || []);
+      setSelectedStudents(
+        studentList?.data?.map((student) => student.id) || []
+      );
     }
   };
 
@@ -69,6 +71,7 @@ const StudentList = () => {
             }}
             onCancel={() => toast.dismiss(t.id)}
             title="Student"
+            message="⚠️ Warning: Deleting this student will permanently remove all related data including clearances, dues, and payment records. This action cannot be undone."
           />
         ),
         { duration: Infinity }
@@ -105,6 +108,7 @@ const StudentList = () => {
             }}
             onCancel={() => toast.dismiss(t.id)}
             title={`${selectedStudents.length} Student(s)`}
+            message={`⚠️ Warning: Deleting ${selectedStudents.length} student(s) will permanently remove all their related data including clearances, dues, and payment records. This action cannot be undone.`}
           />
         ),
         { duration: Infinity }
@@ -185,7 +189,7 @@ const StudentList = () => {
       <CardWrapper>
         <CardHeader title="Student List" handleOpen={handleOpen} />
 
-        {/* Bulk Delete Button */}
+        {/* Bulk Action Buttons */}
         {selectedStudents.length > 0 && (
           <div className="px-6 py-3">
             <button

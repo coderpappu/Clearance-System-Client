@@ -2,13 +2,17 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { AiOutlineDelete } from "react-icons/ai";
 import { CiEdit } from "react-icons/ci";
+import { FiEdit } from "react-icons/fi";
 import { RxCrossCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import {
-    useAddStudentsExcelMutation,
-    useBulkDeleteStudentsMutation,
-    useDeleteStudentMutation,
-    useGetStudentListQuery,
+  useAddStudentsExcelMutation,
+  useBulkDeleteStudentsMutation,
+  useBulkSignClearancesMutation,
+  useBulkUnsignClearancesMutation,
+  useDeleteStudentMutation,
+  useGetStudentListQuery,
+  useGetUserQuery,
 } from "../../api/apiSlice";
 import { CardHeader } from "../../components/CardHeader";
 import CardWrapper from "../../components/CardWrapper";
@@ -29,9 +33,14 @@ const StudentCard = () => {
   const studentsPerPage = 20;
 
   const { data: studentList, isLoading, isError } = useGetStudentListQuery();
+  const { data: userData } = useGetUserQuery();
   const [deleteStudent] = useDeleteStudentMutation();
   const [bulkDeleteStudents] = useBulkDeleteStudentsMutation();
   const [addStudentExcel] = useAddStudentsExcelMutation();
+  const [bulkSignClearances, { isLoading: isSigning }] =
+    useBulkSignClearancesMutation();
+  const [bulkUnsignClearances, { isLoading: isUnsigning }] =
+    useBulkUnsignClearancesMutation();
 
   const onClose = () => setIsPopupOpen(false);
 
@@ -51,13 +60,20 @@ const StudentCard = () => {
 
   // Handle select all checkbox
   const handleSelectAll = () => {
-    const currentPageStudentIds = paginatedStudents?.map((student) => student.id) || [];
-    const allSelected = currentPageStudentIds.every((id) => selectedStudents.includes(id));
-    
+    const currentPageStudentIds =
+      paginatedStudents?.map((student) => student.id) || [];
+    const allSelected = currentPageStudentIds.every((id) =>
+      selectedStudents.includes(id)
+    );
+
     if (allSelected) {
-      setSelectedStudents((prev) => prev.filter((id) => !currentPageStudentIds.includes(id)));
+      setSelectedStudents((prev) =>
+        prev.filter((id) => !currentPageStudentIds.includes(id))
+      );
     } else {
-      setSelectedStudents((prev) => [...new Set([...prev, ...currentPageStudentIds])]);
+      setSelectedStudents((prev) => [
+        ...new Set([...prev, ...currentPageStudentIds]),
+      ]);
     }
   };
 
@@ -82,6 +98,7 @@ const StudentCard = () => {
             }}
             onCancel={() => toast.dismiss(t.id)}
             title="Student"
+            message="⚠️ Warning: Deleting this student will permanently remove all related data including clearances, dues, and payment records. This action cannot be undone."
           />
         ),
         { duration: Infinity }
@@ -118,11 +135,61 @@ const StudentCard = () => {
             }}
             onCancel={() => toast.dismiss(t.id)}
             title={`${selectedStudents.length} Student(s)`}
+            message={`⚠️ Warning: Deleting ${selectedStudents.length} student(s) will permanently remove all their related data including clearances, dues, and payment records. This action cannot be undone.`}
           />
         ),
         { duration: Infinity }
       );
     confirm();
+  };
+
+  // Handle bulk sign
+  const handleBulkSign = async () => {
+    if (selectedStudents.length === 0) {
+      toast.error("Please select students to sign clearances");
+      return;
+    }
+
+    if (!userData?.data?.signature) {
+      toast.error("Please upload your signature in your profile first");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to sign all approved clearances for ${selectedStudents.length} selected student(s) in ${userData?.data?.department_name} department?`
+    );
+
+    if (confirmed) {
+      try {
+        const result = await bulkSignClearances(selectedStudents).unwrap();
+        toast.success(result.message);
+        setSelectedStudents([]); // Clear selection
+      } catch (error) {
+        toast.error(error?.data?.message || "Failed to sign clearances");
+      }
+    }
+  };
+
+  // Handle bulk unsign (remove signatures)
+  const handleBulkUnsign = async () => {
+    if (selectedStudents.length === 0) {
+      toast.error("Please select students to remove signatures");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to remove signatures from ${selectedStudents.length} selected student(s) in ${userData?.data?.department_name} department? This will unsign all clearances you have signed.`
+    );
+
+    if (confirmed) {
+      try {
+        const result = await bulkUnsignClearances(selectedStudents).unwrap();
+        toast.success(result.message);
+        setSelectedStudents([]); // Clear selection
+      } catch (error) {
+        toast.error(error?.data?.message || "Failed to remove signatures");
+      }
+    }
   };
 
   // Handle Excel file selection
@@ -191,8 +258,10 @@ const StudentCard = () => {
     currentPage * studentsPerPage
   );
 
-  const currentPageStudentIds = paginatedStudents?.map((student) => student.id) || [];
-  const allCurrentPageSelected = currentPageStudentIds.length > 0 && 
+  const currentPageStudentIds =
+    paginatedStudents?.map((student) => student.id) || [];
+  const allCurrentPageSelected =
+    currentPageStudentIds.length > 0 &&
     currentPageStudentIds.every((id) => selectedStudents.includes(id));
 
   const totalPages = Math.ceil(filteredStudents?.length / studentsPerPage);
@@ -296,9 +365,37 @@ const StudentCard = () => {
       <CardWrapper>
         <CardHeader title="Student List" handleOpen={handleOpen} />
 
-        {/* Bulk Delete Button */}
+        {/* Bulk Action Buttons */}
         {selectedStudents.length > 0 && (
-          <div className="px-6 py-3">
+          <div className="px-6 py-3 flex gap-3">
+            <button
+              onClick={handleBulkSign}
+              disabled={isSigning || !userData?.data?.signature}
+              title={
+                !userData?.data?.signature
+                  ? "Please upload your signature first"
+                  : "Sign approved clearances for your department"
+              }
+              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            >
+              <FiEdit size={20} />
+              {isSigning
+                ? "Signing..."
+                : `Sign Selected (${selectedStudents.length})`}
+            </button>
+
+            <button
+              onClick={handleBulkUnsign}
+              disabled={isUnsigning}
+              title="Remove signatures from clearances you have signed"
+              className="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            >
+              <RxCrossCircled size={20} />
+              {isUnsigning
+                ? "Removing..."
+                : `Unsign Selected (${selectedStudents.length})`}
+            </button>
+
             <button
               onClick={handleBulkDelete}
               className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"

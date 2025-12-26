@@ -111,6 +111,49 @@ export const apiSlice = createApi({
       invalidatesTags: ["User"],
     }),
 
+    uploadSignature: builder.mutation({
+      query: (formData) => ({
+        url: "/user/signature/upload",
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: ["User"],
+    }),
+
+    signClearances: builder.mutation({
+      query: (studentId) => ({
+        url: `/clearance/sign/${studentId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Clearance"],
+    }),
+
+    bulkSignClearances: builder.mutation({
+      query: (studentIds) => ({
+        url: `/clearance/bulk-sign`,
+        method: "POST",
+        body: { studentIds },
+      }),
+      invalidatesTags: ["Clearance", "student"],
+    }),
+
+    unsignClearances: builder.mutation({
+      query: (studentId) => ({
+        url: `/clearance/unsign/${studentId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Clearance"],
+    }),
+
+    bulkUnsignClearances: builder.mutation({
+      query: (studentIds) => ({
+        url: `/clearance/bulk-unsign`,
+        method: "POST",
+        body: { studentIds },
+      }),
+      invalidatesTags: ["Clearance", "student"],
+    }),
+
     // institute endpoint
     createInstitute: builder.mutation({
       query: (credentials) => ({
@@ -371,6 +414,7 @@ export const apiSlice = createApi({
 export const {
   useCreateUserMutation,
   useLoginUserMutation,
+  useGetUserQuery,
   useGetLoginLogsQuery,
   useGetDeptByUserDetailsQuery,
   useCreateInstituteMutation,
@@ -407,6 +451,11 @@ export const {
   useDeleteUserMutation,
   useUpdateUserMutation,
   useChangeUserPasswordMutation,
+  useUploadSignatureMutation,
+  useSignClearancesMutation,
+  useBulkSignClearancesMutation,
+  useUnsignClearancesMutation,
+  useBulkUnsignClearancesMutation,
 
   useCreateDuePaymentMutation,
   useGetDuePaymentListByStudentQuery,

@@ -1,7 +1,7 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { jwtDecode } from "jwt-decode";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BiLogoAudible } from "react-icons/bi";
 import { BsSun } from "react-icons/bs";
 import { CiBellOn } from "react-icons/ci";
@@ -127,12 +127,12 @@ const Header = ({ moduleName }) => {
             >
               <div className="py-1">
                 <MenuItem>
-                  <a
-                    href="#"
+                  <Link
+                    to={`user/profile/${user?.userId}`}
                     className="block px-4 py-2 text-sm text-gray-700 dark:text-dark-text-color data-focus:bg-gray-100 data-focus:text-gray-900 data-focus:outline-hidden"
                   >
                     Account settings
-                  </a>
+                  </Link>
                 </MenuItem>
 
                 <form action="#" method="POST">
