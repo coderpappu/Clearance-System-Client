@@ -1,4 +1,3 @@
-import React from "react";
 import { IoAdd } from "react-icons/io5";
 
 const SettingCardHeader = ({ title, subTitle }) => {
@@ -22,12 +21,14 @@ const CardHeader = ({ title, handleOpen, isPopupOpen }) => {
         {/* <p className="text-xs text-light-text-color">{subTitle}</p> */}
       </div>
 
-      <div
-        className="w-8 h-8 bg-green-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer"
-        onClick={() => handleOpen()}
-      >
-        <IoAdd color="#fff" />
-      </div>
+      {handleOpen && (
+        <div
+          className="w-8 h-8 bg-green-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer"
+          onClick={() => handleOpen()}
+        >
+          <IoAdd color="#fff" />
+        </div>
+      )}
     </div>
   );
 };

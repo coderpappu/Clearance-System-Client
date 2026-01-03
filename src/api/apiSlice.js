@@ -2,8 +2,9 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const apiSlice = createApi({
   reducerPath: "api",
+
   baseQuery: fetchBaseQuery({
-    // baseUrl: "https://ctgpolyclearance.com/api/",
+    // baseUrl: "https://ctgpolyclearance.com/api",
     baseUrl: "http://localhost:3000/api/",
 
     prepareHeaders: (headers, { getState }) => {
@@ -17,7 +18,7 @@ export const apiSlice = createApi({
     },
   }),
 
-  tagTypes: ["User"],
+  tagTypes: ["User", "RefundSettings", "RefundConfirmations"],
 
   endpoints: (builder) => ({
     // user Related EndPoints
@@ -96,7 +97,7 @@ export const apiSlice = createApi({
     }),
     deleteUser: builder.mutation({
       query: (id) => ({
-        url: `/users/${id}`,
+        url: `/user/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["User"],
@@ -408,6 +409,52 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["duestupayment"],
     }),
+
+    // Refund Settings
+    getRefundSettings: builder.query({
+      query: () => "/refund-settings",
+      providesTags: ["RefundSettings"],
+    }),
+
+    updateRefundSettings: builder.mutation({
+      query: (data) => ({
+        url: "/refund-settings",
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["RefundSettings"],
+    }),
+
+    // Refund Confirmations
+    checkRefundEligibility: builder.mutation({
+      query: (credentials) => ({
+        url: "/refund-confirmations/check",
+        method: "POST",
+        body: credentials,
+      }),
+    }),
+
+    submitRefundConfirmation: builder.mutation({
+      query: (credentials) => ({
+        url: "/refund-confirmations/submit",
+        method: "POST",
+        body: credentials,
+      }),
+    }),
+
+    getRefundConfirmations: builder.query({
+      query: () => "/refund-confirmations",
+      providesTags: ["RefundConfirmations"],
+    }),
+
+    updateRefundConfirmation: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/refund-confirmations/${id}`,
+        method: "PUT",
+        body: { status },
+      }),
+      invalidatesTags: ["RefundConfirmations"],
+    }),
   }),
 });
 
@@ -468,4 +515,12 @@ export const {
   useUpdateDuePaymentMutation,
   useDeleteStuDuePaymentMutation,
   useGetDepartmentClearanceReportQuery,
+
+  // Refund hooks
+  useGetRefundSettingsQuery,
+  useUpdateRefundSettingsMutation,
+  useCheckRefundEligibilityMutation,
+  useSubmitRefundConfirmationMutation,
+  useGetRefundConfirmationsQuery,
+  useUpdateRefundConfirmationMutation,
 } = apiSlice;

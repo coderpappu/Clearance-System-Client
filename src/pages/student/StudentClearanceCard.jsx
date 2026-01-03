@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import {
-    useCreateStudentClearanceMutation,
-    useGetClearanceCategoriesQuery,
-    useGetDepartmentsQuery,
-    useGetStudentBaseClearanceQuery,
-    useGetUserDetailsQuery,
+  useCreateStudentClearanceMutation,
+  useGetClearanceCategoriesQuery,
+  useGetDepartmentsQuery,
+  useGetStudentBaseClearanceQuery,
+  useGetUserDetailsQuery,
 } from "../../api/apiSlice";
 
 const StudentClearanceCard = ({ studentId, instituteId }) => {
@@ -95,12 +95,16 @@ const StudentClearanceCard = ({ studentId, instituteId }) => {
               ?.filter((category) => category.department_id === dept.id)
               ?.map((category) => {
                 // Find the clearance record for this category
-                const clearanceRecord = studentBaseClearance?.data?.clearances?.find(
-                  (c) => c.clearanceCategoryId === category.id
-                );
+                const clearanceRecord =
+                  studentBaseClearance?.data?.clearances?.find(
+                    (c) => c.clearanceCategoryId === category.id
+                  );
 
                 return (
-                  <div className="mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-md" key={category?.id}>
+                  <div
+                    className="mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-md"
+                    key={category?.id}
+                  >
                     <div className="flex items-center mb-2">
                       <input
                         type="checkbox"
@@ -139,23 +143,31 @@ const StudentClearanceCard = ({ studentId, instituteId }) => {
                     </div>
 
                     {/* Display Signature if Approved */}
-                    {clearanceRecord?.status === "APPROVED" && clearanceRecord?.signatureUrl && (
-                      <div className="ml-6 mt-2 p-2 bg-white dark:bg-gray-700 rounded border border-green-300 dark:border-green-600">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={`http://localhost:3000${clearanceRecord.signatureUrl}`}
-                            alt="Signature"
-                            className="h-12 border border-gray-300 dark:border-gray-600 rounded px-2 bg-white"
-                          />
-                          <div className="text-xs text-gray-600 dark:text-gray-300">
-                            <p className="font-semibold text-green-600 dark:text-green-400">✓ Approved</p>
-                            {clearanceRecord.signedAt && (
-                              <p>Signed: {new Date(clearanceRecord.signedAt).toLocaleDateString()}</p>
-                            )}
+                    {clearanceRecord?.status === "APPROVED" &&
+                      clearanceRecord?.signatureUrl && (
+                        <div className="ml-6 mt-2 p-2 bg-white dark:bg-gray-700 rounded border border-green-300 dark:border-green-600">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={`https://ctgpolyclearance.com/api${clearanceRecord.signatureUrl}`}
+                              alt="Signature"
+                              className="h-12 border border-gray-300 dark:border-gray-600 rounded px-2 bg-white"
+                            />
+                            <div className="text-xs text-gray-600 dark:text-gray-300">
+                              <p className="font-semibold text-green-600 dark:text-green-400">
+                                ✓ Approved
+                              </p>
+                              {clearanceRecord.signedAt && (
+                                <p>
+                                  Signed:{" "}
+                                  {new Date(
+                                    clearanceRecord.signedAt
+                                  ).toLocaleDateString()}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                   </div>
                 );
               })}

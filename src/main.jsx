@@ -15,6 +15,9 @@ import Layout from "./pages/Layout";
 import NotFound from "./pages/NotFound";
 import PaymentCard from "./pages/payment/PaymentCard";
 import PaymentVerify from "./pages/payment/PaymentVerify";
+import RefundManagement from "./pages/refund/RefundManagement";
+import RefundSettings from "./pages/settings/RefundSettings";
+import RefundConfirmation from "./pages/student/RefundConfirmation";
 import StudentCard from "./pages/student/StudentCard";
 import StudentDueCheck from "./pages/student/StudentDueCheck";
 import StudentPaymentCard from "./pages/student/StudentPaymentCard";
@@ -138,6 +141,22 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+        path: "/refund-management",
+        element: (
+          <PrivateRoute>
+            <RefundManagement />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/refund-settings",
+        element: (
+          <PrivateRoute>
+            <RefundSettings />
+          </PrivateRoute>
+        ),
+      },
     ],
     errorElement: <NotFound />,
   },
@@ -152,6 +171,10 @@ const router = createBrowserRouter([
   {
     path: "/student-verify",
     element: <StudentDueCheck />,
+  },
+  {
+    path: "/refund-confirmation",
+    element: <RefundConfirmation />,
   },
   {
     path: "/student-payment",

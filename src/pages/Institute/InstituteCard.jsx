@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FiEdit } from "react-icons/fi";
 import { IoAdd } from "react-icons/io5";
 import { RxCrossCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import { useGetInstituteDetailsQuery } from "../../api/apiSlice";
+import getUserDetails from "../../utils/getUserDetails.js";
 import InstituteRegistrationForm from "../IntituteRegistration";
 import InfoBox from "../student/InfoBox";
 
@@ -13,6 +14,10 @@ import InfoBox from "../student/InfoBox";
 
 const InstituteCard = () => {
   const { data: instituteDetails } = useGetInstituteDetailsQuery();
+
+  // Get current user role
+  const currentUser = getUserDetails();
+  const isSuperAdmin = currentUser.role === "SuperAdmin";
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectInstitute, setSelectInstitute] = useState(null);
@@ -30,14 +35,16 @@ const InstituteCard = () => {
     <>
       <div>
         <div className="flex flex-wrap justify-between">
-          <div
-            className={`w-8 ${
-              instituteDetails && "hidden"
-            } h-8 bg-green-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer`}
-            onClick={() => handleOpen()}
-          >
-            <IoAdd color="#fff" />
-          </div>
+          {isSuperAdmin && (
+            <div
+              className={`w-8 ${
+                instituteDetails && "hidden"
+              } h-8 bg-green-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer`}
+              onClick={() => handleOpen()}
+            >
+              <IoAdd color="#fff" />
+            </div>
+          )}
         </div>
         <div className="w-full relative p-5  mt-5 mb-1 rounded-md bg-white dark:bg-dark-card flex flex-wrap justify-between">
           <div className="flex flex-wrap justify-between items-center w-full md:w-[50%]">
@@ -60,11 +67,13 @@ const InstituteCard = () => {
                 {/* Registration No : {studentDetails?.data?.registrationNo} */}
               </h3>
             </div>
-            <div className="w-[40px] absolute cursor-pointer right-0 top-2 h-[40px] flex flex-col justify-center align-middle items-center rounded-full bg-[#85858512] mr-2">
-              <Link onClick={() => handleOpen(instituteDetails)}>
-                <FiEdit />
-              </Link>
-            </div>
+            {isSuperAdmin && (
+              <div className="w-[40px] absolute cursor-pointer right-0 top-2 h-[40px] flex flex-col justify-center align-middle items-center rounded-full bg-[#85858512] mr-2">
+                <Link onClick={() => handleOpen(instituteDetails)}>
+                  <FiEdit />
+                </Link>
+              </div>
+            )}
           </div>
           <div className="w-full md:w-[50%] border-t-2 md:border-t-0 md:border-l-2 border-dotted border-[#cacaca] mt-4 md:mt-0">
             <InfoBox title="Post Office" data={instituteDetails?.postOffice} />

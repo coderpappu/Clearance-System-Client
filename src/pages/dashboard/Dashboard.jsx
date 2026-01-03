@@ -1,4 +1,3 @@
-import React from "react";
 import { GiGraduateCap } from "react-icons/gi";
 import { HiOutlineChartPie, HiOutlineColorSwatch } from "react-icons/hi";
 import { PiStudent } from "react-icons/pi";
@@ -8,6 +7,7 @@ import {
   useGetStudentListQuery,
   useGetUserListQuery,
 } from "../../api/apiSlice";
+import getUserDetails from "../../utils/getUserDetails.js";
 import ClearanceStatusChart from "../reports/ClearanceStatus";
 import { BarChartComponent } from "../reports/CollectionReport";
 import LastLogin from "../reports/LastLogin";
@@ -20,23 +20,30 @@ const DashboardStats = () => {
   const { data: departments } = useGetDepartmentsQuery();
   const { data: Categories } = useGetClearanceCategoriesQuery();
 
+  // Get current user details
+  const currentUser = getUserDetails();
+  const userName = `${currentUser.first_name} ${currentUser.last_name}`;
+  const userRole = currentUser.role;
+
   return (
     <div className="">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4 dark:bg-dark-card rounded-lg bg-white intro_card px-5 py-8 ">
-          <h2 className="text-2xl font-semibold text-blue-900 font-raleway">
-            Welcome Back , Dear Pappu{" "}
+          <h2 className="text-2xl font-semibold text-blue-900 dark:text-blue-400 font-raleway">
+            Welcome Back, {userName}!
           </h2>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Perferendis, velit.
+          <p className="text-gray-600 dark:text-gray-600">
+            Manage your campus clearance system efficiently. Track student clearances, 
+            monitor due payments, and oversee department activities all in one place.
           </p>
-          <button
-            type="button"
-            className="py-3 px-5 bg-dark-bg text-white rounded-lg"
-          >
-            Check More
-          </button>
+          <div className="flex gap-2 text-sm text-gray-500 dark:text-gray-400">
+            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full">
+              {userRole}
+            </span>
+            <span className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">
+              {students?.data?.length || 0} Students
+            </span>
+          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
           <div className="flex items-center bg-white dark:bg-dark-card p-7 rounded-lg shadow hover:shadow-lg transition duration-300 ">

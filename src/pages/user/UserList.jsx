@@ -8,6 +8,7 @@ import { useBulkDeleteUsersMutation, useDeleteUserMutation, useGetUserListQuery 
 import { CardHeader } from "../../components/CardHeader";
 import CardWrapper from "../../components/CardWrapper";
 import ConfirmDialog from "../../components/ConfirmDialog";
+import getUserDetails from "../../utils/getUserDetails.js";
 import UserForm from "./UserForm";
 
 const UserList = () => {
@@ -18,6 +19,10 @@ const UserList = () => {
   const { data: userList, isLoading, isError } = useGetUserListQuery();
   const [deleteUser] = useDeleteUserMutation();
   const [bulkDeleteUsers] = useBulkDeleteUsersMutation();
+
+  // Get current user role
+  const currentUser = getUserDetails();
+  const isSuperAdmin = currentUser.role === "SuperAdmin";
 
   const onClose = () => setIsPopupOpen(false);
 
@@ -121,14 +126,16 @@ const UserList = () => {
         key={user?.id}
         className="w-[1000px] lg:w-full flex flex-wrap justify-between items-center text-[13px] px-3 py-3 border-t border-dark-border-color dark:border-opacity-10 "
       >
-        <div className="dark:text-white w-[5%]">
-          <input
-            type="checkbox"
-            checked={selectedUsers.includes(user?.id)}
-            onChange={() => handleCheckboxChange(user?.id)}
-            className="w-4 h-4 cursor-pointer"
-          />
-        </div>
+        {isSuperAdmin && (
+          <div className="dark:text-white w-[5%]">
+            <input
+              type="checkbox"
+              checked={selectedUsers.includes(user?.id)}
+              onChange={() => handleCheckboxChange(user?.id)}
+              className="w-4 h-4 cursor-pointer"
+            />
+          </div>
+        )}
 
         <div className="dark:text-white w-[5%]">
           <h3>{++index}</h3>
@@ -151,27 +158,37 @@ const UserList = () => {
           <h3>{user?.department_name}</h3>
         </div>
         <div className="dark:text-white w-[10%]">
-          <h3>{user?.createdAt}</h3>
+          <h3>
+            {new Date(user?.createdAt).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </h3>
         </div>
         <div className="dark:text-white w-[15%]">
-          <div className="flex flex-wrap justify-start gap-2">
-            {/* edit button */}
-            <div className="w-8 h-8 bg-green-400 rounded-sm p-2 flex justify-center items-center cursor-pointer">
-              <CiEdit
-                size={20}
-                className="text-white"
-                onClick={() => handleOpen(user?.id)}
-              />
-            </div>
+          {isSuperAdmin ? (
+            <div className="flex flex-wrap justify-start gap-2">
+              {/* edit button */}
+              <div className="w-8 h-8 bg-green-400 rounded-sm p-2 flex justify-center items-center cursor-pointer">
+                <CiEdit
+                  size={20}
+                  className="text-white"
+                  onClick={() => handleOpen(user?.id)}
+                />
+              </div>
 
-            {/* delete button */}
-            <div
-              className="w-8 h-8 bg-red-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer text-white"
-              onClick={() => handleDeleteUser(user?.id)}
-            >
-              <AiOutlineDelete size={20} />
+              {/* delete button */}
+              <div
+                className="w-8 h-8 bg-red-500 text-center flex justify-center items-center rounded-sm p-2 cursor-pointer text-white"
+                onClick={() => handleDeleteUser(user?.id)}
+              >
+                <AiOutlineDelete size={20} />
+              </div>
             </div>
-          </div>
+          ) : (
+            <span className="text-gray-500 dark:text-gray-400 text-xs">No permission</span>
+          )}
         </div>
       </div>
     ));
@@ -179,10 +196,13 @@ const UserList = () => {
   return (
     <>
       <CardWrapper>
-        <CardHeader title="User List" handleOpen={handleOpen} />
+        <CardHeader 
+          title="User List" 
+          handleOpen={isSuperAdmin ? handleOpen : undefined} 
+        />
 
         {/* Bulk Delete Button */}
-        {selectedUsers.length > 0 && (
+        {selectedUsers.length > 0 && isSuperAdmin && (
           <div className="px-6 py-3">
             <button
               onClick={handleBulkDelete}
@@ -198,17 +218,19 @@ const UserList = () => {
         <div className="px-6 py-3 overflow-x-auto ">
           {/* header */}
           <div className="w-[1000px] lg:w-full  bg-light-bg dark:bg-dark-box rounded-sm py-3 px-3 flex flex-wrap justify-between text-sm ">
-            <div className="dark:text-white w-[5%]">
-              <input
-                type="checkbox"
-                checked={
-                  userList?.data?.length > 0 &&
-                  selectedUsers.length === userList?.data?.length
-                }
-                onChange={handleSelectAll}
-                className="w-4 h-4 cursor-pointer"
-              />
-            </div>
+            {isSuperAdmin && (
+              <div className="dark:text-white w-[5%]">
+                <input
+                  type="checkbox"
+                  checked={
+                    userList?.data?.length > 0 &&
+                    selectedUsers.length === userList?.data?.length
+                  }
+                  onChange={handleSelectAll}
+                  className="w-4 h-4 cursor-pointer"
+                />
+              </div>
+            )}
             <div className="dark:text-white w-[5%]">
               <h3>SL</h3>
             </div>

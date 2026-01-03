@@ -159,7 +159,7 @@ const UserProfile = () => {
                   Current Signature:
                 </p>
                 <img
-                  src={`http://localhost:3000${user.data.signature}`}
+                  src={`https://ctgpolyclearance.com/api${user.data.signature}`}
                   alt="Current Signature"
                   className="max-w-xs h-auto border border-gray-300 dark:border-gray-600 rounded p-2 bg-white"
                 />

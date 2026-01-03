@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { BiBookOpen, BiDialpadAlt, BiLayer, BiMenu, BiX } from "react-icons/bi";
 import { PiSpeedometer, PiStudentDuotone, PiUsers } from "react-icons/pi";
 import { SlSettings } from "react-icons/sl";
-import { TbMoneybag } from "react-icons/tb";
+import { TbMoneybag, TbReceipt2 } from "react-icons/tb";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import devCompany from "../assets/company.png";
 import SupportImg from "../assets/customer-service.png";
@@ -38,6 +38,10 @@ const Layout = () => {
       setModuleName("Dashboard");
     } else if (path.includes("/payment-verify")) {
       setModuleName("Payments Verify");
+    } else if (path.includes("/refund-management")) {
+      setModuleName("Refund Management");
+    } else if (path.includes("/refund-settings")) {
+      setModuleName("Refund Settings");
     } else {
       setModuleName("");
     }
@@ -141,6 +145,26 @@ const Layout = () => {
                   }`}
                 >
                   <TbMoneybag className="mr-2" /> Payment
+                </Link>
+              </li>
+              <li className="my-1">
+                <Link
+                  to="/refund-management"
+                  className={`flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md ${
+                    isActive("/refund-management") ? "bg-gray-700" : ""
+                  }`}
+                >
+                  <TbReceipt2 className="mr-2" /> Refund Management
+                </Link>
+              </li>
+              <li className="my-1">
+                <Link
+                  to="/refund-settings"
+                  className={`flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md ${
+                    isActive("/refund-settings") ? "bg-gray-700" : ""
+                  }`}
+                >
+                  <SlSettings className="mr-2" /> Refund Settings
                 </Link>
               </li>
               <li className="my-1">
