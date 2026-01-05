@@ -455,6 +455,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["RefundConfirmations"],
     }),
+
+    deleteRefundConfirmation: builder.mutation({
+      query: (id) => ({
+        url: `/refund-confirmations/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["RefundConfirmations"],
+    }),
   }),
 });
 
@@ -523,4 +531,5 @@ export const {
   useSubmitRefundConfirmationMutation,
   useGetRefundConfirmationsQuery,
   useUpdateRefundConfirmationMutation,
+  useDeleteRefundConfirmationMutation,
 } = apiSlice;

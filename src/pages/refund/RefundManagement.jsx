@@ -1,47 +1,78 @@
 import { useState } from "react";
-import { toast } from "react-hot-toast";
-import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
+import toast from "react-hot-toast";
+import { AiOutlineCheck, AiOutlineClose, AiOutlineDelete } from "react-icons/ai";
 import {
+    useDeleteRefundConfirmationMutation,
     useGetRefundConfirmationsQuery,
     useUpdateRefundConfirmationMutation,
 } from "../../api/apiSlice";
+import { CardHeader } from "../../components/CardHeader";
 import CardWrapper from "../../components/CardWrapper";
 import ConfirmDialog from "../../components/ConfirmDialog";
 
 const RefundManagement = () => {
-  const { data: confirmations, isLoading } = useGetRefundConfirmationsQuery();
+  const { data: confirmations, isLoading, refetch } = useGetRefundConfirmationsQuery();
   const [updateConfirmation] = useUpdateRefundConfirmationMutation();
+  const [deleteConfirmation] = useDeleteRefundConfirmationMutation();
 
-  const [confirmDialog, setConfirmDialog] = useState({
-    isOpen: false,
-    id: null,
-    status: null,
-    studentName: "",
-  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const confirmationsPerPage = 20;
 
   const handleStatusUpdate = (id, status, studentName) => {
-    setConfirmDialog({
-      isOpen: true,
-      id,
-      status,
-      studentName,
-    });
+    const confirm = () =>
+      toast(
+        (t) => (
+          <ConfirmDialog
+            onConfirm={async () => {
+              toast.dismiss(t.id);
+              try {
+                await updateConfirmation({ id, status }).unwrap();
+                toast.success(
+                  `Refund confirmation ${status.toLowerCase()} successfully!`
+                );
+                refetch();
+              } catch (error) {
+                toast.error(error?.data?.message || "Failed to update status");
+              }
+            }}
+            onCancel={() => toast.dismiss(t.id)}
+            title={`${status === "APPROVED" ? "Approve" : "Reject"} Refund Confirmation?`}
+            message={`Are you sure you want to ${status.toLowerCase()} the refund confirmation for ${studentName}?`}
+            confirmText={status === "APPROVED" ? "Approve" : "Reject"}
+            confirmColor={status === "APPROVED" ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"}
+          />
+        ),
+        { duration: Infinity }
+      );
+    confirm();
   };
 
-  const confirmStatusUpdate = async () => {
-    try {
-      await updateConfirmation({
-        id: confirmDialog.id,
-        status: confirmDialog.status,
-      }).unwrap();
-
-      toast.success(
-        `Refund confirmation ${confirmDialog.status.toLowerCase()} successfully!`
+  const handleDelete = (id, studentName) => {
+    const confirm = () =>
+      toast(
+        (t) => (
+          <ConfirmDialog
+            onConfirm={async () => {
+              toast.dismiss(t.id);
+              try {
+                await deleteConfirmation(id).unwrap();
+                toast.success("Refund confirmation deleted successfully!");
+                refetch();
+              } catch (error) {
+                toast.error(error?.data?.message || "Failed to delete confirmation");
+              }
+            }}
+            onCancel={() => toast.dismiss(t.id)}
+            title="Delete Refund Confirmation?"
+            message={`Are you sure you want to delete the refund confirmation for ${studentName}? The student will be able to submit again.`}
+            confirmText="Delete"
+            confirmColor="bg-red-500 hover:bg-red-600"
+          />
+        ),
+        { duration: Infinity }
       );
-      setConfirmDialog({ isOpen: false, id: null, status: null, studentName: "" });
-    } catch (error) {
-      toast.error(error?.data?.message || "Failed to update status");
-    }
+    confirm();
   };
 
   const getStatusBadge = (status) => {
@@ -52,6 +83,26 @@ const RefundManagement = () => {
     };
     return badges[status] || badges.PENDING;
   };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredConfirmations = confirmations?.data?.filter((confirmation) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      confirmation.student.name.toLowerCase().includes(searchLower) ||
+      confirmation.student.boardRoll.toLowerCase().includes(searchLower) ||
+      confirmation.student.registrationNo.toLowerCase().includes(searchLower)
+    );
+  }) || [];
+
+  const paginatedConfirmations = filteredConfirmations.slice(
+    (currentPage - 1) * confirmationsPerPage,
+    currentPage * confirmationsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredConfirmations.length / confirmationsPerPage);
 
   if (isLoading) {
     return (
@@ -64,25 +115,29 @@ const RefundManagement = () => {
   }
 
   return (
-    <>
-      <CardWrapper>
-        <div className="border-b border-gray-200 dark:border-dark-border-color px-6 py-4">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-            Refund Confirmations
-          </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Manage student refund confirmations
-          </p>
+    <CardWrapper>
+      <CardHeader title="Refund Confirmations" />
+
+      <div className="px-6 py-3">
+        {/* Search */}
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search by name, roll, or registration..."
+            value={searchTerm}
+            onChange={handleSearch}
+            className="w-full md:w-1/3 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-dark-bg dark:text-white"
+          />
         </div>
 
-        <div className="px-6 py-3">
-          {confirmations?.data?.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400">
-                No refund confirmations yet
-              </p>
-            </div>
-          ) : (
+        {filteredConfirmations.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 dark:text-gray-400">
+              No refund confirmations found
+            </p>
+          </div>
+        ) : (
+          <>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 dark:bg-dark-box">
@@ -114,10 +169,13 @@ const RefundManagement = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-gray-700">
-                  {confirmations?.data?.map((confirmation, index) => (
-                    <tr key={confirmation.id} className="hover:bg-gray-50 dark:hover:bg-dark-box">
+                  {paginatedConfirmations.map((confirmation, index) => (
+                    <tr
+                      key={confirmation.id}
+                      className="hover:bg-gray-50 dark:hover:bg-dark-box"
+                    >
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        {index + 1}
+                        {(currentPage - 1) * confirmationsPerPage + index + 1}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                         {confirmation.student.name}
@@ -132,11 +190,14 @@ const RefundManagement = () => {
                         {confirmation.student.department.name}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        {new Date(confirmation.confirmed_at).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
+                        {new Date(confirmation.confirmed_at).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          }
+                        )}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <span
@@ -178,9 +239,22 @@ const RefundManagement = () => {
                             </button>
                           </div>
                         ) : (
-                          <span className="text-gray-400 dark:text-gray-500 text-xs">
-                            {confirmation.status === "APPROVED" ? "Approved" : "Rejected"}
-                          </span>
+                          <div className="flex gap-2">
+                            <span className="text-gray-400 dark:text-gray-500 text-xs">
+                              {confirmation.status === "APPROVED"
+                                ? "Approved"
+                                : "Rejected"}
+                            </span>
+                            <button
+                              onClick={() =>
+                                handleDelete(confirmation.id, confirmation.student.name)
+                              }
+                              className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition"
+                              title="Delete"
+                            >
+                              <AiOutlineDelete size={16} />
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -188,23 +262,35 @@ const RefundManagement = () => {
                 </tbody>
               </table>
             </div>
-          )}
-        </div>
-      </CardWrapper>
 
-      {/* Confirm Dialog */}
-      <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        onClose={() =>
-          setConfirmDialog({ isOpen: false, id: null, status: null, studentName: "" })
-        }
-        onConfirm={confirmStatusUpdate}
-        title={`${confirmDialog.status === "APPROVED" ? "Approve" : "Reject"} Refund Confirmation`}
-        message={`Are you sure you want to ${confirmDialog.status?.toLowerCase()} the refund confirmation for ${
-          confirmDialog.studentName
-        }?`}
-      />
-    </>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-4">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </CardWrapper>
   );
 };
 

@@ -1,8 +1,15 @@
-const ConfirmDialog = ({ onConfirm, onCancel, title, message }) => (
+const ConfirmDialog = ({ 
+  onConfirm, 
+  onCancel, 
+  title, 
+  message,
+  confirmText = "Delete",
+  confirmColor = "bg-red-500 hover:bg-red-600"
+}) => (
   <div className="p-4">
-    <p className="mb-2 font-semibold">{`Delete ${title}?`}</p>
+    <p className="mb-2 font-semibold">{title}</p>
     <p className="mb-4 text-sm text-gray-600">
-      {message || `Are you sure you want to delete this ${title}?`}
+      {message}
     </p>
     <div className="flex justify-end space-x-2">
       <button
@@ -13,9 +20,9 @@ const ConfirmDialog = ({ onConfirm, onCancel, title, message }) => (
       </button>
       <button
         onClick={onConfirm}
-        className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600"
+        className={`text-white py-1 px-3 rounded ${confirmColor}`}
       >
-        Delete
+        {confirmText}
       </button>
     </div>
   </div>

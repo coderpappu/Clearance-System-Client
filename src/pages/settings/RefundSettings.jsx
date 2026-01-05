@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import {
     useGetRefundSettingsQuery,
     useUpdateRefundSettingsMutation,
 } from "../../api/apiSlice";
+import { CardHeader } from "../../components/CardHeader";
 import CardWrapper from "../../components/CardWrapper";
 
 const RefundSettings = () => {
@@ -66,20 +67,13 @@ const RefundSettings = () => {
 
   return (
     <CardWrapper>
-      <div className="border-b border-gray-200 dark:border-dark-border-color px-6 py-4">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-          Refund Settings
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Configure campus refund confirmation system
-        </p>
-      </div>
+      <CardHeader title="Refund Settings" />
 
       <div className="p-6">
-        <form onSubmit={handleSubmit} className="max-w-2xl">
+        <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
           {/* Enable/Disable Toggle */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-dark-box rounded-lg">
+          <div className="bg-gray-50 dark:bg-dark-box p-4 rounded-lg">
+            <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-base font-medium text-gray-900 dark:text-white">
                   Refund Process Status
@@ -94,7 +88,9 @@ const RefundSettings = () => {
                 type="button"
                 onClick={handleToggle}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                  formData.isActive ? "bg-green-600" : "bg-gray-300 dark:bg-gray-600"
+                  formData.isActive
+                    ? "bg-green-600"
+                    : "bg-gray-300 dark:bg-gray-600"
                 }`}
               >
                 <span
@@ -107,7 +103,7 @@ const RefundSettings = () => {
           </div>
 
           {/* Refund Amount */}
-          <div className="mb-6">
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Refund Amount (Optional)
             </label>
@@ -124,12 +120,13 @@ const RefundSettings = () => {
               />
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              This amount will be displayed to students. Leave empty if not applicable.
+              This amount will be displayed to students. Leave empty if not
+              applicable.
             </p>
           </div>
 
           {/* Status Information */}
-          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="p-4 bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20 border border-blue-200 dark:border-blue-800 rounded-lg">
             <h4 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
               Current Status
             </h4>
