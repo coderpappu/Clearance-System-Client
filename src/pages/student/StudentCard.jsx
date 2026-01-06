@@ -7,6 +7,7 @@ import { RxCrossCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import {
   useAddStudentsExcelMutation,
+  useBulkApproveAllClearancesMutation,
   useBulkDeleteStudentsMutation,
   useBulkSignClearancesMutation,
   useBulkUnsignClearancesMutation,
@@ -41,6 +42,9 @@ const StudentCard = () => {
     useBulkSignClearancesMutation();
   const [bulkUnsignClearances, { isLoading: isUnsigning }] =
     useBulkUnsignClearancesMutation();
+  const [bulkApproveAllClearances] = useBulkApproveAllClearancesMutation();
+
+  const isSuperAdmin = userData?.data?.role === "SuperAdmin";
 
   const onClose = () => setIsPopupOpen(false);
 
@@ -188,6 +192,30 @@ const StudentCard = () => {
         setSelectedStudents([]); // Clear selection
       } catch (error) {
         toast.error(error?.data?.message || "Failed to remove signatures");
+      }
+    }
+  };
+
+  // Handle bulk approve all clearances (SuperAdmin only)
+  const handleBulkApproveAll = async () => {
+    if (selectedStudents.length === 0) {
+      toast.error("Please select students to approve clearances");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to approve ALL clearance categories for ${selectedStudents.length} selected student(s)? This action will mark all clearances as approved.`
+    );
+
+    if (confirmed) {
+      try {
+        const result = await bulkApproveAllClearances(
+          selectedStudents
+        ).unwrap();
+        toast.success(result.message);
+        setSelectedStudents([]); // Clear selection
+      } catch (error) {
+        toast.error(error?.data?.message || "Failed to approve clearances");
       }
     }
   };
@@ -395,6 +423,28 @@ const StudentCard = () => {
                 ? "Removing..."
                 : `Unsign Selected (${selectedStudents.length})`}
             </button>
+
+            {isSuperAdmin && (
+              <button
+                onClick={handleBulkApproveAll}
+                title="Approve all clearance categories for selected students"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Give Full Clearance ({selectedStudents.length})
+              </button>
+            )}
 
             <button
               onClick={handleBulkDelete}

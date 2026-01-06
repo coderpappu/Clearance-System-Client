@@ -155,6 +155,15 @@ export const apiSlice = createApi({
       invalidatesTags: ["Clearance", "student"],
     }),
 
+    bulkApproveAllClearances: builder.mutation({
+      query: (studentIds) => ({
+        url: `/clearance/bulk-approve-all`,
+        method: "POST",
+        body: { studentIds },
+      }),
+      invalidatesTags: ["Clearance", "student"],
+    }),
+
     // institute endpoint
     createInstitute: builder.mutation({
       query: (credentials) => ({
@@ -526,6 +535,7 @@ export const {
   useBulkSignClearancesMutation,
   useUnsignClearancesMutation,
   useBulkUnsignClearancesMutation,
+  useBulkApproveAllClearancesMutation,
 
   useCreateDuePaymentMutation,
   useGetDuePaymentListByStudentQuery,
