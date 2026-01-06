@@ -148,6 +148,26 @@ const LoginForm = () => {
                   </a>
                 </p> */}
               </form>
+              {/* Quick Links for Students */}
+              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">
+                  Quick Links for Students
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => navigate("/student-verify")}
+                    className="flex-1 text-black bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-white dark:hover:bg-blue-900/30 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center transition-colors"
+                  >
+                    Check Due Payment
+                  </button>
+                  <button
+                    onClick={() => navigate("/refund-confirmation")}
+                    className="flex-1 text-black bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:text-white dark:hover:bg-green-900/30 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center transition-colors"
+                  >
+                    Check Refund Status
+                  </button>
+                </div>
+              </div>{" "}
             </div>
           </div>
           <div className="w-[200px] mt-28 flex flex-col items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">

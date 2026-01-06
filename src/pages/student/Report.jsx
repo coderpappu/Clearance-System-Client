@@ -1,13 +1,13 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { usePDF } from "react-to-pdf";
 import {
   useGetStudentBaseClearanceQuery,
   useGetStudentDetailsQuery,
 } from "../../api/apiSlice";
-// you can also use a function to return the target element besides using React refs
 
 const ClearanceForm = () => {
   const { id } = useParams();
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const {
     data: studentBaseClearance,
@@ -21,20 +21,58 @@ const ClearanceForm = () => {
     isError: isDetailsError,
   } = useGetStudentDetailsQuery(id);
 
-  const { toPDF, targetRef } = usePDF({
-    filename: `${
-      studentDetails?.data?.name
-    }_${new Date().toLocaleDateString()}.pdf`,
-    options: {
-      format: "A4",
-      margin: {
-        top: 40,
-        right: 40,
-        bottom: 40,
-        left: 40,
-      },
-    },
-  });
+  const handleDownloadPDF = async () => {
+    try {
+      setIsDownloading(true);
+
+      // Get the token from localStorage
+      const token = localStorage.getItem("token");
+
+      // Fetch PDF from backend
+      const response = await fetch(
+        `https://ctgpolyclearance.com/api/clearance/student/${id}/report/pdf`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to generate PDF");
+      }
+
+      // Get the blob
+      const blob = await response.blob();
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+
+      // Generate filename: StudentName_Department_Date.pdf
+      const date = new Date().toISOString().split("T")[0];
+      const studentName =
+        studentDetails?.data?.name?.replace(/\s+/g, "_") || "Student";
+      const departmentName =
+        studentDetails?.data?.department?.name?.replace(/\s+/g, "_") ||
+        "Department";
+      a.download = `${studentName}_${departmentName}_${date}.pdf`;
+
+      // Trigger download
+      document.body.appendChild(a);
+      a.click();
+
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+      alert("Failed to download PDF. Please try again.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   // Split the departments into two groups for two columns
   const departmentEntries = Object.entries(studentBaseClearance?.data || {});
@@ -42,21 +80,37 @@ const ClearanceForm = () => {
   const firstHalf = departmentEntries.slice(0, half);
   const secondHalf = departmentEntries.slice(half);
 
+  if (isBaseClearanceLoading || isDetailsLoading) {
+    return (
+      <div className="w-[85%] mx-auto p-4 text-center">
+        <p>Loading clearance report...</p>
+      </div>
+    );
+  }
+
+  if (isBaseClearanceError || isDetailsError) {
+    return (
+      <div className="w-[85%] mx-auto p-4 text-center text-red-500">
+        <p>Error loading clearance report. Please try again.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-[85%] mx-auto p-4">
-      <button
-        onClick={() => toPDF()}
-        className=" disabled:opacity-75 mb-4 px-4 py-2 bg-blue-500 text-white rounded cursor-pointer "
-        disabled={studentDetails?.data?.status !== "Success"}
-      >
-        Download
-      </button>
+      {/* Download Button - Only show when status is Success */}
+      {studentDetails?.data?.status === "Success" && (
+        <button
+          onClick={handleDownloadPDF}
+          className="mb-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isDownloading}
+        >
+          {isDownloading ? "Generating PDF..." : "Download Clearance Report"}
+        </button>
+      )}
 
-      <div
-        className="w-full mx-auto py-10 px-20 border border-gray-300 rounded-lg bg-white"
-        id="container"
-        ref={targetRef}
-      >
+      {/* Preview Section */}
+      <div className="w-full mx-auto py-10 px-20 border border-gray-300 rounded-lg bg-white">
         {/* Header */}
         <header className="text-center mb-8">
           <h3 className="text-lg">People Republic of Bangladesh</h3>
@@ -64,234 +118,91 @@ const ClearanceForm = () => {
           <h1 className="text-2xl font-bold">
             Chattogram Polytechnic Institute
           </h1>
-          <h4>Nasirabad , Chattogram </h4>
+          <h4>Nasirabad, Chattogram</h4>
           <p className="text-md my-2 font-bold underline">
             Student Clearance Form
           </p>
         </header>
-        {/* application format  */}
 
-        <div className="text-lg">
-          {`This is to certify that ${studentDetails?.data?.name} , son of ${studentDetails?.data?.father_name} and ${studentDetails?.data?.mother_name}, is a student of 8th semester, ${studentDetails?.data?.shift} shift. His roll number is ${studentDetails?.data?.boardRoll}, and his registration number is ${studentDetails?.data?.registrationNo}. 
-`}
-          <br />
-          <br />
-          As he has successfully completed his studies, we are proceeding with
-          his refund. If there are any outstanding dues associated with him, we
-          kindly request you to inform us at your earliest convenience.
-        </div>
-        <div className="flex justify-end my-14 mt-20 ">
-          <div>
-            <div className="w-56 border-b border-gray-500"></div>
-            <p className="text-center text-base mt-3">
-              Principal/ Vice-Principal
-              <p />
-              <p className="my-1"> Chattogram Polytechnic Institute</p>
-              <p className="my-1"> Nasirabad , Chattogram</p>
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-wrap justify-between text-[13px]">
-          <div className="w-[50%] flex flex-wrap justify-start gap-0 font-semibold text-black ">
-            <div className="w-[35%]  border border-gray-300 p-2">
-              Department Name
-            </div>
-            <div className="w-[40%] border border-gray-300 p-2">
-              <h2>Lab </h2>
-            </div>
-            <div className="w-[5%] border border-gray-300 p-2">
-              <h2>S</h2>
-            </div>
-            <div className="w-[20%] border border-gray-300 p-2">
-              <p className="text-center text-xs">Head Signature</p>
-            </div>
-          </div>
-          <div className="w-[50%] flex flex-wrap justify-start gap-0 font-semibold text-black ">
-            <div className="w-[35%]  border border-gray-300 p-2">
-              Department Name
-            </div>
-            <div className="w-[40%] border border-gray-300 p-2">
-              <h2>Lab </h2>
-            </div>
-            <div className="w-[5%] border border-gray-300 p-2">
-              <h2>S</h2>
-            </div>
-            <div className="w-[20%] border border-gray-300 p-2">
-              <p className="text-center text-xs">Head Signature</p>
-            </div>
-          </div>
+        {/* Student Information */}
+        <div className="text-base mb-6">
+          <p className="mb-2">
+            <strong>Name:</strong> {studentDetails?.data?.name}
+          </p>
+          <p className="mb-2">
+            <strong>Father's Name:</strong> {studentDetails?.data?.father_name}
+          </p>
+          <p className="mb-2">
+            <strong>Mother's Name:</strong> {studentDetails?.data?.mother_name}
+          </p>
+          <p className="mb-2">
+            <strong>Roll Number:</strong> {studentDetails?.data?.boardRoll}
+          </p>
+          <p className="mb-2">
+            <strong>Registration Number:</strong>{" "}
+            {studentDetails?.data?.registrationNo}
+          </p>
+          <p className="mb-2">
+            <strong>Shift:</strong> {studentDetails?.data?.shift}
+          </p>
+          <p className="mb-2">
+            <strong>Department:</strong>{" "}
+            {studentDetails?.data?.department?.name}
+          </p>
+          <p className="mb-2">
+            <strong>Status:</strong>{" "}
+            <span
+              className={`font-semibold ${
+                studentDetails?.data?.status === "Success"
+                  ? "text-green-600"
+                  : "text-yellow-600"
+              }`}
+            >
+              {studentDetails?.data?.status}
+            </span>
+          </p>
         </div>
 
-        {/* Table */}
-        <div className="flex flex-wrap justify-between text-[13px]">
-          <div className="w-[50%]">
-            {firstHalf.map(([departmentName, clearances]) => (
+        {/* Clearance Summary */}
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-4">Clearance Summary</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {departmentEntries.map(([departmentName, clearances]) => (
               <div
-                className="flex flex-wrap justify-start gap-0  text-black"
                 key={departmentName}
+                className="border border-gray-300 rounded p-3"
               >
-                <div className="w-[35%] border border-gray-300 p-2 ">
-                  {departmentName}
-                </div>
-                <div className="w-[40%] border border-gray-300 p-2">
-                  <ol type="1" className="list-disc list-inside pl-2">
-                    {clearances.map((clearance) => (
-                      <li key={clearance.id}>
-                        {clearance.clearanceCategory.name}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-                <div className="w-[5%] border border-gray-300 p-2">
-                  {clearances.every(
-                    (clearance) => clearance.status === "APPROVED"
-                  )
-                    ? "✔"
-                    : clearances.map((clearance) => (
-                        <div key={clearance.id}>
-                          {clearance.status === "APPROVED" ? "✔" : "✖"}
-                        </div>
-                      ))}
-                </div>
-                <div className="w-[20%] border border-gray-300 p-2">
-                  {/* Display signature if all clearances approved and signature exists */}
-                  {(() => {
-                    const allApproved = clearances.every(
-                      (c) => c.status === "APPROVED"
-                    );
-                    const signatureUrl = clearances.find(
-                      (c) => c.signatureUrl
-                    )?.signatureUrl;
-
-                    return allApproved && signatureUrl ? (
-                      <div className="flex flex-col items-center">
-                        <img
-                          src={`https://ctgpolyclearance.com/api${signatureUrl}`}
-                          alt="Signature"
-                          className="h-8 object-contain"
-                          crossOrigin="anonymous"
-                        />
-                        <p className="text-center text-xs mt-1">Signature</p>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="h-8 border-b border-gray-400"></div>
-                        <p className="text-center text-xs">Signature</p>
-                      </>
-                    );
-                  })()}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="w-[50%]">
-            {secondHalf.map(([departmentName, clearances]) => (
-              <div
-                className="flex flex-wrap justify-start gap-0  text-black"
-                key={departmentName}
-              >
-                <div className="w-[35%] border border-gray-300 p-2">
-                  {departmentName}
-                </div>
-                <div className="w-[40%] border border-gray-300 p-2">
-                  <ul className="list-disc list-inside pl-2">
-                    {clearances.map((clearance) => (
-                      <li key={clearance.id}>
-                        {clearance.clearanceCategory.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="w-[5%] border border-gray-300 p-2">
-                  {clearances.every(
-                    (clearance) => clearance.status === "APPROVED"
-                  )
-                    ? "✔"
-                    : clearances.map((clearance) => (
-                        <div key={clearance.id}>
-                          {clearance.status === "APPROVED" ? "✔" : "✖"}
-                        </div>
-                      ))}
-                </div>
-                <div className="w-[20%] border border-gray-300 p-2">
-                  {/* Display signature if all clearances approved and signature exists */}
-                  {(() => {
-                    const allApproved = clearances.every(
-                      (c) => c.status === "APPROVED"
-                    );
-                    const signatureUrl = clearances.find(
-                      (c) => c.signatureUrl
-                    )?.signatureUrl;
-
-                    return allApproved && signatureUrl ? (
-                      <div className="flex flex-col items-center">
-                        <img
-                          src={`https://ctgpolyclearance.com/api${signatureUrl}`}
-                          alt="Signature"
-                          className="h-8 object-contain"
-                          crossOrigin="anonymous"
-                        />
-                        <p className="text-center text-xs mt-1">Signature</p>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="h-8 border-b border-gray-400"></div>
-                        <p className="text-center text-xs">Signature</p>
-                      </>
-                    );
-                  })()}
-                </div>
+                <h4 className="font-semibold mb-2">{departmentName}</h4>
+                <ul className="list-disc list-inside text-sm">
+                  {clearances.map((clearance) => (
+                    <li
+                      key={clearance.id}
+                      className={
+                        clearance.status === "APPROVED"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }
+                    >
+                      {clearance.clearanceCategory.name} -{" "}
+                      {clearance.status === "APPROVED" ? "✓" : "✗"}
+                      {clearance.signatureUrl && " (Signed)"}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="my-6 text-lg">
-          <p>
-            His total refundable amount is ............................ BDT,
-            from which ........................ BDT has been deducted for
-            necessary reasons. The remaining amount will be returned.
+        {/* Note */}
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
+          <p className="text-sm text-blue-800">
+            <strong>Note:</strong> The PDF report will be generated with all
+            clearance details, signatures, and official formatting. Click the
+            "Download Clearance Report" button above to get the official PDF
+            document.
           </p>
         </div>
-
-        <div className="flex justify-end my-16">
-          <div>
-            <div className="w-56 border-b border-gray-500"></div>
-            <p className="text-center text-base my-1">
-              Principal
-              <p /> <p className="my-1"> Chattogram Polytechnic Institute</p>
-              <p className="my-1"> Nasirabad , Chattogram</p>
-            </p>
-          </div>
-        </div>
-
-        <div className="my-3 text-lg">
-          <p>
-            At the time of admission, I deposited ....................... Tk as
-            a security deposit to the institute. I hereby confirm that I have
-            received the refunded amount.
-          </p>
-        </div>
-
-        {/* Footer */}
-        <footer className="mt-8 text-sm text-gray-700">
-          <div className="flex justify-between">
-            <div>
-              <p>Date:</p>
-              <div className="w-48 border-b mt-3 border-gray-500"></div>
-            </div>
-
-            <div className="flex justify-end my-8">
-              <div>
-                <div className="w-56 border-b border-gray-500"></div>
-                <p className="text-center text-base">
-                  Student Signature
-                  <p />
-                </p>
-              </div>
-            </div>
-          </div>
-        </footer>
       </div>
     </div>
   );

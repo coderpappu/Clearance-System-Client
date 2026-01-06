@@ -4,8 +4,8 @@ export const apiSlice = createApi({
   reducerPath: "api",
 
   baseQuery: fetchBaseQuery({
-    // baseUrl: "https://ctgpolyclearance.com/api",
-    baseUrl: "http://localhost:3000/api/",
+    baseUrl: "https://ctgpolyclearance.com/api",
+    // baseUrl: "http://localhost:3000/api/",
 
     prepareHeaders: (headers, { getState }) => {
       const token = localStorage.getItem("token");
@@ -463,6 +463,21 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["RefundConfirmations"],
     }),
+
+    // Generate Clearance Report PDF
+    generateClearanceReportPDF: builder.query({
+      query: (studentId) => ({
+        url: `/clearance/student/${studentId}/report/pdf`,
+        responseHandler: async (response) => {
+          if (!response.ok) {
+            throw new Error("Failed to generate PDF");
+          }
+          return response.blob();
+        },
+        cache: "no-cache",
+      }),
+      providesTags: ["clearance"],
+    }),
   }),
 });
 
@@ -532,4 +547,5 @@ export const {
   useGetRefundConfirmationsQuery,
   useUpdateRefundConfirmationMutation,
   useDeleteRefundConfirmationMutation,
+  useGenerateClearanceReportPDFQuery,
 } = apiSlice;
