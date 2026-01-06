@@ -30,7 +30,7 @@ const ClearanceForm = () => {
 
       // Fetch PDF from backend
       const response = await fetch(
-        `https://ctgpolyclearance.com/api/clearance/student/${id}/report/pdf`,
+        `http://localhost:3000/api/clearance/student/${id}/report/pdf`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
