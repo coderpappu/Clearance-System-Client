@@ -51,8 +51,12 @@ const LoginForm = () => {
 
         localStorage.setItem("token", data?.data?.token);
 
-        navigate("/");
         toast.success("Login Successful!");
+
+        // Small delay to ensure token is set before navigation
+        setTimeout(() => {
+          navigate("/", { replace: true });
+        }, 100);
       } catch (error) {
         toast.error("Failed to login. Please check your credentials.");
       }
