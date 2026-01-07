@@ -18,7 +18,19 @@ export const apiSlice = createApi({
     },
   }),
 
-  tagTypes: ["User", "RefundSettings", "RefundConfirmations"],
+  tagTypes: [
+    "User",
+    "student",
+    "clearance",
+    "Clearance",
+    "Departments",
+    "clearancecategory",
+    "Institute",
+    "duepayment",
+    "duestupayment",
+    "RefundSettings",
+    "RefundConfirmations",
+  ],
 
   endpoints: (builder) => ({
     // user Related EndPoints
@@ -118,7 +130,7 @@ export const apiSlice = createApi({
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: ["User"],
+      invalidatesTags: ["User", "clearance", "Clearance"],
     }),
 
     signClearances: builder.mutation({
@@ -126,7 +138,7 @@ export const apiSlice = createApi({
         url: `/clearance/sign/${studentId}`,
         method: "POST",
       }),
-      invalidatesTags: ["Clearance"],
+      invalidatesTags: ["Clearance", "clearance", "student"],
     }),
 
     bulkSignClearances: builder.mutation({
@@ -135,7 +147,7 @@ export const apiSlice = createApi({
         method: "POST",
         body: { studentIds },
       }),
-      invalidatesTags: ["Clearance", "student"],
+      invalidatesTags: ["Clearance", "clearance", "student"],
     }),
 
     unsignClearances: builder.mutation({
@@ -143,7 +155,7 @@ export const apiSlice = createApi({
         url: `/clearance/unsign/${studentId}`,
         method: "POST",
       }),
-      invalidatesTags: ["Clearance"],
+      invalidatesTags: ["Clearance", "clearance", "student"],
     }),
 
     bulkUnsignClearances: builder.mutation({
@@ -152,7 +164,7 @@ export const apiSlice = createApi({
         method: "POST",
         body: { studentIds },
       }),
-      invalidatesTags: ["Clearance", "student"],
+      invalidatesTags: ["Clearance", "clearance", "student"],
     }),
 
     bulkApproveAllClearances: builder.mutation({
@@ -161,8 +173,7 @@ export const apiSlice = createApi({
         method: "POST",
         body: { studentIds },
       }),
-
-      invalidatesTags: ["Clearance", "student", "clearance"],
+      invalidatesTags: ["Clearance", "clearance", "student"],
     }),
 
     // institute endpoint

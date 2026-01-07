@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { AiOutlineDelete } from "react-icons/ai";
 import { CiEdit } from "react-icons/ci";
@@ -21,18 +21,58 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 import Pagination from "../../components/Pagination";
 import StudentForm from "./StudentForm";
 
+// Get saved filters from localStorage
+const getSavedFilters = () => {
+  try {
+    const saved = localStorage.getItem("studentListFilters");
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+};
+
 const StudentCard = () => {
+  const savedFilters = getSavedFilters();
+
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedStudentId, setSelectStudentId] = useState(null);
   const [excelFile, setExcelFile] = useState(null); // State to hold the Excel file
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sessionFilter, setSessionFilter] = useState("");
-  const [departmentFilter, setDepartmentFilter] = useState("");
-  const [shiftFilter, setShiftFilter] = useState("");
-  const [groupFilter, setGroupFilter] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(savedFilters.searchTerm || "");
+  const [sessionFilter, setSessionFilter] = useState(
+    savedFilters.sessionFilter || ""
+  );
+  const [departmentFilter, setDepartmentFilter] = useState(
+    savedFilters.departmentFilter || ""
+  );
+  const [shiftFilter, setShiftFilter] = useState(
+    savedFilters.shiftFilter || ""
+  );
+  const [groupFilter, setGroupFilter] = useState(
+    savedFilters.groupFilter || ""
+  );
+  const [currentPage, setCurrentPage] = useState(savedFilters.currentPage || 1);
   const [selectedStudents, setSelectedStudents] = useState([]);
   const studentsPerPage = 20;
+
+  // Save filters to localStorage whenever they change
+  useEffect(() => {
+    const filters = {
+      searchTerm,
+      sessionFilter,
+      departmentFilter,
+      shiftFilter,
+      groupFilter,
+      currentPage,
+    };
+    localStorage.setItem("studentListFilters", JSON.stringify(filters));
+  }, [
+    searchTerm,
+    sessionFilter,
+    departmentFilter,
+    shiftFilter,
+    groupFilter,
+    currentPage,
+  ]);
 
   const { data: studentList, isLoading, isError } = useGetStudentListQuery();
   const { data: userData } = useGetUserQuery();
