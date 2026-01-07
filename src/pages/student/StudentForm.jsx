@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import {
@@ -32,13 +32,13 @@ const StudentForm = ({ selectedStudentId, onClose }) => {
     department_id: Yup.string().required("Department is required"),
     shift: Yup.string().required("Shift is required"),
     session: Yup.string().required("Session is required"),
-    group: Yup.string().required("Group is required"),
-    birthDate: Yup.date().required("Birth date is required"),
-    phoneNumber: Yup.string().required("Phone number is required"),
-    district: Yup.string().required("District is required"),
-    upazila: Yup.string().required("Upazila is required"),
-    mother_name: Yup.string().required("Mother's name is required"),
-    father_name: Yup.string().required("Father's name is required"),
+    group: Yup.string(), // Optional
+    birthDate: Yup.date(), // Optional
+    phoneNumber: Yup.string(), // Optional
+    district: Yup.string(), // Optional
+    upazila: Yup.string(), // Optional
+    mother_name: Yup.string(), // Optional
+    father_name: Yup.string(), // Optional
   });
 
   // Local state for initial values
@@ -292,7 +292,7 @@ const StudentForm = ({ selectedStudentId, onClose }) => {
           ) : null}
         </div>
 
-        {/* Group Dropdown */}
+        {/* Group Input */}
         <div>
           <label
             htmlFor="group"
@@ -300,31 +300,26 @@ const StudentForm = ({ selectedStudentId, onClose }) => {
           >
             Group
           </label>
-          <select
+          <input
+            type="text"
             name="group"
             id="group"
+            placeholder="Enter group (e.g., A1, B1, A2, B2)"
             className={`w-full bg-gray-50 border ${
               formik.touched.group && formik.errors.group
                 ? "border-red-500"
                 : "border-gray-300"
-            } text-gray-900 rounded-lg p-3 dark:bg-gray-700`}
+            } text-gray-900 rounded-lg p-3 dark:bg-gray-700 dark:text-white`}
             value={formik.values.group}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-          >
-            <option value="">Select Group</option>
-            {groupList.map((group, idx) => (
-              <option key={idx} value={group}>
-                {group}
-              </option>
-            ))}
-          </select>
+          />
           {formik.touched.group && formik.errors.group ? (
             <div className="text-red-500 text-sm">{formik.errors.group}</div>
           ) : null}
         </div>
 
-        {/* Shift Dropdown */}
+        {/* Shift Input */}
         <div>
           <label
             htmlFor="shift"
@@ -332,25 +327,20 @@ const StudentForm = ({ selectedStudentId, onClose }) => {
           >
             Shift
           </label>
-          <select
+          <input
+            type="text"
             name="shift"
             id="shift"
+            placeholder="Enter shift (e.g., 1st Shift, 2nd Shift)"
             className={`w-full bg-gray-50 border ${
               formik.touched.shift && formik.errors.shift
                 ? "border-red-500"
                 : "border-gray-300"
-            } text-gray-900 rounded-lg p-3 dark:bg-gray-700`}
+            } text-gray-900 rounded-lg p-3 dark:bg-gray-700 dark:text-white`}
             value={formik.values.shift}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-          >
-            <option value="">Select Shift</option>
-            {shiftList.map((shift, idx) => (
-              <option key={idx} value={shift}>
-                {shift}
-              </option>
-            ))}
-          </select>
+          />
           {formik.touched.shift && formik.errors.shift ? (
             <div className="text-red-500 text-sm">{formik.errors.shift}</div>
           ) : null}
@@ -399,7 +389,7 @@ const StudentForm = ({ selectedStudentId, onClose }) => {
             type="submit"
             className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
           >
-            Register Student
+            {selectedStudentId ? "Update Student" : "Register Student"}
           </button>
         </div>
       </form>

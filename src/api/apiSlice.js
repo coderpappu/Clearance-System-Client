@@ -4,8 +4,8 @@ export const apiSlice = createApi({
   reducerPath: "api",
 
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://ctgpolyclearance.com/api",
-    // baseUrl: "http://localhost:3000/api/",
+    // baseUrl: "https://ctgpolyclearance.com/api",
+    baseUrl: "http://localhost:3000/api/",
 
     prepareHeaders: (headers, { getState }) => {
       const token = localStorage.getItem("token");
