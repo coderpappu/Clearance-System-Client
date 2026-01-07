@@ -5,6 +5,7 @@ import { CiEdit } from "react-icons/ci";
 import { RxCrossCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import {
+  useBulkApproveAllClearancesMutation,
   useBulkDeleteStudentsMutation,
   useDeleteStudentMutation,
   useGetStudentListQuery,
@@ -12,6 +13,7 @@ import {
 import { CardHeader } from "../components/CardHeader";
 import CardWrapper from "../components/CardWrapper";
 import ConfirmDialog from "../components/ConfirmDialog";
+import getUserDetails from "../utils/getUserDetails";
 import StudentForm from "./student/StudentForm";
 
 const StudentList = () => {
@@ -19,9 +21,13 @@ const StudentList = () => {
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [selectedStudents, setSelectedStudents] = useState([]);
 
+  const currentUser = getUserDetails();
+  const isSuperAdmin = currentUser?.role === "SuperAdmin";
+
   const { data: studentList, isLoading, isError } = useGetStudentListQuery();
   const [deleteStudent] = useDeleteStudentMutation();
   const [bulkDeleteStudents] = useBulkDeleteStudentsMutation();
+  const [bulkApproveAllClearances] = useBulkApproveAllClearancesMutation();
 
   const onClose = () => setIsPopupOpen(false);
 
@@ -116,6 +122,44 @@ const StudentList = () => {
     confirm();
   };
 
+  // Handle bulk approve all clearances (SuperAdmin only)
+  const handleBulkApproveAll = async () => {
+    if (selectedStudents.length === 0) {
+      toast.error("Please select students to approve clearances");
+      return;
+    }
+
+    const confirm = () =>
+      toast(
+        (t) => (
+          <ConfirmDialog
+            onConfirm={async () => {
+              toast.dismiss(t.id);
+              try {
+                const res = await bulkApproveAllClearances(selectedStudents);
+                if (res.error != null) {
+                  toast.error(res.error.data.message);
+                } else {
+                  toast.success(
+                    res.data?.message ||
+                      `All clearances approved for ${selectedStudents.length} student(s)`
+                  );
+                  setSelectedStudents([]);
+                }
+              } catch (error) {
+                toast.error(error.message || "Failed to approve clearances");
+              }
+            }}
+            onCancel={() => toast.dismiss(t.id)}
+            title={`Approve Clearances for ${selectedStudents.length} Student(s)`}
+            message={`This will approve ALL clearance categories for ${selectedStudents.length} selected student(s). Are you sure you want to proceed?`}
+          />
+        ),
+        { duration: Infinity }
+      );
+    confirm();
+  };
+
   let content;
 
   if (isLoading && isError) return "Loading...";
@@ -191,7 +235,7 @@ const StudentList = () => {
 
         {/* Bulk Action Buttons */}
         {selectedStudents.length > 0 && (
-          <div className="px-6 py-3">
+          <div className="px-6 py-3 flex gap-3">
             <button
               onClick={handleBulkDelete}
               className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
@@ -199,6 +243,27 @@ const StudentList = () => {
               <AiOutlineDelete size={20} />
               Delete Selected ({selectedStudents.length})
             </button>
+
+            {isSuperAdmin && (
+              <button
+                onClick={handleBulkApproveAll}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Give Full Clearance ({selectedStudents.length})
+              </button>
+            )}
           </div>
         )}
 

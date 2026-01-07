@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { IoArrowBack } from "react-icons/io5";
 import { RxCrossCircled } from "react-icons/rx";
 import { usePDF } from "react-to-pdf";
 import { useGetTotalDueByStudentIdQuery } from "../../api/apiSlice";
@@ -8,7 +9,7 @@ import ErrorMessage from "../../utils/ErrorMessage";
 import StudentPaymentCard from "./StudentPaymentCard";
 const StudentDueCheck = () => {
   const [boardRoll, setBoardRoll] = useState("");
-  const [session, setSession] = useState("");
+  const [registrationNo, setRegistrationNo] = useState("");
   const [error, setError] = useState("");
   const [studentData, setStudentData] = useState("");
   const [showResult, setShowResult] = useState(false);
@@ -29,13 +30,13 @@ const StudentDueCheck = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!boardRoll || !session) {
+    if (!boardRoll || !registrationNo) {
       setError("Both fields are required");
       return;
     }
     setError("");
     try {
-      setStudentData(boardRoll);
+      setStudentData(`${boardRoll}-${registrationNo}`);
       setShowResult(true);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -45,7 +46,7 @@ const StudentDueCheck = () => {
   const handleBack = () => {
     setShowResult(false);
     setBoardRoll("");
-    setSession("");
+    setRegistrationNo("");
     setError("");
     setStudentData("");
   };
@@ -62,7 +63,7 @@ const StudentDueCheck = () => {
         <div className="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white text-center">
-              Student Account
+              Student Due Check
             </h1>
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
               <div>
@@ -84,22 +85,20 @@ const StudentDueCheck = () => {
               </div>
               <div>
                 <label
-                  htmlFor="session"
+                  htmlFor="registrationNo"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Session
+                  Registration Number
                 </label>
-                <select
-                  name="session"
-                  id="session"
-                  value={session}
-                  onChange={(e) => setSession(e.target.value)}
+                <input
+                  type="text"
+                  name="registrationNo"
+                  id="registrationNo"
+                  value={registrationNo}
+                  onChange={(e) => setRegistrationNo(e.target.value)}
+                  placeholder="Enter registration number"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                >
-                  <option value="">Select Session</option>
-                  <option value="20-21">20-21</option>
-                  <option value="21-22">21-22</option>
-                </select>
+                />
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}
               <button
@@ -115,10 +114,11 @@ const StudentDueCheck = () => {
         <div className="w-full bg-white rounded-lg shadow dark:border sm:max-w-2xl xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <button
-              className="text-blue-500 hover:underline"
+              className="flex items-center gap-2 px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors duration-200"
               onClick={handleBack}
             >
-              &larr; Back
+              <IoArrowBack size={18} />
+              Back
             </button>
             {isError ? (
               <ErrorMessage message={serverMsg?.data?.message} />
@@ -205,14 +205,14 @@ const StudentDueCheck = () => {
                 </div>
                 <div className="flex  justify-start gap-3">
                   <button
-                    onClick={() => toPDF()}
-                    className="mb-4 px-3 py-2 bg-blue-500 text-white rounded cursor-pointer text-sm"
+                    disabled
+                    className="mb-4 px-3 py-2 bg-gray-400 text-white rounded cursor-not-allowed text-sm"
                   >
                     Print
                   </button>
                   <button
-                    onClick={() => handleOpen()}
-                    className="mb-4 px-3 py-2 bg-green-500 text-white rounded cursor-pointer text-sm"
+                    disabled
+                    className="mb-4 px-3 py-2 bg-gray-400 text-white rounded cursor-not-allowed text-sm"
                   >
                     Payment
                   </button>

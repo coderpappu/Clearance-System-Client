@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { IoArrowBack } from "react-icons/io5";
 import {
-    useCheckRefundEligibilityMutation,
-    useSubmitRefundConfirmationMutation,
+  useCheckRefundEligibilityMutation,
+  useSubmitRefundConfirmationMutation,
 } from "../../api/apiSlice";
 import Logo from "../../assets/cpi_logo.png";
 import ErrorMessage from "../../utils/ErrorMessage";
@@ -45,7 +46,10 @@ const RefundConfirmation = () => {
       setShowResult(true);
       setAgreed(false);
     } catch (error) {
-      setError(error?.data?.message || "Student not found or refund process is not active");
+      setError(
+        error?.data?.message ||
+          "Student not found or refund process is not active"
+      );
     }
   };
 
@@ -78,9 +82,18 @@ const RefundConfirmation = () => {
 
   const getStatusBadge = (status) => {
     const badges = {
-      PENDING: { bg: "bg-yellow-100 dark:bg-yellow-900", text: "text-yellow-800 dark:text-yellow-200" },
-      APPROVED: { bg: "bg-green-100 dark:bg-green-900", text: "text-green-800 dark:text-green-200" },
-      REJECTED: { bg: "bg-red-100 dark:bg-red-900", text: "text-red-800 dark:text-red-200" },
+      PENDING: {
+        bg: "bg-yellow-100 dark:bg-yellow-900",
+        text: "text-yellow-800 dark:text-yellow-200",
+      },
+      APPROVED: {
+        bg: "bg-green-100 dark:bg-green-900",
+        text: "text-green-800 dark:text-green-200",
+      },
+      REJECTED: {
+        bg: "bg-red-100 dark:bg-red-900",
+        text: "text-red-800 dark:text-red-200",
+      },
     };
     return badges[status] || badges.PENDING;
   };
@@ -155,10 +168,11 @@ const RefundConfirmation = () => {
         <div className="w-full bg-white rounded-lg shadow dark:border sm:max-w-2xl xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <button
-              className="text-blue-500 hover:underline"
+              className="flex items-center gap-2 px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors duration-200"
               onClick={handleBack}
             >
-              &larr; Back
+              <IoArrowBack size={18} />
+              Back
             </button>
 
             {serverError ? (
@@ -237,7 +251,10 @@ const RefundConfirmation = () => {
                         <span
                           className={`inline-block px-4 py-2 rounded-full text-sm font-medium ${
                             getStatusBadge(studentData?.confirmation?.status).bg
-                          } ${getStatusBadge(studentData?.confirmation?.status).text}`}
+                          } ${
+                            getStatusBadge(studentData?.confirmation?.status)
+                              .text
+                          }`}
                         >
                           {studentData?.confirmation?.status}
                         </span>

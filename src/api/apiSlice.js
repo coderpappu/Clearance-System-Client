@@ -4,8 +4,8 @@ export const apiSlice = createApi({
   reducerPath: "api",
 
   baseQuery: fetchBaseQuery({
-    // baseUrl: "https://ctgpolyclearance.com/api",
-    baseUrl: "http://localhost:3000/api/",
+    baseUrl: "https://ctgpolyclearance.com/api",
+    // baseUrl: "http://localhost:3000/api/",
 
     prepareHeaders: (headers, { getState }) => {
       const token = localStorage.getItem("token");
@@ -153,6 +153,16 @@ export const apiSlice = createApi({
         body: { studentIds },
       }),
       invalidatesTags: ["Clearance", "student"],
+    }),
+
+    bulkApproveAllClearances: builder.mutation({
+      query: (studentIds) => ({
+        url: `/clearance/bulk-approve-all`,
+        method: "POST",
+        body: { studentIds },
+      }),
+
+      invalidatesTags: ["Clearance", "student", "clearance"],
     }),
 
     // institute endpoint
@@ -526,6 +536,7 @@ export const {
   useBulkSignClearancesMutation,
   useUnsignClearancesMutation,
   useBulkUnsignClearancesMutation,
+  useBulkApproveAllClearancesMutation,
 
   useCreateDuePaymentMutation,
   useGetDuePaymentListByStudentQuery,
