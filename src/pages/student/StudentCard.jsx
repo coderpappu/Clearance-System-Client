@@ -74,7 +74,19 @@ const StudentCard = () => {
     currentPage,
   ]);
 
-  const { data: studentList, isLoading, isError } = useGetStudentListQuery();
+  const {
+    data: studentList,
+    isLoading,
+    isError,
+  } = useGetStudentListQuery({
+    page: currentPage,
+    limit: studentsPerPage,
+    search: searchTerm,
+    session: sessionFilter,
+    department: departmentFilter,
+    shift: shiftFilter,
+    group: groupFilter,
+  });
   const { data: userData } = useGetUserQuery();
   const [deleteStudent] = useDeleteStudentMutation();
   const [bulkDeleteStudents] = useBulkDeleteStudentsMutation();
@@ -310,30 +322,16 @@ const StudentCard = () => {
     setGroupFilter(e.target.value);
   };
 
-  const filteredStudents = studentList?.data?.filter((student) => {
-    return (
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (sessionFilter ? student.session === sessionFilter : true) &&
-      (departmentFilter
-        ? student.department?.name === departmentFilter
-        : true) &&
-      (shiftFilter ? student.shift === shiftFilter : true) &&
-      (groupFilter ? student.group === groupFilter : true)
-    );
-  });
-
-  const paginatedStudents = filteredStudents?.slice(
-    (currentPage - 1) * studentsPerPage,
-    currentPage * studentsPerPage
-  );
+  // Server-side pagination - use data directly
+  const paginatedStudents = studentList?.data || [];
+  const totalPages = studentList?.pagination?.totalPages || 1;
+  const totalCount = studentList?.pagination?.totalCount || 0;
 
   const currentPageStudentIds =
     paginatedStudents?.map((student) => student.id) || [];
   const allCurrentPageSelected =
     currentPageStudentIds.length > 0 &&
     currentPageStudentIds.every((id) => selectedStudents.includes(id));
-
-  const totalPages = Math.ceil(filteredStudents?.length / studentsPerPage);
 
   const uniqueSessions = [
     ...new Set(studentList?.data?.map((student) => student.session)),

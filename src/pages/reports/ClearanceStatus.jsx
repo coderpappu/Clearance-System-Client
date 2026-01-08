@@ -1,13 +1,13 @@
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "keep-react";
 import { Cell, Pie, PieChart } from "recharts";
-import { useGetDepartmentClearanceReportQuery } from "../../api/apiSlice";
 
-const PieChartComponent = () => {
-  const {
-    data: chartData,
-    isLoading,
-    isError,
-  } = useGetDepartmentClearanceReportQuery();
+const PieChartComponent = ({ dashboardData }) => {
+  // Use department clearance data instead of status distribution
+  const departmentClearanceData =
+    dashboardData?.departmentClearanceStats?.departments || [];
+  const totalCleared =
+    dashboardData?.departmentClearanceStats?.totalCleared || 0;
+  const isLoading = !dashboardData;
 
   // Vibrant color palette for departments
   const COLORS = [
@@ -24,17 +24,16 @@ const PieChartComponent = () => {
   ];
 
   // Add fill colors to chart data
-  const processedData = chartData?.data?.map((item, index) => ({
-    ...item,
-    fill: COLORS[index % COLORS.length],
-  })) || [];
-
-  // Calculate total students
-  const totalStudents = processedData.reduce((sum, item) => sum + item.students, 0);
+  const processedData =
+    departmentClearanceData?.map((item, index) => ({
+      name: item.departmentName,
+      value: item.clearedStudents,
+      fill: COLORS[index % COLORS.length],
+    })) || [];
 
   const chartConfig = {
-    students: {
-      label: "Students",
+    value: {
+      label: "Cleared Students",
     },
   };
 
@@ -42,7 +41,7 @@ const PieChartComponent = () => {
     return (
       <div className="p-6 rounded-lg bg-white dark:bg-dark-card shadow-sm">
         <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-dark-heading-color">
-          Clearance Status by Department
+          Department Clearance Status
         </h3>
         <div className="h-[280px] flex items-center justify-center">
           <p className="text-gray-500 dark:text-gray-400">Loading...</p>
@@ -51,14 +50,16 @@ const PieChartComponent = () => {
     );
   }
 
-  if (isError || !processedData || processedData.length === 0) {
+  if (!processedData || processedData.length === 0) {
     return (
       <div className="p-6 rounded-lg bg-white dark:bg-dark-card shadow-sm">
         <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-dark-heading-color">
-          Clearance Status by Department
+          Department Clearance Status
         </h3>
         <div className="h-[280px] flex items-center justify-center">
-          <p className="text-gray-500 dark:text-gray-400">No clearance data available</p>
+          <p className="text-gray-500 dark:text-gray-400">
+            No clearance data available
+          </p>
         </div>
       </div>
     );
@@ -67,7 +68,7 @@ const PieChartComponent = () => {
   return (
     <div className="p-6 rounded-lg bg-white dark:bg-dark-card shadow-sm">
       <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-dark-heading-color">
-        Clearance Status
+        Department Clearance Status
       </h3>
 
       <div className="relative">
@@ -79,8 +80,8 @@ const PieChartComponent = () => {
             />
             <Pie
               data={processedData}
-              dataKey="students"
-              nameKey="department"
+              dataKey="value"
+              nameKey="name"
               cx="50%"
               cy="50%"
               innerRadius={70}
@@ -97,8 +98,12 @@ const PieChartComponent = () => {
 
         {/* Center label */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-          <p className="text-3xl font-bold text-gray-800 dark:text-white">{totalStudents}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Total Students</p>
+          <p className="text-3xl font-bold text-gray-800 dark:text-white">
+            {totalCleared}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Total Cleared
+          </p>
         </div>
       </div>
     </div>

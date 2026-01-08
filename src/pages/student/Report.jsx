@@ -4,6 +4,7 @@ import {
   useGetStudentBaseClearanceQuery,
   useGetStudentDetailsQuery,
 } from "../../api/apiSlice";
+import { getApiUrl } from "../../utils/config";
 
 const ClearanceForm = () => {
   const { id } = useParams();
@@ -30,7 +31,7 @@ const ClearanceForm = () => {
 
       // Fetch PDF from backend
       const response = await fetch(
-        `https://ctgpolyclearance.com/api/clearance/student/${id}/report/pdf`,
+        getApiUrl(`/clearance/student/${id}/report/pdf`),
         {
           headers: {
             Authorization: `Bearer ${token}`,

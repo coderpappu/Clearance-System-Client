@@ -6,11 +6,10 @@ import {
   ChartTooltipContent,
 } from "keep-react";
 import { Bar, BarChart, CartesianGrid, Rectangle, XAxis } from "recharts";
-import { useGetDeptStudentsReportQuery } from "../../api/apiSlice";
 
-export const BarChartComponent = () => {
-  const { data } = useGetDeptStudentsReportQuery();
-  const deptReport = data?.data;
+export const BarChartComponent = ({ dashboardData }) => {
+  // Use data from dashboard stats instead of separate API call
+  const deptReport = dashboardData?.departmentStats || [];
 
   const chartConfig = {
     desktop: {
@@ -28,7 +27,7 @@ export const BarChartComponent = () => {
         <BarChart accessibilityLayer data={deptReport}>
           <CartesianGrid vertical={false} />
           <XAxis
-            dataKey="department"
+            dataKey="departmentName"
             tickLine={false}
             tickMargin={10}
             axisLine={false}

@@ -9,6 +9,7 @@ import {
   useGetStudentBaseClearanceQuery,
   useGetUserDetailsQuery,
 } from "../../api/apiSlice";
+import { config } from "../../utils/config";
 
 const StudentClearanceCard = ({ studentId, instituteId }) => {
   const token = localStorage.getItem("token");
@@ -148,7 +149,7 @@ const StudentClearanceCard = ({ studentId, instituteId }) => {
                         <div className="ml-6 mt-2 p-2 bg-white dark:bg-gray-700 rounded border border-green-300 dark:border-green-600">
                           <div className="flex items-center gap-3">
                             <img
-                              src={`https://ctgpolyclearance.com/api${clearanceRecord.signatureUrl}`}
+                              src={`${config.apiBaseUrl}${clearanceRecord.signatureUrl}`}
                               alt="Signature"
                               className="h-12 border border-gray-300 dark:border-gray-600 rounded px-2 bg-white"
                             />

@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Legend,
   Line,
@@ -8,7 +7,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useGetDuePaidReportQuery } from "../../api/apiSlice";
 
 const data = [
   { name: "Jan", Sales: 4000, Profit: 2400 },
@@ -21,8 +19,6 @@ const data = [
 ];
 
 const MyLineChart = () => {
- 
-
   return (
     <div className="bg-white dark:bg-dark-card p-4 rounded shadow">
       {" "}

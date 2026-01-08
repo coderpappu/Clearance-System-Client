@@ -8,6 +8,7 @@ import {
   useGetUserDetailsQuery,
   useUploadSignatureMutation,
 } from "../../api/apiSlice";
+import { config } from "../../utils/config";
 import Button from "../student/Button";
 import InfoBox from "../student/InfoBox";
 
@@ -159,7 +160,7 @@ const UserProfile = () => {
                   Current Signature:
                 </p>
                 <img
-                  src={`https://ctgpolyclearance.com/api${user.data.signature}`}
+                  src={`${config.apiBaseUrl}${user.data.signature}`}
                   alt="Current Signature"
                   className="max-w-xs h-auto border border-gray-300 dark:border-gray-600 rounded p-2 bg-white"
                 />

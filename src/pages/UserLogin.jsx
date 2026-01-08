@@ -53,10 +53,7 @@ const LoginForm = () => {
 
         toast.success("Login Successful!");
 
-        // Small delay to ensure token is set before navigation
-        setTimeout(() => {
-          navigate("/", { replace: true });
-        }, 100);
+        navigate("/dashboard");
       } catch (error) {
         toast.error("Failed to login. Please check your credentials.");
       }

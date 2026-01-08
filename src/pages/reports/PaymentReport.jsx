@@ -7,36 +7,64 @@ import {
   ChartTooltipContent,
 } from "keep-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-import { useGetDuePaidReportQuery } from "../../api/apiSlice";
 
-export const AreaChartComponent = () => {
-  const { data, isLoading } = useGetDuePaidReportQuery();
+export const AreaChartComponent = ({ dashboardData }) => {
+  // Use financial data from dashboard stats
+  const dueStats = dashboardData?.financial?.dueStats || [];
+  const paymentStats = dashboardData?.financial?.paymentStats || [];
 
-  if (isLoading) return <div>Loading...</div>;
-
-  const duepaidReport = data?.data;
+  // Transform data for the chart - showing due vs paid by status
+  const chartData = [
+    {
+      name: "Pending",
+      dueAmount: parseFloat(
+        dueStats.find((s) => s.status === "PENDING")?.amount || 0
+      ),
+      paidAmount: parseFloat(
+        paymentStats.find((s) => s.status === "PENDING")?.amount || 0
+      ),
+    },
+    {
+      name: "Approved",
+      dueAmount: parseFloat(
+        dueStats.find((s) => s.status === "APPROVED")?.amount || 0
+      ),
+      paidAmount: parseFloat(
+        paymentStats.find((s) => s.status === "APPROVED")?.amount || 0
+      ),
+    },
+    {
+      name: "Rejected",
+      dueAmount: parseFloat(
+        dueStats.find((s) => s.status === "REJECTED")?.amount || 0
+      ),
+      paidAmount: parseFloat(
+        paymentStats.find((s) => s.status === "REJECTED")?.amount || 0
+      ),
+    },
+  ];
 
   const chartConfig = {
-    due_student: {
-      label: "due_student",
-      color: "#1B4DFF",
+    dueAmount: {
+      label: "Due Amount",
+      color: "#EF4444",
     },
-    due_paid: {
-      label: "due_paid",
-      color: "#60a5fa",
+    paidAmount: {
+      label: "Paid Amount",
+      color: "#10B981",
     },
   };
 
   return (
     <div className="p-4 rounded bg-white dark:bg-dark-card ">
       <h3 className="text-lg font-semibold mb-2 text-dark-box  dark:text-dark-heading-color">
-        Payment's Due
+        Payment Overview
       </h3>
 
       <ChartContainer config={chartConfig} className="h-[300px] w-full">
         <AreaChart
           accessibilityLayer
-          data={duepaidReport}
+          data={chartData}
           margin={{
             left: 12,
             right: 12,
@@ -44,22 +72,22 @@ export const AreaChartComponent = () => {
         >
           <CartesianGrid vertical={false} />
           <XAxis
-            dataKey="department"
+            dataKey="name"
             tickLine={false}
             axisLine={false}
             tickMargin={8}
-            tickFormatter={(value) => value.slice(0, 3)}
           />
           <defs>
-            <linearGradient id="due_paid" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#1B4DFF" stopOpacity={0.4} />
-              <stop offset="95%" stopColor="#1B4DFF" stopOpacity={0} />
+            <linearGradient id="dueAmount" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#EF4444" stopOpacity={0.4} />
+              <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
             </linearGradient>
-            <linearGradient id="due_student" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#1B4DFF" stopOpacity={0.4} />
-              <stop offset="95%" stopColor="#1B4DFF" stopOpacity={0} />
+            <linearGradient id="paidAmount" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#10B981" stopOpacity={0.4} />
+              <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
             </linearGradient>
           </defs>
+          <ChartTooltip content={<ChartTooltipContent />} />
           <ChartLegend
             verticalAlign="top"
             align="right"
@@ -68,22 +96,18 @@ export const AreaChartComponent = () => {
           <Area
             stackId="a"
             type="natural"
-            dataKey="due_paid"
-            stroke="#1B4DFF"
+            dataKey="dueAmount"
+            stroke="#EF4444"
             fillOpacity={1}
-            fill="url(#due_paid)"
+            fill="url(#dueAmount)"
           />
           <Area
             stackId="a"
             type="natural"
-            dataKey="due_student"
-            stroke="#1B4DFF"
+            dataKey="paidAmount"
+            stroke="#10B981"
             fillOpacity={1}
-            fill="url(#due_student)"
-          />
-          <ChartTooltip
-            cursor={true}
-            content={<ChartTooltipContent indicator="dot" />}
+            fill="url(#paidAmount)"
           />
         </AreaChart>
       </ChartContainer>

@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { config } from "../utils/config";
 
 export const apiSlice = createApi({
   reducerPath: "api",
 
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://ctgpolyclearance.com/api",
-    // baseUrl: "http://localhost:3000/api/",
+    baseUrl: config.apiBaseUrl,
 
     prepareHeaders: (headers, { getState }) => {
       const token = localStorage.getItem("token");
@@ -79,7 +79,13 @@ export const apiSlice = createApi({
     }),
 
     getUserList: builder.query({
-      query: () => "/user/",
+      query: (params = {}) => {
+        const queryParams = new URLSearchParams();
+        if (params.page) queryParams.append("page", params.page);
+        if (params.limit) queryParams.append("limit", params.limit);
+        const queryString = queryParams.toString();
+        return `/user/${queryString ? `?${queryString}` : ""}`;
+      },
       providesTags: ["User"],
     }),
     getUserDetails: builder.query({
@@ -215,7 +221,13 @@ export const apiSlice = createApi({
     }),
 
     getDepartments: builder.query({
-      query: () => "/departments",
+      query: (params = {}) => {
+        const queryParams = new URLSearchParams();
+        if (params.page) queryParams.append("page", params.page);
+        if (params.limit) queryParams.append("limit", params.limit);
+        const queryString = queryParams.toString();
+        return `/departments${queryString ? `?${queryString}` : ""}`;
+      },
       providesTags: ["Departments"],
     }),
     getDepartmentDetails: builder.query({
@@ -249,7 +261,13 @@ export const apiSlice = createApi({
     }),
 
     getClearanceCategories: builder.query({
-      query: () => "/clearancecategory",
+      query: (params = {}) => {
+        const queryParams = new URLSearchParams();
+        if (params.page) queryParams.append("page", params.page);
+        if (params.limit) queryParams.append("limit", params.limit);
+        const queryString = queryParams.toString();
+        return `/clearancecategory${queryString ? `?${queryString}` : ""}`;
+      },
       providesTags: ["clearancecategory"],
     }),
     getClearanceCategoryDetails: builder.query({
@@ -283,7 +301,19 @@ export const apiSlice = createApi({
     }),
 
     getStudentList: builder.query({
-      query: () => "/student",
+      query: (params = {}) => {
+        const queryParams = new URLSearchParams();
+        if (params.page) queryParams.append("page", params.page);
+        if (params.limit) queryParams.append("limit", params.limit);
+        if (params.search) queryParams.append("search", params.search);
+        if (params.session) queryParams.append("session", params.session);
+        if (params.department)
+          queryParams.append("department", params.department);
+        if (params.shift) queryParams.append("shift", params.shift);
+        if (params.group) queryParams.append("group", params.group);
+        const queryString = queryParams.toString();
+        return `/student${queryString ? `?${queryString}` : ""}`;
+      },
       providesTags: ["student", "clearance"],
     }),
 
@@ -499,6 +529,12 @@ export const apiSlice = createApi({
       }),
       providesTags: ["clearance"],
     }),
+
+    // Dashboard Statistics
+    getDashboardStats: builder.query({
+      query: () => "/dashboard/stats",
+      providesTags: ["student", "User", "Departments", "clearancecategory"],
+    }),
   }),
 });
 
@@ -570,4 +606,7 @@ export const {
   useUpdateRefundConfirmationMutation,
   useDeleteRefundConfirmationMutation,
   useGenerateClearanceReportPDFQuery,
+
+  // Dashboard hook
+  useGetDashboardStatsQuery,
 } = apiSlice;

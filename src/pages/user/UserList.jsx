@@ -4,10 +4,15 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { CiEdit } from "react-icons/ci";
 import { RxCrossCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
-import { useBulkDeleteUsersMutation, useDeleteUserMutation, useGetUserListQuery } from "../../api/apiSlice";
+import {
+  useBulkDeleteUsersMutation,
+  useDeleteUserMutation,
+  useGetUserListQuery,
+} from "../../api/apiSlice";
 import { CardHeader } from "../../components/CardHeader";
 import CardWrapper from "../../components/CardWrapper";
 import ConfirmDialog from "../../components/ConfirmDialog";
+import Pagination from "../../components/Pagination";
 import getUserDetails from "../../utils/getUserDetails.js";
 import UserForm from "./UserForm";
 
@@ -15,8 +20,17 @@ const UserList = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedUserId, setSelectUserId] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 20;
 
-  const { data: userList, isLoading, isError } = useGetUserListQuery();
+  const {
+    data: userList,
+    isLoading,
+    isError,
+  } = useGetUserListQuery({
+    page: currentPage,
+    limit: usersPerPage,
+  });
   const [deleteUser] = useDeleteUserMutation();
   const [bulkDeleteUsers] = useBulkDeleteUsersMutation();
 
@@ -187,7 +201,9 @@ const UserList = () => {
               </div>
             </div>
           ) : (
-            <span className="text-gray-500 dark:text-gray-400 text-xs">No permission</span>
+            <span className="text-gray-500 dark:text-gray-400 text-xs">
+              No permission
+            </span>
           )}
         </div>
       </div>
@@ -196,9 +212,9 @@ const UserList = () => {
   return (
     <>
       <CardWrapper>
-        <CardHeader 
-          title="User List" 
-          handleOpen={isSuperAdmin ? handleOpen : undefined} 
+        <CardHeader
+          title="User List"
+          handleOpen={isSuperAdmin ? handleOpen : undefined}
         />
 
         {/* Bulk Delete Button */}
@@ -257,6 +273,16 @@ const UserList = () => {
           {/* body */}
           {content}
         </div>
+
+        {/* Pagination */}
+        {userList?.pagination && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={userList.pagination.totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
+
         {isPopupOpen && (
           <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
             <div className="bg-white dark:bg-dark-card rounded-lg p-6 w-full max-w-4xl">
@@ -283,4 +309,3 @@ const UserList = () => {
 };
 
 export default UserList;
-
