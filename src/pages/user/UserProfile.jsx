@@ -4,9 +4,10 @@ import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import * as Yup from "yup";
 import {
-  useChangeUserPasswordMutation,
-  useGetUserDetailsQuery,
-  useUploadSignatureMutation,
+    useChangeUserPasswordMutation,
+    useGetUserDetailsQuery,
+    usePrincipalSignAllSuccessfulMutation,
+    useUploadSignatureMutation,
 } from "../../api/apiSlice";
 import { config } from "../../utils/config";
 import Button from "../student/Button";
@@ -21,6 +22,8 @@ const UserProfile = () => {
   const [changePassword] = useChangeUserPasswordMutation();
   const [uploadSignature, { isLoading: isUploading }] =
     useUploadSignatureMutation();
+  const [principalSignAll, { isLoading: isSigning }] =
+    usePrincipalSignAllSuccessfulMutation();
 
   const handleSelect = (id) => {
     setSelected(id);
@@ -94,6 +97,22 @@ const UserProfile = () => {
       setSignaturePreview(null);
     } catch (error) {
       toast.error("Failed to upload signature. Please try again.");
+    }
+  };
+
+  const handlePrincipalSignAll = async () => {
+    if (!user?.data?.signature) {
+      toast.error("Please upload your signature first");
+      return;
+    }
+
+    if (window.confirm("This will add your signature to ALL successful students. Are you sure?")) {
+      try {
+        const result = await principalSignAll().unwrap();
+        toast.success(result.message || "Successfully signed all students!");
+      } catch (error) {
+        toast.error(error?.data?.message || "Failed to sign students. Please try again.");
+      }
     }
   };
 
@@ -206,6 +225,37 @@ const UserProfile = () => {
                 {isUploading ? "Uploading..." : "Upload Signature"}
               </button>
             </div>
+
+            {/* Principal Sign All Button */}
+            {user?.data?.role === "Principal" && user?.data?.signature && (
+              <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900 dark:bg-opacity-20 rounded-lg border-2 border-purple-200 dark:border-purple-700">
+                <h4 className="text-md font-semibold text-purple-900 dark:text-purple-200 mb-2">
+                  Principal Actions
+                </h4>
+                <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                  Sign all successful students in the institute with one click.
+                </p>
+                <button
+                  onClick={handlePrincipalSignAll}
+                  disabled={isSigning}
+                  className="px-6 py-3 text-white bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm dark:bg-purple-500 dark:hover:bg-purple-600 dark:focus:ring-purple-800 flex items-center gap-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  {isSigning ? "Signing All Students..." : "Sign All Successful Students"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -1,16 +1,16 @@
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 
 import {
-  useCreateUserMutation,
-  useGetDepartmentsQuery,
-  useGetUserDetailsQuery,
-  useUpdateUserMutation,
+    useCreateUserMutation,
+    useGetDepartmentsQuery,
+    useGetUserDetailsQuery,
+    useUpdateUserMutation,
 } from "../../api/apiSlice";
 
-const roles = ["Admin", "SuperAdmin", "User", "Manager"];
+const roles = ["Admin", "SuperAdmin", "Principal", "User", "Manager"];
 
 const UserForm = ({ selectedUserId, onClose }) => {
   const [updateUser] = useUpdateUserMutation();

@@ -5,10 +5,11 @@ import { CiEdit } from "react-icons/ci";
 import { RxCrossCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import {
-  useBulkApproveAllClearancesMutation,
-  useBulkDeleteStudentsMutation,
-  useDeleteStudentMutation,
-  useGetStudentListQuery,
+    useBulkApproveAllClearancesMutation,
+    useBulkDeleteStudentsMutation,
+    useDeleteStudentMutation,
+    useGetStudentListQuery,
+    usePrincipalBulkSignMutation,
 } from "../api/apiSlice";
 import { CardHeader } from "../components/CardHeader";
 import CardWrapper from "../components/CardWrapper";
@@ -23,11 +24,13 @@ const StudentList = () => {
 
   const currentUser = getUserDetails();
   const isSuperAdmin = currentUser?.role === "SuperAdmin";
+  const isPrincipal = currentUser?.role === "Principal";
 
   const { data: studentList, isLoading, isError } = useGetStudentListQuery();
   const [deleteStudent] = useDeleteStudentMutation();
   const [bulkDeleteStudents] = useBulkDeleteStudentsMutation();
   const [bulkApproveAllClearances] = useBulkApproveAllClearancesMutation();
+  const [principalBulkSign] = usePrincipalBulkSignMutation();
 
   const onClose = () => setIsPopupOpen(false);
 
@@ -160,6 +163,44 @@ const StudentList = () => {
     confirm();
   };
 
+  // Handle principal bulk sign
+  const handlePrincipalBulkSign = async () => {
+    if (selectedStudents.length === 0) {
+      toast.error("Please select students to sign");
+      return;
+    }
+
+    const confirm = () =>
+      toast(
+        (t) => (
+          <ConfirmDialog
+            onConfirm={async () => {
+              toast.dismiss(t.id);
+              try {
+                const res = await principalBulkSign(selectedStudents);
+                if (res.error != null) {
+                  toast.error(res.error.data.message);
+                } else {
+                  toast.success(
+                    res.data?.message ||
+                      `Principal signature added to ${selectedStudents.length} student(s)`
+                  );
+                  setSelectedStudents([]);
+                }
+              } catch (error) {
+                toast.error(error.message || "Failed to sign as principal");
+              }
+            }}
+            onCancel={() => toast.dismiss(t.id)}
+            title={`Sign as Principal for ${selectedStudents.length} Student(s)`}
+            message={`This will add your Principal signature to ${selectedStudents.length} selected student(s). Are you sure?`}
+          />
+        ),
+        { duration: Infinity }
+      );
+    confirm();
+  };
+
   let content;
 
   if (isLoading && isError) return "Loading...";
@@ -262,6 +303,27 @@ const StudentList = () => {
                   />
                 </svg>
                 Give Full Clearance ({selectedStudents.length})
+              </button>
+            )}
+
+            {isPrincipal && (
+              <button
+                onClick={handlePrincipalBulkSign}
+                className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Sign as Principal ({selectedStudents.length})
               </button>
             )}
           </div>

@@ -188,6 +188,23 @@ export const apiSlice = createApi({
       invalidatesTags: ["Clearance", "clearance", "student"], // Invalidate cache to refresh UI
     }),
 
+    principalBulkSign: builder.mutation({
+      query: (studentIds) => ({
+        url: `/clearance/principal-bulk-sign`,
+        method: "POST",
+        body: { studentIds },
+      }),
+      invalidatesTags: ["student", "Clearance", "clearance"],
+    }),
+
+    principalSignAllSuccessful: builder.mutation({
+      query: () => ({
+        url: `/clearance/principal-sign-all-successful`,
+        method: "POST",
+      }),
+      invalidatesTags: ["student", "Clearance", "clearance"],
+    }),
+
     // institute endpoint
     createInstitute: builder.mutation({
       query: (credentials) => ({
@@ -602,6 +619,8 @@ export const {
   useUnsignClearancesMutation,
   useBulkUnsignClearancesMutation,
   useBulkApproveAllClearancesMutation,
+  usePrincipalBulkSignMutation,
+  usePrincipalSignAllSuccessfulMutation,
 
   useCreateDuePaymentMutation,
   useGetDuePaymentListByStudentQuery,
