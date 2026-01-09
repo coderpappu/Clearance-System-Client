@@ -12,6 +12,7 @@ import {
   useBulkSignClearancesMutation,
   useBulkUnsignClearancesMutation,
   useDeleteStudentMutation,
+  useGetStudentFilterOptionsQuery,
   useGetStudentListQuery,
   useGetUserQuery,
 } from "../../api/apiSlice";
@@ -87,6 +88,10 @@ const StudentCard = () => {
     shift: shiftFilter,
     group: groupFilter,
   });
+
+  // Fetch filter options from backend
+  const { data: filterOptions } = useGetStudentFilterOptionsQuery();
+
   const { data: userData } = useGetUserQuery();
   const [deleteStudent] = useDeleteStudentMutation();
   const [bulkDeleteStudents] = useBulkDeleteStudentsMutation();
@@ -333,18 +338,11 @@ const StudentCard = () => {
     currentPageStudentIds.length > 0 &&
     currentPageStudentIds.every((id) => selectedStudents.includes(id));
 
-  const uniqueSessions = [
-    ...new Set(studentList?.data?.map((student) => student.session)),
-  ];
-  const uniqueDepartments = [
-    ...new Set(studentList?.data?.map((student) => student.department?.name)),
-  ];
-  const uniqueShifts = [
-    ...new Set(studentList?.data?.map((student) => student.shift)),
-  ];
-  const uniqueGroups = [
-    ...new Set(studentList?.data?.map((student) => student.group)),
-  ];
+  // Use filter options from backend API
+  const uniqueSessions = filterOptions?.data?.sessions || [];
+  const uniqueDepartments = filterOptions?.data?.departments || [];
+  const uniqueShifts = filterOptions?.data?.shifts || [];
+  const uniqueGroups = filterOptions?.data?.groups || [];
 
   let content;
 

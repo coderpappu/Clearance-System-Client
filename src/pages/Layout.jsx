@@ -167,16 +167,6 @@ const Layout = () => {
                   <SlSettings className="mr-2" /> Refund Settings
                 </Link>
               </li>
-              <li className="my-1">
-                <Link
-                  to="/settings"
-                  className={`flex items-center px-4 py-2 text-base transition-all hover:bg-gray-700 rounded-md ${
-                    isActive("/settings") ? "bg-gray-700" : ""
-                  }`}
-                >
-                  <SlSettings className="mr-2" /> Settings
-                </Link>
-              </li>
             </ul>
           </nav>
 

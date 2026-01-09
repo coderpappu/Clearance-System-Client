@@ -18,6 +18,12 @@ export const apiSlice = createApi({
     },
   }),
 
+  // Global cache configuration
+  keepUnusedDataFor: 300, // Keep cached data for 5 minutes (300 seconds)
+  refetchOnMountOrArgChange: 300, // Only refetch if data is older than 5 minutes
+  refetchOnReconnect: true, // Refetch when reconnecting
+  refetchOnFocus: false, // Don't refetch on window focus (reduces unnecessary calls)
+
   tagTypes: [
     "User",
     "student",
@@ -179,7 +185,7 @@ export const apiSlice = createApi({
         method: "POST",
         body: { studentIds },
       }),
-      invalidatesTags: ["Clearance", "clearance", "student"],
+      invalidatesTags: ["Clearance", "clearance", "student"], // Invalidate cache to refresh UI
     }),
 
     // institute endpoint
@@ -195,10 +201,12 @@ export const apiSlice = createApi({
     getInstitute: builder.query({
       query: () => "/institutes",
       providesTags: ["Institute"],
+      keepUnusedDataFor: 600, // 10 minutes - institutes rarely change
     }),
     getInstituteDetails: builder.query({
       query: () => "/institute",
       providesTags: ["Institute"],
+      keepUnusedDataFor: 600, // 10 minutes
     }),
 
     updateInstitute: builder.mutation({
@@ -229,6 +237,7 @@ export const apiSlice = createApi({
         return `/departments${queryString ? `?${queryString}` : ""}`;
       },
       providesTags: ["Departments"],
+      keepUnusedDataFor: 600, // 10 minutes - departments rarely change
     }),
     getDepartmentDetails: builder.query({
       query: (id) => `/departments/${id}`,
@@ -269,6 +278,7 @@ export const apiSlice = createApi({
         return `/clearancecategory${queryString ? `?${queryString}` : ""}`;
       },
       providesTags: ["clearancecategory"],
+      keepUnusedDataFor: 600, // 10 minutes - categories rarely change
     }),
     getClearanceCategoryDetails: builder.query({
       query: (id) => `/clearancecategory/${id}`,
@@ -320,6 +330,12 @@ export const apiSlice = createApi({
     getDeptStudentsReport: builder.query({
       query: () => "/student/deptstudentreport",
       providesTags: ["student", "clearance"],
+    }),
+
+    getStudentFilterOptions: builder.query({
+      query: () => "/student/filter-options",
+      providesTags: ["student"],
+      keepUnusedDataFor: 600, // 10 minutes - filter options change infrequently
     }),
 
     getStudentDetails: builder.query({
@@ -534,6 +550,7 @@ export const apiSlice = createApi({
     getDashboardStats: builder.query({
       query: () => "/dashboard/stats",
       providesTags: ["student", "User", "Departments", "clearancecategory"],
+      keepUnusedDataFor: 60, // 1 minute - dashboard needs fresher data
     }),
   }),
 });
@@ -561,6 +578,7 @@ export const {
 
   useCreateStudentAccMutation,
   useGetStudentListQuery,
+  useGetStudentFilterOptionsQuery,
   useGetDeptStudentsReportQuery,
   useGetStudentDetailsQuery,
   useUpdateStudentMutation,
