@@ -6,15 +6,16 @@ import { FiEdit } from "react-icons/fi";
 import { RxCrossCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import {
-  useAddStudentsExcelMutation,
-  useBulkApproveAllClearancesMutation,
-  useBulkDeleteStudentsMutation,
-  useBulkSignClearancesMutation,
-  useBulkUnsignClearancesMutation,
-  useDeleteStudentMutation,
-  useGetStudentFilterOptionsQuery,
-  useGetStudentListQuery,
-  useGetUserQuery,
+    useAddStudentsExcelMutation,
+    useBulkApproveAllClearancesMutation,
+    useBulkApproveDepartmentClearancesMutation,
+    useBulkDeleteStudentsMutation,
+    useBulkSignClearancesMutation,
+    useBulkUnsignClearancesMutation,
+    useDeleteStudentMutation,
+    useGetStudentFilterOptionsQuery,
+    useGetStudentListQuery,
+    useGetUserQuery,
 } from "../../api/apiSlice";
 import { CardHeader } from "../../components/CardHeader";
 import CardWrapper from "../../components/CardWrapper";
@@ -101,6 +102,8 @@ const StudentCard = () => {
   const [bulkUnsignClearances, { isLoading: isUnsigning }] =
     useBulkUnsignClearancesMutation();
   const [bulkApproveAllClearances] = useBulkApproveAllClearancesMutation();
+  const [bulkApproveDepartmentClearances] =
+    useBulkApproveDepartmentClearancesMutation();
 
   const isSuperAdmin = userData?.data?.role === "SuperAdmin";
 
@@ -113,11 +116,19 @@ const StudentCard = () => {
 
   // Handle individual checkbox selection
   const handleCheckboxChange = (studentId) => {
-    setSelectedStudents((prev) =>
-      prev.includes(studentId)
-        ? prev.filter((id) => id !== studentId)
-        : [...prev, studentId]
-    );
+    setSelectedStudents((prev) => {
+      // If trying to add a student
+      if (!prev.includes(studentId)) {
+        // Check if already at 20 limit
+        if (prev.length >= 20) {
+          toast.error("Cannot select more than 20 students at a time");
+          return prev;
+        }
+        return [...prev, studentId];
+      }
+      // Removing a student
+      return prev.filter((id) => id !== studentId);
+    });
   };
 
   // Handle select all checkbox
@@ -133,9 +144,28 @@ const StudentCard = () => {
         prev.filter((id) => !currentPageStudentIds.includes(id))
       );
     } else {
-      setSelectedStudents((prev) => [
-        ...new Set([...prev, ...currentPageStudentIds]),
-      ]);
+      // Calculate how many more can be selected
+      const remainingSlots = 20 - selectedStudents.length;
+      
+      if (remainingSlots <= 0) {
+        toast.error("Cannot select more students. Maximum 20 students allowed.");
+        return;
+      }
+      
+      if (currentPageStudentIds.length > remainingSlots) {
+        toast.error(
+          `Can only select ${remainingSlots} more student(s). Maximum 20 students total.`
+        );
+        // Select only what fits within the limit
+        const studentsToAdd = currentPageStudentIds.slice(0, remainingSlots);
+        setSelectedStudents((prev) => [
+          ...new Set([...prev, ...studentsToAdd]),
+        ]);
+      } else {
+        setSelectedStudents((prev) => [
+          ...new Set([...prev, ...currentPageStudentIds]),
+        ]);
+      }
     }
   };
 
@@ -261,6 +291,13 @@ const StudentCard = () => {
       return;
     }
 
+    if (selectedStudents.length > 20) {
+      toast.error(
+        "Cannot approve more than 20 students at once. Please select fewer students."
+      );
+      return;
+    }
+
     const confirmed = window.confirm(
       `Are you sure you want to approve ALL clearance categories for ${selectedStudents.length} selected student(s)? This action will mark all clearances as approved.`
     );
@@ -275,6 +312,78 @@ const StudentCard = () => {
       } catch (error) {
         toast.error(error?.data?.message || "Failed to approve clearances");
       }
+    }
+  };
+
+  // Handle department-wide clearance approval (SuperAdmin only - all department students)
+  const handleDepartmentWideApproval = async () => {
+    const confirmed = window.confirm(
+      `⚠️ WARNING: This will approve ALL clearance categories for ALL students in your department. This action cannot be undone easily. Are you sure you want to proceed?`
+    );
+
+    if (confirmed) {
+      try {
+        const result = await bulkApproveDepartmentClearances().unwrap();
+        toast.success(result.message || "Department-wide clearances approved successfully");
+      } catch (error) {
+        toast.error(
+          error?.data?.message || "Failed to approve department-wide clearances"
+        );
+      }
+    }
+  };
+
+  // Handle bulk download department reports (SuperAdmin only)
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleBulkDownloadReports = async () => {
+    try {
+      setIsDownloading(true);
+      
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/clearance/department/bulk-reports/pdf`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to download reports");
+      }
+
+      // Get blob from response
+      const blob = await response.blob();
+
+      // Extract filename from Content-Disposition header
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let filename = "Department_Clearance_Reports.pdf";
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success("Reports downloaded successfully!");
+    } catch (error) {
+      toast.error(error.message || "Failed to download reports");
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -430,7 +539,7 @@ const StudentCard = () => {
       <CardWrapper>
         <CardHeader title="Student List" handleOpen={handleOpen} />
 
-        {/* Bulk Action Buttons */}
+        {/* Bulk Action Buttons - When students ARE selected (1-20) */}
         {selectedStudents.length > 0 && (
           <div className="px-6 py-3 flex gap-3">
             <button
@@ -489,6 +598,82 @@ const StudentCard = () => {
             >
               <AiOutlineDelete size={20} />
               Delete Selected ({selectedStudents.length})
+            </button>
+          </div>
+        )}
+
+        {/* Department-Wide Approval - When NO students selected (SuperAdmin only) */}
+        {isSuperAdmin && selectedStudents.length === 0 && (
+          <div className="px-6 py-3 flex gap-3">
+            <button
+              onClick={handleDepartmentWideApproval}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-md"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Give Full Department Clearance
+            </button>
+
+            <button
+              onClick={handleBulkDownloadReports}
+              disabled={isDownloading}
+              className={`${
+                isDownloading
+                  ? "bg-indigo-400 cursor-not-allowed"
+                  : "bg-indigo-600 hover:bg-indigo-700"
+              } text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-md`}
+            >
+              {isDownloading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Download All Reports (PDF)
+                </>
+              )}
             </button>
           </div>
         )}

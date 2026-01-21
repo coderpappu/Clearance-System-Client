@@ -6,6 +6,7 @@ import { RxCrossCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import {
     useBulkApproveAllClearancesMutation,
+    useBulkApproveDepartmentClearancesMutation,
     useBulkDeleteStudentsMutation,
     useDeleteStudentMutation,
     useGetStudentListQuery,
@@ -14,6 +15,7 @@ import {
 import { CardHeader } from "../components/CardHeader";
 import CardWrapper from "../components/CardWrapper";
 import ConfirmDialog from "../components/ConfirmDialog";
+import { config } from "../utils/config";
 import getUserDetails from "../utils/getUserDetails";
 import StudentForm from "./student/StudentForm";
 
@@ -30,6 +32,8 @@ const StudentList = () => {
   const [deleteStudent] = useDeleteStudentMutation();
   const [bulkDeleteStudents] = useBulkDeleteStudentsMutation();
   const [bulkApproveAllClearances] = useBulkApproveAllClearancesMutation();
+  const [bulkApproveDepartmentClearances] =
+    useBulkApproveDepartmentClearancesMutation();
   const [principalBulkSign] = usePrincipalBulkSignMutation();
 
   const onClose = () => setIsPopupOpen(false);
@@ -41,11 +45,19 @@ const StudentList = () => {
 
   // Handle individual checkbox selection
   const handleCheckboxChange = (studentId) => {
-    setSelectedStudents((prev) =>
-      prev.includes(studentId)
-        ? prev.filter((id) => id !== studentId)
-        : [...prev, studentId]
-    );
+    setSelectedStudents((prev) => {
+      // If trying to add a student
+      if (!prev.includes(studentId)) {
+        // Check if already at 20 limit
+        if (prev.length >= 20) {
+          toast.error("Cannot select more than 20 students at a time");
+          return prev;
+        }
+        return [...prev, studentId];
+      }
+      // Removing a student
+      return prev.filter((id) => id !== studentId);
+    });
   };
 
   // Handle select all checkbox
@@ -53,9 +65,18 @@ const StudentList = () => {
     if (selectedStudents.length === studentList?.data?.length) {
       setSelectedStudents([]);
     } else {
-      setSelectedStudents(
-        studentList?.data?.map((student) => student.id) || []
-      );
+      const allStudentIds = studentList?.data?.map((student) => student.id) || [];
+      
+      // Check if total students exceed 20 limit
+      if (allStudentIds.length > 20) {
+        toast.error(
+          `Cannot select all ${allStudentIds.length} students. Maximum 20 students can be selected at a time. Please select manually or use department-wide approval.`
+        );
+        // Select only first 20
+        setSelectedStudents(allStudentIds.slice(0, 20));
+      } else {
+        setSelectedStudents(allStudentIds);
+      }
     }
   };
 
@@ -132,6 +153,13 @@ const StudentList = () => {
       return;
     }
 
+    if (selectedStudents.length > 20) {
+      toast.error(
+        "Cannot approve more than 20 students at once. Please select fewer students."
+      );
+      return;
+    }
+
     const confirm = () =>
       toast(
         (t) => (
@@ -156,6 +184,41 @@ const StudentList = () => {
             onCancel={() => toast.dismiss(t.id)}
             title={`Approve Clearances for ${selectedStudents.length} Student(s)`}
             message={`This will approve ALL clearance categories for ${selectedStudents.length} selected student(s). Are you sure you want to proceed?`}
+          />
+        ),
+        { duration: Infinity }
+      );
+    confirm();
+  };
+
+  // Handle department-wide clearance approval (SuperAdmin only - all department students)
+  const handleDepartmentWideApproval = async () => {
+    const confirm = () =>
+      toast(
+        (t) => (
+          <ConfirmDialog
+            onConfirm={async () => {
+              toast.dismiss(t.id);
+              try {
+                const res = await bulkApproveDepartmentClearances();
+                if (res.error != null) {
+                  toast.error(res.error.data.message);
+                } else {
+                  toast.success(
+                    res.data?.message ||
+                      "Department-wide clearances approved successfully"
+                  );
+                }
+              } catch (error) {
+                toast.error(
+                  error.message ||
+                    "Failed to approve department-wide clearances"
+                );
+              }
+            }}
+            onCancel={() => toast.dismiss(t.id)}
+            title="Approve All Department Clearances"
+            message={`⚠️ This will approve ALL clearance categories for ALL students in your department. This action cannot be undone easily. Are you sure you want to proceed?`}
           />
         ),
         { duration: Infinity }
@@ -199,6 +262,60 @@ const StudentList = () => {
         { duration: Infinity }
       );
     confirm();
+  };
+
+  // Handle bulk download department reports (SuperAdmin only)
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleBulkDownloadReports = async () => {
+    try {
+      setIsDownloading(true);
+      
+      const response = await fetch(
+        `${config.apiBaseUrl}/clearance/department/bulk-reports/pdf`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to download reports");
+      }
+
+      // Get blob from response
+      const blob = await response.blob();
+
+      // Extract filename from Content-Disposition header
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let filename = "Department_Clearance_Reports.pdf";
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success("Reports downloaded successfully!");
+    } catch (error) {
+      toast.error(error.message || "Failed to download reports");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   let content;
@@ -272,9 +389,9 @@ const StudentList = () => {
   return (
     <>
       <CardWrapper>
-        <CardHeader title="Student List" handleOpen={handleOpen} />
+        <CardHeader title="Student Lis" handleOpen={handleOpen} />
 
-        {/* Bulk Action Buttons */}
+        {/* Bulk Action Buttons - When students ARE selected (1-20) */}
         {selectedStudents.length > 0 && (
           <div className="px-6 py-3 flex gap-3">
             <button
@@ -326,6 +443,87 @@ const StudentList = () => {
                 Sign as Principal ({selectedStudents.length})
               </button>
             )}
+          </div>
+        )}
+
+        {/* Department-Wide Approval - When NO students selected (SuperAdmin only) */}
+        {isSuperAdmin && selectedStudents.length === 0 && (
+          <div className="px-6 py-3 flex gap-3">
+            <button
+              onClick={handleDepartmentWideApproval}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-md"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+                <path
+                  fillRule="evenodd"
+                  d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Give Full Department Clearance
+            </button>
+
+            <button
+              onClick={handleBulkDownloadReports}
+              disabled={isDownloading}
+              className={`${
+                isDownloading
+                  ? "bg-indigo-400 cursor-not-allowed"
+                  : "bg-indigo-500 hover:bg-indigo-600"
+              } text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-md`}
+            >
+              {isDownloading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Download All Reports (PDF)
+                </>
+              )}
+            </button>
           </div>
         )}
 

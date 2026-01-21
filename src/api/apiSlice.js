@@ -205,6 +205,14 @@ export const apiSlice = createApi({
       invalidatesTags: ["student", "Clearance", "clearance"],
     }),
 
+    bulkApproveDepartmentClearances: builder.mutation({
+      query: () => ({
+        url: `/clearance/bulk-approve-department`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Clearance", "clearance", "student"],
+    }),
+
     // institute endpoint
     createInstitute: builder.mutation({
       query: (credentials) => ({
@@ -548,6 +556,14 @@ export const apiSlice = createApi({
       invalidatesTags: ["RefundConfirmations"],
     }),
 
+    bulkApproveDepartmentRefunds: builder.mutation({
+      query: () => ({
+        url: "/refund-confirmations/bulk-approve-department",
+        method: "POST",
+      }),
+      invalidatesTags: ["RefundConfirmations"],
+    }),
+
     // Generate Clearance Report PDF
     generateClearanceReportPDF: builder.query({
       query: (studentId) => ({
@@ -555,6 +571,21 @@ export const apiSlice = createApi({
         responseHandler: async (response) => {
           if (!response.ok) {
             throw new Error("Failed to generate PDF");
+          }
+          return response.blob();
+        },
+        cache: "no-cache",
+      }),
+      providesTags: ["clearance"],
+    }),
+
+    // Bulk Download Department Clearance Reports (SuperAdmin)
+    bulkDownloadDepartmentReports: builder.query({
+      query: () => ({
+        url: `/clearance/department/bulk-reports/pdf`,
+        responseHandler: async (response) => {
+          if (!response.ok) {
+            throw new Error("Failed to generate bulk PDF");
           }
           return response.blob();
         },
@@ -621,6 +652,7 @@ export const {
   useBulkApproveAllClearancesMutation,
   usePrincipalBulkSignMutation,
   usePrincipalSignAllSuccessfulMutation,
+  useBulkApproveDepartmentClearancesMutation,
 
   useCreateDuePaymentMutation,
   useGetDuePaymentListByStudentQuery,
@@ -642,7 +674,9 @@ export const {
   useGetRefundConfirmationsQuery,
   useUpdateRefundConfirmationMutation,
   useDeleteRefundConfirmationMutation,
+  useBulkApproveDepartmentRefundsMutation,
   useGenerateClearanceReportPDFQuery,
+  useBulkDownloadDepartmentReportsQuery,
 
   // Dashboard hook
   useGetDashboardStatsQuery,

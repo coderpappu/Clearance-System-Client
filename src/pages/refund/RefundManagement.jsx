@@ -2,9 +2,11 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { AiOutlineCheck, AiOutlineClose, AiOutlineDelete } from "react-icons/ai";
 import {
-    useDeleteRefundConfirmationMutation,
-    useGetRefundConfirmationsQuery,
-    useUpdateRefundConfirmationMutation,
+  useBulkApproveDepartmentRefundsMutation,
+  useDeleteRefundConfirmationMutation,
+  useGetRefundConfirmationsQuery,
+  useGetUserQuery,
+  useUpdateRefundConfirmationMutation,
 } from "../../api/apiSlice";
 import { CardHeader } from "../../components/CardHeader";
 import CardWrapper from "../../components/CardWrapper";
@@ -12,8 +14,13 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 
 const RefundManagement = () => {
   const { data: confirmations, isLoading, refetch } = useGetRefundConfirmationsQuery();
+  const { data: userData } = useGetUserQuery();
   const [updateConfirmation] = useUpdateRefundConfirmationMutation();
   const [deleteConfirmation] = useDeleteRefundConfirmationMutation();
+  const [bulkApproveRefunds, { isLoading: isApprovingBulk }] =
+    useBulkApproveDepartmentRefundsMutation();
+
+  const isSuperAdmin = userData?.data?.role === "SuperAdmin";
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,6 +82,42 @@ const RefundManagement = () => {
     confirm();
   };
 
+  const handleBulkApproveRefunds = () => {
+    const pendingCount = filteredConfirmations.filter(
+      (c) => c.status === "PENDING"
+    ).length;
+
+    if (pendingCount === 0) {
+      toast.error("No pending refund confirmations to approve");
+      return;
+    }
+
+    const confirm = () =>
+      toast(
+        (t) => (
+          <ConfirmDialog
+            onConfirm={async () => {
+              toast.dismiss(t.id);
+              try {
+                const result = await bulkApproveRefunds().unwrap();
+                toast.success(result.message);
+                refetch();
+              } catch (error) {
+                toast.error(error?.data?.message || "Failed to approve refunds");
+              }
+            }}
+            onCancel={() => toast.dismiss(t.id)}
+            title="Approve All Department Refunds?"
+            message={`Are you sure you want to approve ALL ${pendingCount} pending refund confirmations in your department?`}
+            confirmText="Approve All"
+            confirmColor="bg-green-500 hover:bg-green-600"
+          />
+        ),
+        { duration: Infinity }
+      );
+    confirm();
+  };
+
   const getStatusBadge = (status) => {
     const badges = {
       PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
@@ -116,11 +159,11 @@ const RefundManagement = () => {
 
   return (
     <CardWrapper>
-      <CardHeader title="Refund Confirmations" />
+      <CardHeader title="Refund Confirmation" />
 
       <div className="px-6 py-3">
-        {/* Search */}
-        <div className="mb-4">
+        {/* Search and Bulk Actions */}
+        <div className="mb-4 flex flex-col md:flex-row gap-3 justify-between items-start md:items-center">
           <input
             type="text"
             placeholder="Search by name, roll, or registration..."
@@ -128,6 +171,30 @@ const RefundManagement = () => {
             onChange={handleSearch}
             className="w-full md:w-1/3 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-dark-bg dark:text-white"
           />
+          
+          {/* Bulk Approve Button (SuperAdmin Only) */}
+          {isSuperAdmin && (
+            <button
+              onClick={handleBulkApproveRefunds}
+              disabled={isApprovingBulk}
+              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+            >
+              {isApprovingBulk ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Approving...
+                </>
+              ) : (
+                <>
+                  <AiOutlineCheck size={16} />
+                  Approve All Refunds
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         {filteredConfirmations.length === 0 ? (
